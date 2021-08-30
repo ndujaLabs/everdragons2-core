@@ -49,7 +49,6 @@ contracts/build/
 contracts/README.md
 
 # temporary artifact from solidity-coverage
-allFiredEvents
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts

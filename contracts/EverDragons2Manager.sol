@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface IEverDragons2 {
   function mintAndTransfer(address recipient, uint256[] memory tokenIds) external;
+  function mintAndTransfer(address[] memory recipients, uint256[] memory tokenIds) external;
 }
 
 contract EverDragons2Manager is Ownable {
@@ -37,7 +38,7 @@ contract EverDragons2Manager is Ownable {
     uint16 blocksBetweenDecrements; // 270 << and batches
     uint16 initialBatchReservedIncluded; // 2000
     uint16 batchSize; // 1000
-    uint16 maxTokenId; // (10000 - foundersAvatars) - extra reserve (for investors, etc.)
+    uint16 maxTokenId; // 8000
     uint8 ethId; // 1
     uint8 tronId; // 2
     uint8 poaId; // 3
@@ -47,7 +48,7 @@ contract EverDragons2Manager is Ownable {
   Conf public conf;
   IEverDragons2 public everDragons2;
 
-  uint256 public nextTokenId;
+  uint256 public nextTokenId = 1;
   uint256 public ethBalance;
   uint256 public startingBlock;
   address public validator;
@@ -87,16 +88,12 @@ contract EverDragons2Manager is Ownable {
   ) external onlyOwner {
     require(initiated == false, "Sale already set");
     validator = validator_;
-    // we could force them to avoid errors:
+    // right now:
     //    conf_.eVOnPOA = 342;
     //    conf_.eVOnTron = 392;
     //    conf_.eVOnEth = 972;
-    //    conf_.ethId = 1;
-    //    conf_.tronId = 2;
-    //    conf_.poaId = 3;
     conf = conf_;
     startingBlock = startingBlock_;
-    nextTokenId = uint256(conf.eVOnPOA + conf.eVOnTron + conf.eVOnEth + 1);
     for (uint256 i = 0; i < bridges.length; i++) {
       bridge[bridges[i]] = true;
     }
@@ -116,7 +113,11 @@ contract EverDragons2Manager is Ownable {
     for (uint8 i = 0; i < currentStep_; i++) {
       price = price.div(10).mul(9);
     }
-    return price.mul(10**18).div(100);
+    return price.mul(10 ** 18).div(100);
+  }
+  
+  function saleEnded() public returns (bool) {
+    return saleClosed || nextTokenId > conf.maxTokenId;
   }
 
   function claimToken(
@@ -124,18 +125,19 @@ contract EverDragons2Manager is Ownable {
     uint8 chainId,
     bytes memory signature
   ) external {
-    require(!saleClosed && nextTokenId <= conf.maxTokenId, "Sale is ended or closed");
+    require(!saleEnded(), "Sale is ended or closed");
     require(!bridge[_msgSender()], "Bridges can not claim tokens");
     require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, chainId), signature), "Invalid signature");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       if (chainId == conf.ethId) {
         require(tokenIds[i] <= conf.eVOnEth, "Id out of range");
+        tokenIds[i] += conf.maxTokenId;
       } else if (chainId == conf.tronId) {
         require(tokenIds[i] <= conf.eVOnTron, "Id out of range");
-        tokenIds[i] += conf.eVOnEth;
+        tokenIds[i] += conf.maxTokenId + conf.eVOnEth;
       } else if (chainId == conf.poaId) {
         require(tokenIds[i] <= conf.eVOnPOA, "Id out of range");
-        tokenIds[i] += conf.eVOnEth + conf.eVOnTron;
+        tokenIds[i] += conf.maxTokenId + conf.eVOnEth + conf.eVOnTron;
       } else {
         revert("Chain not supported");
       }
@@ -143,19 +145,21 @@ contract EverDragons2Manager is Ownable {
     everDragons2.mintAndTransfer(_msgSender(), tokenIds);
   }
 
-  function giveAwayToken(uint256[] memory tokenIds) external onlyOwner {
+  function giveAwayTokens(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
+    require(recipients.length == tokenIds.length, "Inconsistent lengths");
+    uint16 allReserved = conf.eVOnEth + conf.eVOnTron + conf.eVOnPOA;
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(
-        tokenIds[i] > conf.maxTokenId ||
-          ((nextTokenId > conf.maxTokenId || saleClosed) && tokenIds[i] <= conf.eVOnEth + conf.eVOnTron + conf.eVOnPOA), // all tokens have been sold
+        (saleEnded() && tokenIds[i] > conf.maxTokenId) ||
+        (!saleEnded() && tokenIds[i] > conf.maxTokenId + allReserved),
         "Id out of range"
       );
     }
-    everDragons2.mintAndTransfer(_msgSender(), tokenIds);
+    everDragons2.mintAndTransfer(recipients, tokenIds);
   }
 
-  function buyToken(uint256[] memory tokenIds) external payable {
-    require(!saleClosed && nextTokenId <= conf.maxTokenId, "Sale is ended or closed");
+  function buyTokens(uint256[] memory tokenIds) external payable {
+    require(!saleEnded(), "Sale is ended or closed");
     require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
     uint256 price = currentPrice(currentStep());
     require(msg.value == price.mul(tokenIds.length), "Insufficient payment");
@@ -183,7 +187,7 @@ contract EverDragons2Manager is Ownable {
 
   function _withdrawEarnings(uint256 amount) internal {
     withdrawnAmounts[_msgSender()] += amount;
-    (bool success, ) = _msgSender().call{value: amount}("");
+    (bool success,) = _msgSender().call{value : amount}("");
     require(success);
   }
 
@@ -204,13 +208,13 @@ contract EverDragons2Manager is Ownable {
     uint8 chainId
   ) public pure returns (bytes32) {
     return
-      keccak256(
-        abi.encodePacked(
-          "\x19\x00", // EIP-191
-          addr,
-          tokenIds,
-          chainId
-        )
-      );
+    keccak256(
+      abi.encodePacked(
+        "\x19\x00", // EIP-191
+        addr,
+        tokenIds,
+        chainId
+      )
+    );
   }
 }
