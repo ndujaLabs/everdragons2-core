@@ -22,13 +22,16 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  // We get the contract to deploy
-  const BrokenJazz = await hre.ethers.getContractFactory("BrokenJazz");
-  const brokenJazz = await BrokenJazz.deploy("0x4B97426740f536a4a51677A50A5f6d836ec466D6");
+  EverDragons2 = await ethers.getContractFactory("EverDragons2")
+  everDragons2 = await EverDragons2.deploy()
+  await everDragons2.deployed()
+  EverDragons2Manager = await ethers.getContractFactory("EverDragons2Manager")
+  everDragons2Manager = await EverDragons2Manager.deploy(everDragons2.address)
+  await everDragons2Manager.deployed()
+  everDragons2.setManager(everDragons2Manager.address)
 
-  await brokenJazz.deployed();
-
-  console.log("BrokenJazz deployed to:", brokenJazz.address);
+  console.log("EverDragons2 deployed to:", everDragons2.address);
+  console.log("EverDragons2Manager deployed to:", everDragons2Manager.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
