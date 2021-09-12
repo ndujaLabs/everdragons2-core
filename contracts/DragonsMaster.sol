@@ -10,8 +10,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // EverDragons2 website: https://everdragons2.com
 
 interface IEverDragons2 {
-  function mintAndTransfer(address recipient, uint256[] memory tokenIds) external;
-  function mintAndTransfer(address[] memory recipients, uint256[] memory tokenIds) external;
+  function mint(address recipient, uint256[] memory tokenIds) external;
+  function mint(address[] memory recipients, uint256[] memory tokenIds) external;
 }
 
 contract EverDragons2Manager is Ownable {
@@ -36,7 +36,6 @@ contract EverDragons2Manager is Ownable {
     uint16 maxPrice; // 100 = 1 ETH
     uint16 decrementPercentage; // 10%
     uint16 blocksBetweenDecrements; // 270 << and batches
-    uint16 initialBatchReservedIncluded; // 2000
     uint16 batchSize; // 1000
     uint16 maxTokenId; // 8000
     uint8 ethId; // 1
@@ -142,7 +141,7 @@ contract EverDragons2Manager is Ownable {
         revert("Chain not supported");
       }
     }
-    everDragons2.mintAndTransfer(_msgSender(), tokenIds);
+    everDragons2.mint(_msgSender(), tokenIds);
   }
 
   function giveAwayTokens(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
@@ -155,19 +154,31 @@ contract EverDragons2Manager is Ownable {
         "Id out of range"
       );
     }
-    everDragons2.mintAndTransfer(recipients, tokenIds);
+    everDragons2.mint(recipients, tokenIds);
   }
 
-  function buyTokens(uint256[] memory tokenIds) external payable {
+  function sale(uint256[] memory tokenIds) external payable {
     require(!saleEnded(), "Sale is ended or closed");
     require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
     uint256 price = currentPrice(currentStep());
-    require(msg.value == price.mul(tokenIds.length), "Insufficient payment");
+    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       tokenIds[i] = nextTokenId++;
     }
     ethBalance += msg.value;
-    everDragons2.mintAndTransfer(_msgSender(), tokenIds);
+    everDragons2.mint(_msgSender(), tokenIds);
+  }
+
+  function presale(uint256[] memory tokenIds) external payable {
+    require(!saleEnded(), "Sale is ended or closed");
+    require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
+    uint256 price = currentPrice(currentStep());
+    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+    for (uint256 i = 0; i < tokenIds.length; i++) {
+      tokenIds[i] = nextTokenId++;
+    }
+    ethBalance += msg.value;
+    everDragons2.mint(_msgSender(), tokenIds);
   }
 
   function isSignedByValidator(bytes32 _hash, bytes memory _signature) public view returns (bool) {

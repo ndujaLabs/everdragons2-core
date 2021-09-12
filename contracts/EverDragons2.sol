@@ -24,21 +24,20 @@ contract EverDragons2 is ERC721, Ownable {
     manager = manager_;
   }
 
-  function mintAndTransfer(address recipient, uint256[] memory tokenIds) external onlyManager {
+  function mint(address recipient, uint256[] memory tokenIds) external onlyManager {
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      _mintAndTransfer(recipient, tokenIds[i]);
+      _mint(recipient, tokenIds[i]);
     }
   }
 
-  function mintAndTransfer(address[] memory recipients, uint256[] memory tokenIds) external onlyManager {
+  function mint(address[] memory recipients, uint256[] memory tokenIds) external onlyManager {
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      _mintAndTransfer(recipients[i], tokenIds[i]);
+      _mint(recipients[i], tokenIds[i]);
     }
   }
 
-  function _mintAndTransfer(address recipient, uint256 tokenId) internal {
-      _mint(owner(), tokenId);
-      _transfer(owner(), recipient, tokenId);
+  function _mint(address recipient, uint256 tokenId) internal {
+      _mint(recipient, tokenId);
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
