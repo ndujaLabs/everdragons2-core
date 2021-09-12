@@ -1,18 +1,11 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Author: Francesco Sullo <francesco@sullo.co>
-// EverDragons2 website: https://everdragons2.com
-
-interface IEverDragons2 {
-  function mint(address recipient, uint256[] memory tokenIds) external;
-  function mint(address[] memory recipients, uint256[] memory tokenIds) external;
-}
+import "./IEverDragons2.sol";
 
 contract EverDragons2Manager is Ownable {
   using ECDSA for bytes32;
@@ -33,27 +26,31 @@ contract EverDragons2Manager is Ownable {
     uint16 eVOnEth; // 972
     uint16 eVOnTron; // 392
     uint16 eVOnPOA; // 342
-    uint16 maxPrice; // 100 = 1 ETH
-    uint16 decrementPercentage; // 10%
-    uint16 blocksBetweenDecrements; // 270 << and batches
-    uint16 batchSize; // 1000
+    uint16 price; // 0.1 ETH
+    uint16 presaleDiscount; // 20%
     uint16 maxTokenId; // 8000
+    uint16 maxPresaleTokenId; // 800
+    uint16 durationPresale; // in number of blocks
+    uint8 maxPerWalletInPresale; // 1
+    uint8 maxPerWalletInSale; // 5
     uint8 ethId; // 1
     uint8 tronId; // 2
     uint8 poaId; // 3
-    uint8 numberOfSteps; // 24 << price reduces 10% every hour
   }
-
-  Conf public conf;
-  IEverDragons2 public everDragons2;
 
   uint256 public nextTokenId = 1;
   uint256 public ethBalance;
   uint256 public startingBlock;
+
+  Conf public conf;
+  IEverDragons2 public everDragons2;
+
   address public validator;
   bool public saleClosed;
   bool public initiated;
+  bool public presaleClosed;
 
+  mapping(bytes16 => bool) private _signatureUsed;
   mapping(address => bool) public bridge;
 
   constructor(address everDragons2_) {
@@ -61,13 +58,17 @@ contract EverDragons2Manager is Ownable {
   }
 
   function setTeamPoints(address[] memory addrs, uint16[] memory points) external onlyOwner {
-    require(teamPoints.length == 0, "Team points already set");
+    require(startingBlock > block.number, "Sale has already started");
+    if (teamPoints.length != 0) {
+      // fixing a previous mistake
+      delete teamPoints;
+    }
     uint256 total = 0;
     for (uint256 i = 0; i < addrs.length; i++) {
       total += points[i];
     }
     // 10 is 0.1%, 10000 is 100%
-    require(total == 10000, "All team points must sum to 1000");
+    require(total == 10000, "All team points must sum to 10000");
     for (uint256 i = 0; i < addrs.length; i++) {
       teamPoints.push(Point(addrs[i], points[i]));
     }
@@ -99,24 +100,12 @@ contract EverDragons2Manager is Ownable {
     initiated = true;
   }
 
-  function currentStep() public view returns (uint8) {
-    uint256 batch = uint8(block.number.sub(startingBlock).div(conf.blocksBetweenDecrements));
-    if (batch > conf.numberOfSteps - 1) {
-      batch = conf.numberOfSteps - 1;
-    }
-    return uint8(batch);
+  function saleEnded() public view returns (bool) {
+    return saleClosed || nextTokenId > conf.maxTokenId;
   }
 
-  function currentPrice(uint8 currentStep_) public view returns (uint256) {
-    uint256 price = uint256(conf.maxPrice);
-    for (uint8 i = 0; i < currentStep_; i++) {
-      price = price.div(10).mul(9);
-    }
-    return price.mul(10 ** 18).div(100);
-  }
-  
-  function saleEnded() public returns (bool) {
-    return saleClosed || nextTokenId > conf.maxTokenId;
+  function presaleEnded() public view returns (bool) {
+    return presaleClosed || nextTokenId > conf.maxPresaleTokenId;
   }
 
   function claimToken(
@@ -126,7 +115,7 @@ contract EverDragons2Manager is Ownable {
   ) external {
     require(!saleEnded(), "Sale is ended or closed");
     require(!bridge[_msgSender()], "Bridges can not claim tokens");
-    require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, chainId), signature), "Invalid signature");
+    require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, uint256(chainId)), signature), "Invalid signature");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       if (chainId == conf.ethId) {
         require(tokenIds[i] <= conf.eVOnEth, "Id out of range");
@@ -149,36 +138,42 @@ contract EverDragons2Manager is Ownable {
     uint16 allReserved = conf.eVOnEth + conf.eVOnTron + conf.eVOnPOA;
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(
-        (saleEnded() && tokenIds[i] > conf.maxTokenId) ||
-        (!saleEnded() && tokenIds[i] > conf.maxTokenId + allReserved),
+        (saleEnded() && tokenIds[i] > conf.maxTokenId) || (!saleEnded() && tokenIds[i] > conf.maxTokenId + allReserved),
         "Id out of range"
       );
     }
     everDragons2.mint(recipients, tokenIds);
   }
 
-  function sale(uint256[] memory tokenIds) external payable {
+  function sale(
+    uint256[] memory tokenIds,
+    uint256 timestamp,
+    bytes memory signature
+  ) external payable {
+    require(block.number >= startingBlock, "Sale not started yet");
     require(!saleEnded(), "Sale is ended or closed");
-    require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
-    uint256 price = currentPrice(currentStep());
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+    if (block.number > startingBlock.add(conf.durationPresale)) {
+      require(tokenIds.length <= conf.maxPerWalletInSale, "Too many tokens required");
+      require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
+      require(msg.value >= uint256(conf.price).mul(tokenIds.length), "Insufficient payment");
+    } else {
+      require(tokenIds.length <= conf.maxPerWalletInPresale, "Too many tokens required");
+      require(nextTokenId + tokenIds.length - 1 <= conf.maxPresaleTokenId, "Not enough tokens left");
+      require(
+        msg.value >= uint256(conf.price).mul(tokenIds.length).mul(100 - conf.presaleDiscount).div(100),
+        "Insufficient payment"
+      );
+    }
+    require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, timestamp), signature), "Invalid signature");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       tokenIds[i] = nextTokenId++;
     }
     ethBalance += msg.value;
     everDragons2.mint(_msgSender(), tokenIds);
-  }
-
-  function presale(uint256[] memory tokenIds) external payable {
-    require(!saleEnded(), "Sale is ended or closed");
-    require(nextTokenId + tokenIds.length - 1 <= conf.maxTokenId, "Not enough tokens left");
-    uint256 price = currentPrice(currentStep());
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
-    for (uint256 i = 0; i < tokenIds.length; i++) {
-      tokenIds[i] = nextTokenId++;
-    }
-    ethBalance += msg.value;
-    everDragons2.mint(_msgSender(), tokenIds);
+    // last requirement, to let fraudster to pay all the gas for nothing
+    bytes16 sig = bytes16(keccak256(signature));
+    require(!_signatureUsed[sig], "Signature already used");
+    _signatureUsed[sig] = true;
   }
 
   function isSignedByValidator(bytes32 _hash, bytes memory _signature) public view returns (bool) {
@@ -197,8 +192,8 @@ contract EverDragons2Manager is Ownable {
   }
 
   function _withdrawEarnings(uint256 amount) internal {
-    withdrawnAmounts[_msgSender()] += amount;
-    (bool success,) = _msgSender().call{value : amount}("");
+    withdrawnAmounts[_msgSender()].add(amount);
+    (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
   }
 
@@ -216,16 +211,16 @@ contract EverDragons2Manager is Ownable {
   function encodeForSignature(
     address addr,
     uint256[] memory tokenIds,
-    uint8 chainId
+    uint256 chainIdOrTimestamp
   ) public pure returns (bytes32) {
     return
-    keccak256(
-      abi.encodePacked(
-        "\x19\x00", // EIP-191
-        addr,
-        tokenIds,
-        chainId
-      )
-    );
+      keccak256(
+        abi.encodePacked(
+          "\x19\x00", // EIP-191
+          addr,
+          tokenIds,
+          chainIdOrTimestamp
+        )
+      );
   }
 }
