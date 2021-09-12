@@ -185,7 +185,7 @@ contract EverDragons2Manager is Ownable {
   }
 
   function claimEarnings(uint256 amount) external {
-    require(saleClosed || nextTokenId > conf.maxTokenId, "Sale is still active");
+    require(saleEnded(), "Sale is still active");
     uint256 available = amountAvailableForWithdrawn(_msgSender());
     require(amount <= available, "Insufficient funds");
     _withdrawEarnings(amount);
@@ -198,7 +198,7 @@ contract EverDragons2Manager is Ownable {
   }
 
   function amountAvailableForWithdrawn(address teamMember) public view returns (uint256) {
-    if (saleClosed || nextTokenId > conf.maxTokenId) {
+    if (saleEnded()) {
       for (uint256 i = 0; i < teamPoints.length; i++) {
         if (teamPoints[i].teamMember == teamMember) {
           return ethBalance.div(10000).mul(teamPoints[i].points).sub(withdrawnAmounts[teamMember]);
