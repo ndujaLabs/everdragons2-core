@@ -1,20 +1,16 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
+
+// Author: Francesco Sullo <francesco@sullo.co>
+// EverDragons2 website: https://everdragons2.com
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Author: Francesco Sullo <francesco@sullo.co>
-// EverDragons2 website: https://everdragons2.com
+import "./IEverDragons2.sol";
 
-interface IEverDragons2 {
-  function mintAndTransfer(address recipient, uint256[] memory tokenIds) external;
-  function mintAndTransfer(address[] memory recipients, uint256[] memory tokenIds) external;
-}
-
-contract EverDragons2Manager is Ownable {
+contract DragonsMaster is Ownable {
   using ECDSA for bytes32;
   using SafeMath for uint256;
 
@@ -37,7 +33,7 @@ contract EverDragons2Manager is Ownable {
     uint16 decrementPercentage; // 10%
     uint16 blocksBetweenDecrements; // 270 << and batches
     uint16 initialBatchReservedIncluded; // 2000
-    uint16 batchSize; // 1000
+    uint16 batchSize; // 2000
     uint16 maxTokenId; // 8000
     uint8 ethId; // 1
     uint8 tronId; // 2
@@ -113,9 +109,9 @@ contract EverDragons2Manager is Ownable {
     for (uint8 i = 0; i < currentStep_; i++) {
       price = price.div(10).mul(9);
     }
-    return price.mul(10 ** 18).div(100);
+    return price.mul(10**18).div(100);
   }
-  
+
   function saleEnded() public returns (bool) {
     return saleClosed || nextTokenId > conf.maxTokenId;
   }
@@ -142,7 +138,7 @@ contract EverDragons2Manager is Ownable {
         revert("Chain not supported");
       }
     }
-    everDragons2.mintAndTransfer(_msgSender(), tokenIds);
+    everDragons2.mint(_msgSender(), tokenIds);
   }
 
   function giveAwayTokens(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
@@ -150,12 +146,11 @@ contract EverDragons2Manager is Ownable {
     uint16 allReserved = conf.eVOnEth + conf.eVOnTron + conf.eVOnPOA;
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(
-        (saleEnded() && tokenIds[i] > conf.maxTokenId) ||
-        (!saleEnded() && tokenIds[i] > conf.maxTokenId + allReserved),
+        (saleEnded() && tokenIds[i] > conf.maxTokenId) || (!saleEnded() && tokenIds[i] > conf.maxTokenId + allReserved),
         "Id out of range"
       );
     }
-    everDragons2.mintAndTransfer(recipients, tokenIds);
+    everDragons2.mint(recipients, tokenIds);
   }
 
   function buyTokens(uint256[] memory tokenIds) external payable {
@@ -167,7 +162,7 @@ contract EverDragons2Manager is Ownable {
       tokenIds[i] = nextTokenId++;
     }
     ethBalance += msg.value;
-    everDragons2.mintAndTransfer(_msgSender(), tokenIds);
+    everDragons2.mint(_msgSender(), tokenIds);
   }
 
   function isSignedByValidator(bytes32 _hash, bytes memory _signature) public view returns (bool) {
@@ -187,7 +182,7 @@ contract EverDragons2Manager is Ownable {
 
   function _withdrawEarnings(uint256 amount) internal {
     withdrawnAmounts[_msgSender()] += amount;
-    (bool success,) = _msgSender().call{value : amount}("");
+    (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
   }
 
@@ -208,13 +203,13 @@ contract EverDragons2Manager is Ownable {
     uint8 chainId
   ) public pure returns (bytes32) {
     return
-    keccak256(
-      abi.encodePacked(
-        "\x19\x00", // EIP-191
-        addr,
-        tokenIds,
-        chainId
-      )
-    );
+      keccak256(
+        abi.encodePacked(
+          "\x19\x00", // EIP-191
+          addr,
+          tokenIds,
+          chainId
+        )
+      );
   }
 }

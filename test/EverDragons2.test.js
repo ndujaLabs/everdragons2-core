@@ -4,8 +4,8 @@ describe("EverDragons2", function() {
 
   let EverDragons2
   let everDragons2
-  let EverDragons2Manager
-  let everDragons2Manager
+  let DragonsMaster
+  let dragonMaster
 
   let addr0 = '0x0000000000000000000000000000000000000000'
   let owner, teamMember1, teamMember2, validator, collector1, collector2, edOwner1, edOwner2
@@ -39,16 +39,17 @@ describe("EverDragons2", function() {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
     everDragons2 = await EverDragons2.deploy()
     await everDragons2.deployed()
-    EverDragons2Manager = await ethers.getContractFactory("EverDragons2Manager")
-    everDragons2Manager = await EverDragons2Manager.deploy(everDragons2.address)
-    await everDragons2Manager.deployed()
-    everDragons2.setManager(everDragons2Manager.address)
+    DragonsMaster = await ethers.getContractFactory("DragonsMaster")
+    dragonMaster = await DragonsMaster.deploy(everDragons2.address)
+    await dragonMaster.deployed()
+    everDragons2.setManager(dragonMaster.address)
   })
 
   it("should return the EverDragons2 name and symbol", async function() {
     expect(await everDragons2.name()).to.equal("EverDragons2")
     expect(await everDragons2.symbol()).to.equal("ED2")
-    expect(await everDragons2.manager()).to.equal(everDragons2Manager.address)
+    expect(await everDragons2.manager()).to.equal(dragonMaster.address)
+    expect(await everDragons2.ownerOf(10000)).to.equal(owner.address)
   })
   //
   // it("should mint token #23", async function() {
