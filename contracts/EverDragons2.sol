@@ -19,7 +19,9 @@ contract EverDragons2 is IEverDragons2, ERC721, Ownable {
     _;
   }
 
-  constructor() ERC721("EverDragons2", "ED2") {}
+  constructor() ERC721("EverDragons2", "ED2") {
+    _mint(msg.sender, 10000);
+  }
 
   function setManager(address manager_) external override onlyOwner {
     require(manager == address(0), "Manager already set");
@@ -43,6 +45,7 @@ contract EverDragons2 is IEverDragons2, ERC721, Ownable {
   }
 
   function updateBaseURI(string memory uri) external override onlyOwner {
+    // this is mostly an emergency command. Hopefully, we shall not use it
     _uri = uri;
   }
 }
