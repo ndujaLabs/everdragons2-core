@@ -49,7 +49,7 @@ describe("EverDragons2", function() {
     expect(await everDragons2.name()).to.equal("EverDragons2")
     expect(await everDragons2.symbol()).to.equal("ED2")
     expect(await everDragons2.manager()).to.equal(dragonMaster.address)
-    expect(await everDragons2.ownerOf(10000)).to.equal(owner.address)
+    expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
   })
   //
   // it("should mint token #23", async function() {
