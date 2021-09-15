@@ -6,10 +6,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./IEverDragons2.sol";
 import "./DragonsMaster.sol";
 
-contract EverDragons2 is IEverDragons2, ERC721, Ownable {
+contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   address public manager;
 
   string private _uri = "https://everdragons2.com/metadata/";
@@ -21,6 +22,18 @@ contract EverDragons2 is IEverDragons2, ERC721, Ownable {
 
   constructor() ERC721("EverDragons2", "ED2") {
     _mint(msg.sender, 10001);
+  }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 tokenId
+  ) internal override(ERC721, ERC721Enumerable) {
+    super._beforeTokenTransfer(from, to, tokenId);
+  }
+
+  function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+    return super.supportsInterface(interfaceId);
   }
 
   function setManager(address manager_) external override onlyOwner {
