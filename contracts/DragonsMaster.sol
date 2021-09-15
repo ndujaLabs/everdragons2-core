@@ -112,7 +112,7 @@ contract DragonsMaster is Ownable {
     return price.mul(10**18).div(100);
   }
 
-  function saleEnded() public returns (bool) {
+  function saleEnded() public view returns (bool) {
     return saleClosed || nextTokenId > conf.maxTokenId;
   }
 
