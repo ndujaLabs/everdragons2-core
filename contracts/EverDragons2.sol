@@ -20,7 +20,7 @@ contract EverDragons2 is IEverDragons2, ERC721, Ownable {
   }
 
   constructor() ERC721("EverDragons2", "ED2") {
-    _mint(msg.sender, 10000);
+    _mint(msg.sender, 10001);
   }
 
   function setManager(address manager_) external override onlyOwner {
