@@ -13,7 +13,7 @@ import "./DragonsMaster.sol";
 contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   address public manager;
 
-  string private _uri = "https://everdragons2.com/metadata/";
+  string private _uri = "https://everdragons2.com/metadata/ed2/";
 
   modifier onlyManager() {
     require(_msgSender() == manager, "Forbidden");
