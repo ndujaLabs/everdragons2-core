@@ -1,21 +1,12 @@
-const { expect, assert } = require("chai")
+const {expect, assert} = require("chai")
 
-describe("EverDragons2", function() {
+describe("EverDragons2", function () {
 
   let EverDragons2
   let everDragons2
-  let DragonsMaster
-  let dragonMaster
 
   let addr0 = '0x0000000000000000000000000000000000000000'
-  let owner, teamMember1, teamMember2, validator, collector1, collector2, edOwner1, edOwner2
-
-  async function getSignature(address, tokenId, tokenURI) {
-    const hash = await everDragons2.encodeForSignature(address, tokenId, tokenURI)
-    const signingKey = new ethers.utils.SigningKey('0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d')
-    const signedDigest = signingKey.signDigest(hash)
-    return ethers.utils.joinSignature(signedDigest)
-  }
+  let owner, dragonMaster, teamMember, validator, collector1, collector2, edOwner1, edOwner2
 
   async function assertThrowsMessage(promise, message, showError) {
     try {
@@ -32,66 +23,65 @@ describe("EverDragons2", function() {
   }
 
   before(async function () {
-    [owner, teamMember1, teamMember2, validator, collector1, collector2, edOwner1, edOwner2] = await ethers.getSigners()
+    [owner, dragonMaster, teamMember, validator, collector1, collector2, edOwner1, edOwner2] = await ethers.getSigners()
   })
 
   beforeEach(async function () {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
     everDragons2 = await EverDragons2.deploy()
     await everDragons2.deployed()
-    DragonsMaster = await ethers.getContractFactory("DragonsMaster")
-    dragonMaster = await DragonsMaster.deploy(everDragons2.address)
-    await dragonMaster.deployed()
     everDragons2.setManager(dragonMaster.address)
   })
 
-  it("should return the EverDragons2 name and symbol", async function() {
+  it("should return the EverDragons2 name and symbol", async function () {
     expect(await everDragons2.name()).to.equal("EverDragons2")
     expect(await everDragons2.symbol()).to.equal("ED2")
     expect(await everDragons2.manager()).to.equal(dragonMaster.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
   })
-  //
-  // it("should mint token #23", async function() {
-  //
-  //   const tokenId = 23
-  //   const tokenUri = 'ipfs://QmZ5bK81zLneKyV6KUYVGc9WAfVzBeCGTbRTGFQwHLXCfz'
-  //
-  //   let signature = await getSignature(bob.address, tokenId, tokenUri)
-  //
-  //   await expect(everDragons2.connect(bob).claimToken(tokenId, tokenUri, signature))
-  //       .to.emit(everDragons2, 'Transfer')
-  //       .withArgs(addr0, bob.address, tokenId);
-  //
-  // })
-  //
-  //
-  // it("should throw if signature is wrong", async function() {
-  //
-  //   const tokenId = 23
-  //   const tokenUri = 'ipfs://QmZ5bK81zLneKyV6KUYVGc9WAfVzBeCGTbRTGFQwHLXCfz'
-  //
-  //   let signature = await getSignature(bob.address, tokenId, tokenUri)
-  //
-  //   await assertThrowsMessage(
-  //       everDragons2.connect(bob).claimToken(24, tokenUri, signature),
-  //       'Invalid signature')
-  //
-  //   await assertThrowsMessage(
-  //       everDragons2.connect(alice).claimToken(tokenId, tokenUri, signature),
-  //       'Invalid signature')
-  //
-  //   const hash = await everDragons2.encodeForSignature(bob.address, tokenId, tokenUri)
-  //   const signingKey = new ethers.utils.SigningKey(
-  //       // bob private key
-  //       '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a')
-  //   const signedDigest = signingKey.signDigest(hash)
-  //   signature = ethers.utils.joinSignature(signedDigest)
-  //
-  //   await assertThrowsMessage(
-  //       everDragons2.connect(bob).claimToken(tokenId, tokenUri, signature),
-  //       'Invalid signature')
-  //
-  // })
+
+  it("should mint token 23, 100 and 3230 and give them to collector1", async function () {
+
+    const tokenIds = [23, 100, 3230]
+
+    await expect(everDragons2.connect(dragonMaster)['mint(address,uint256[])'](collector1.address, tokenIds))
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[0])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[1])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[2]);
+
+    expect(await everDragons2.ownerOf(tokenIds[0])).to.equal(collector1.address)
+    expect(await everDragons2.tokenOfOwnerByIndex(collector1.address, 0)).to.equal(tokenIds[0])
+    expect(await everDragons2.tokenOfOwnerByIndex(collector1.address, 1)).to.equal(tokenIds[1])
+    expect(await everDragons2.tokenOfOwnerByIndex(collector1.address, 2)).to.equal(tokenIds[2])
+
+  })
+
+  it("should mint token 23, 100 and 3230 and give two to collector1 and one to collector2", async function () {
+
+    const tokenIds = [23, 100, 3230]
+
+    await expect(everDragons2.connect(dragonMaster)['mint(address[],uint256[])']([collector1.address, collector2.address, collector1.address,], tokenIds))
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[0])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector2.address, tokenIds[1])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[2])
+
+    expect(await everDragons2.ownerOf(tokenIds[0])).to.equal(collector1.address)
+    expect(await everDragons2.ownerOf(tokenIds[1])).to.equal(collector2.address)
+    expect(await everDragons2.ownerOf(tokenIds[2])).to.equal(collector1.address)
+  })
+
+  it("should throw if dragons master tries to mint when minting is ended", async function () {
+
+    await everDragons2.endMinting()
+    const tokenIds = [1, 2, 3, 4]
+    await expect(everDragons2.connect(dragonMaster)['mint(address,uint256[])'](collector1.address, tokenIds))
+        .revertedWith('Minting ended')
+  })
 
 })

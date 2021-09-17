@@ -12,4 +12,6 @@ interface IEverDragons2 {
   function mint(address[] memory recipients, uint256[] memory tokenIds) external;
 
   function updateBaseURI(string memory uri) external;
+
+  function endMinting() external;
 }

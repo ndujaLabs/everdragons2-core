@@ -14,9 +14,15 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   address public manager;
 
   string private _uri = "https://everdragons2.com/metadata/ed2/";
+  bool private _mintEnded;
 
   modifier onlyManager() {
-    require(_msgSender() == manager, "Forbidden");
+    require(manager != address(0) && _msgSender() == manager, "Forbidden");
+    _;
+  }
+
+  modifier canMint() {
+    require(!_mintEnded, "Minting ended");
     _;
   }
 
@@ -36,18 +42,18 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
     return super.supportsInterface(interfaceId);
   }
 
-  function setManager(address manager_) external override onlyOwner {
-    require(manager == address(0), "Manager already set");
+  function setManager(address manager_) external override onlyOwner canMint {
+    require(manager_ != address(0), "Manager cannot be 0x0");
     manager = manager_;
   }
 
-  function mint(address recipient, uint256[] memory tokenIds) external override onlyManager {
+  function mint(address recipient, uint256[] memory tokenIds) external override onlyManager canMint {
     for (uint256 i = 0; i < tokenIds.length; i++) {
       _mint(recipient, tokenIds[i]);
     }
   }
 
-  function mint(address[] memory recipients, uint256[] memory tokenIds) external override onlyManager {
+  function mint(address[] memory recipients, uint256[] memory tokenIds) external override onlyManager canMint {
     for (uint256 i = 0; i < tokenIds.length; i++) {
       _mint(recipients[i], tokenIds[i]);
     }
@@ -60,5 +66,9 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   function updateBaseURI(string memory uri) external override onlyOwner {
     // this is mostly an emergency command. Hopefully, we shall not use it
     _uri = uri;
+  }
+
+  function endMinting() external override onlyOwner {
+    _mintEnded = true;
   }
 }
