@@ -11,6 +11,7 @@ import "./IEverDragons2.sol";
 import "./DragonsMaster.sol";
 
 contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
+  using Address for address;
   address public manager;
 
   string private _uri = "https://everdragons2.com/metadata/ed2/";
@@ -64,7 +65,7 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   }
 
   function updateBaseURI(string memory uri) external override onlyOwner {
-    // this is mostly an emergency command. Hopefully, we shall not use it
+    // this is mostly an emergency command
     _uri = uri;
   }
 

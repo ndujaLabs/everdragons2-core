@@ -4,9 +4,11 @@ describe("EverDragons2", function () {
 
   let EverDragons2
   let everDragons2
+  let DragonsMaster
+  let dragonsMaster
 
   let addr0 = '0x0000000000000000000000000000000000000000'
-  let owner, dragonMaster, teamMember, validator, collector1, collector2, edOwner1, edOwner2
+  let owner, teamMember, validator, collector1, collector2, edOwner1, edOwner2
 
   async function assertThrowsMessage(promise, message, showError) {
     try {
@@ -23,20 +25,23 @@ describe("EverDragons2", function () {
   }
 
   before(async function () {
-    [owner, dragonMaster, teamMember, validator, collector1, collector2, edOwner1, edOwner2] = await ethers.getSigners()
+    [owner, teamMember, validator, collector1, collector2, edOwner1, edOwner2] = await ethers.getSigners()
   })
 
   beforeEach(async function () {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
     everDragons2 = await EverDragons2.deploy()
     await everDragons2.deployed()
-    everDragons2.setManager(dragonMaster.address)
+    DragonsMaster = await ethers.getContractFactory("DragonsMasterMock")
+    dragonsMaster = await DragonsMaster.deploy(everDragons2.address)
+    await dragonsMaster.deployed()
+    everDragons2.setManager(dragonsMaster.address)
   })
 
   it("should return the EverDragons2 name and symbol", async function () {
     expect(await everDragons2.name()).to.equal("EverDragons2")
     expect(await everDragons2.symbol()).to.equal("ED2")
-    expect(await everDragons2.manager()).to.equal(dragonMaster.address)
+    expect(await everDragons2.manager()).to.equal(dragonsMaster.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
   })
 
@@ -44,7 +49,7 @@ describe("EverDragons2", function () {
 
     const tokenIds = [23, 100, 3230]
 
-    await expect(everDragons2.connect(dragonMaster)['mint(address,uint256[])'](collector1.address, tokenIds))
+    await expect(dragonsMaster['mint(address,uint256[])'](collector1.address, tokenIds))
         .to.emit(everDragons2, 'Transfer')
         .withArgs(addr0, collector1.address, tokenIds[0])
         .to.emit(everDragons2, 'Transfer')
@@ -63,7 +68,7 @@ describe("EverDragons2", function () {
 
     const tokenIds = [23, 100, 3230]
 
-    await expect(everDragons2.connect(dragonMaster)['mint(address[],uint256[])']([collector1.address, collector2.address, collector1.address,], tokenIds))
+    await expect(dragonsMaster['mint(address[],uint256[])']([collector1.address, collector2.address, collector1.address,], tokenIds))
         .to.emit(everDragons2, 'Transfer')
         .withArgs(addr0, collector1.address, tokenIds[0])
         .to.emit(everDragons2, 'Transfer')
@@ -80,7 +85,7 @@ describe("EverDragons2", function () {
 
     await everDragons2.endMinting()
     const tokenIds = [1, 2, 3, 4]
-    await expect(everDragons2.connect(dragonMaster)['mint(address,uint256[])'](collector1.address, tokenIds))
+    await expect(dragonsMaster['mint(address,uint256[])'](collector1.address, tokenIds))
         .revertedWith('Minting ended')
   })
 
