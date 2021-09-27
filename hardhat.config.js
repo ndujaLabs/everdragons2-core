@@ -1,6 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
-require("hardhat-gas-reporter");
+// require("hardhat-gas-reporter");
 
 let env = require('./env.json');
 
@@ -40,15 +40,15 @@ module.exports = {
     ganache: {
       url: "http://localhost:7545"
     },
-    eth_rinkeby: {
+    rinkeby: {
       url: `https://rinkeby.infura.io/v3/${env.infuraApiKey}`,
       accounts: [env.privateKey]
     },
-    eth_goerli: {
+    goerli: {
       url: `https://goerli.infura.io/v3/${env.infuraApiKey}`,
       accounts: [env.privateKey]
     },
-    eth_mainnet: {
+    ethereum: {
       url: `https://mainnet.infura.io/v3/${env.infuraApiKey}`,
       accounts: [env.privateKey]
     },
@@ -58,19 +58,19 @@ module.exports = {
       gasPrice: 20000000000,
       accounts: [env.privateKey]
     },
-    bsc_mainnet: {
+    bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
       gasPrice: 20000000000,
       accounts: [env.privateKey]
     },
-    matic_testnet: {
+    mumbai: {
       url: "https://rpc-mumbai.matic.today/",
       chainId: 80001,
       gasPrice: 20000000000,
       accounts: [env.privateKey]
     },
-    matic_mainnet: {
+    matic: {
       url: `https://rpc-mainnet.maticvigil.com/v1/${env.maticvigilKey}`,
       chainId: 137,
       gasPrice: 20000000000,
