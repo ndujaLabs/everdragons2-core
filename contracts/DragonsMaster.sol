@@ -68,7 +68,8 @@ contract DragonsMaster is Ownable {
   }
 
   function closeSale() external onlyOwner {
-    // this is irreversible
+    // This is irreversible.
+    // We use numberOfSteps to not use a boolean that would require more gas
     conf.numberOfSteps = 0;
   }
 
@@ -211,7 +212,7 @@ contract DragonsMaster is Ownable {
   // withdraw
 
   function claimEarnings(uint256 amount) external {
-    require(conf.numberOfSteps == 0 || conf.nextTokenId > conf.maxBuyableTokenId, "Sale still active");
+    require(saleEnded(), "Sale still active");
     uint256 available = withdrawable(_msgSender());
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
