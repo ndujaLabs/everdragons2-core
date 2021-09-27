@@ -33,7 +33,7 @@ describe("DragonsMaster", function () {
     conf = {
       validator: validator.address,
       nextTokenId: 1,
-      maxBuyableTokenId: 8194, // 10000 - 1706 - 100 = 8273
+      maxBuyableTokenId: 8000,
       maxPrice: 180, // = 1.8 ETH
       decrementPercentage: 10, // 10%
       minutesBetweenDecrements: 60, // 1 hour
@@ -308,7 +308,7 @@ describe("DragonsMaster", function () {
 
     it("should throw if collector1 try to claim tokens out of range", async function () {
 
-      const ids = [9890, 9981]
+      const ids = [9690, 9981]
       const addresses = [communityMenber1.address, communityMenber2.address]
 
       assertThrowsMessage(dragonsMaster.giveAwayTokens(addresses, ids),
