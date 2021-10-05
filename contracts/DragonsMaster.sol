@@ -8,17 +8,16 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IEverDragonsERC721Token.sol";
+
 //import "hardhat/console.sol";
 
 interface IEverDragons2 {
-
   function mint(address recipient, uint256[] memory tokenIds) external;
 
   function mint(address[] memory recipients, uint256[] memory tokenIds) external;
 
   function ownerOf(uint256 tokenId) external view returns (address);
 }
-
 
 contract DragonsMaster is Ownable {
   using ECDSA for bytes32;
@@ -62,7 +61,7 @@ contract DragonsMaster is Ownable {
   Conf public conf;
 
   modifier saleActive() {
-    require(block.timestamp >= uint(conf.startingTimestamp), "Sale not started yet");
+    require(block.timestamp >= uint256(conf.startingTimestamp), "Sale not started yet");
     require(!saleEnded(), "Sale is ended or closed");
     _;
   }
@@ -72,7 +71,7 @@ contract DragonsMaster is Ownable {
     _;
   }
 
-  modifier enoughTokensLeft(uint tokenIdsLength) {
+  modifier enoughTokensLeft(uint256 tokenIdsLength) {
     require(conf.nextTokenId + tokenIdsLength - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
     _;
   }
@@ -105,7 +104,7 @@ contract DragonsMaster is Ownable {
     address ed2,
     address ndl,
     address bridge1, // 0xeE0f42712598f28521f45237cf42ad95F1d52DAa
-    address bridge2  // 0x74AF9991d5FEa09EBB042CaFE51972D89aCDaFC8
+    address bridge2 // 0x74AF9991d5FEa09EBB042CaFE51972D89aCDaFC8
   ) external onlyOwner {
     require(conf.validator == address(0), "Sale already set");
     conf = conf_;
@@ -117,7 +116,9 @@ contract DragonsMaster is Ownable {
   }
 
   function currentStep(uint8 skippedSteps) public view saleActive returns (uint8) {
-    uint8 step = uint8(block.timestamp.sub(conf.startingTimestamp).div(uint(conf.minutesBetweenDecrements) * 60).add(skippedSteps));
+    uint8 step = uint8(
+      block.timestamp.sub(conf.startingTimestamp).div(uint256(conf.minutesBetweenDecrements) * 60).add(skippedSteps)
+    );
     if (step > conf.numberOfSteps - 1) {
       step = conf.numberOfSteps - 1;
     }
@@ -129,7 +130,7 @@ contract DragonsMaster is Ownable {
     for (uint8 i = 0; i < currentStep_; i++) {
       price = price.div(10).mul(9);
     }
-    return price.mul(10 ** 18).div(100);
+    return price.mul(10**18).div(100);
   }
 
   function saleEnded() public view returns (bool) {
@@ -138,8 +139,8 @@ contract DragonsMaster is Ownable {
 
   // actions
 
-  function claimTokens(uint[] memory tokenIds) external isNotABridge saleActive {
-    for (uint i = 0; i < tokenIds.length; i++) {
+  function claimTokens(uint256[] memory tokenIds) external isNotABridge saleActive {
+    for (uint256 i = 0; i < tokenIds.length; i++) {
       require(everDragons.ownerOf(tokenIds[i]) == _msgSender(), "Not the token holder");
       tokenIds[i] = tokenIds[i].add(conf.maxBuyableTokenId);
     }
@@ -150,19 +151,18 @@ contract DragonsMaster is Ownable {
     require(recipients.length == tokenIds.length, "Inconsistent lengths");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(
-        (saleEnded() && tokenIds[i] > conf.maxBuyableTokenId) ||
-        (!saleEnded() && tokenIds[i] > conf.maxBuyableTokenId + 972),
+        (saleEnded() && tokenIds[i] > conf.maxBuyableTokenId) || (!saleEnded() && tokenIds[i] > conf.maxBuyableTokenId + 972),
         "Id out of range"
       );
     }
     everDragons2.mint(recipients, tokenIds);
   }
 
-  function buyTokens(uint tokens) external saleActive enoughTokensLeft(tokens) payable {
+  function buyTokens(uint256 tokens) external payable saleActive enoughTokensLeft(tokens) {
     uint256 price = currentPrice(currentStep(0));
     require(msg.value >= price.mul(tokens), "Insufficient payment");
-    uint[] memory tokenIds = new uint[](tokens);
-    uint nextTokenId = uint(conf.nextTokenId);
+    uint256[] memory tokenIds = new uint256[](tokens);
+    uint256 nextTokenId = uint256(conf.nextTokenId);
     for (uint256 i = 0; i < tokens; i++) {
       tokenIds[i] = nextTokenId++;
     }
@@ -175,16 +175,13 @@ contract DragonsMaster is Ownable {
     uint256 tokens,
     uint8 skippedSteps,
     bytes memory signature
-  ) external saleActive enoughTokensLeft(tokens) payable {
-    require(
-      isSignedByValidator(encodeForSignature(_msgSender(), tokens, skippedSteps), signature),
-      "Invalid signature"
-    );
+  ) external payable saleActive enoughTokensLeft(tokens) {
+    require(isSignedByValidator(encodeForSignature(_msgSender(), tokens, skippedSteps), signature), "Invalid signature");
     require(discounted[_msgSender()] == false, "Discount already used");
     uint256 price = currentPrice(currentStep(skippedSteps));
     require(msg.value >= price.mul(tokens), "Insufficient payment");
-    uint[] memory tokenIds = new uint[](tokens);
-    uint nextTokenId = uint(conf.nextTokenId);
+    uint256[] memory tokenIds = new uint256[](tokens);
+    uint256 nextTokenId = uint256(conf.nextTokenId);
     for (uint256 i = 0; i < tokens; i++) {
       tokenIds[i] = nextTokenId++;
     }
@@ -206,14 +203,14 @@ contract DragonsMaster is Ownable {
     uint8 skippedSteps
   ) public pure returns (bytes32) {
     return
-    keccak256(
-      abi.encodePacked(
-        "\x19\x00", // EIP-191
-        addr,
-        tokens,
-        skippedSteps
-      )
-    );
+      keccak256(
+        abi.encodePacked(
+          "\x19\x00", // EIP-191
+          addr,
+          tokens,
+          skippedSteps
+        )
+      );
   }
 
   // withdraw
@@ -223,7 +220,7 @@ contract DragonsMaster is Ownable {
     uint256 available = withdrawable(_msgSender());
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
-    (bool success,) = _msgSender().call{value : amount}("");
+    (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
   }
 

@@ -2,10 +2,9 @@
 pragma solidity ^0.8.0;
 
 contract EverDragonsERC721TokenMock {
+  mapping(uint256 => address) public tokens;
 
-  mapping(uint => address) internal tokens;
-
-  function mintToken(address owner, uint tokenID) external {
+  function mintToken(address owner, uint256 tokenID) external {
     tokens[tokenID] = owner;
   }
 
