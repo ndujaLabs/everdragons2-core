@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./IEverDragons2.sol";
 
+import "hardhat/console.sol";
+
 contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   using Address for address;
   address public manager;
@@ -49,6 +51,7 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
 
   function mint(address recipient, uint256[] memory tokenIds) external override onlyManager canMint {
     for (uint256 i = 0; i < tokenIds.length; i++) {
+//      console.log("tokenid",tokenIds[i]);
       _mint(recipient, tokenIds[i]);
     }
   }

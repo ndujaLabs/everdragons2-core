@@ -4,6 +4,8 @@ const {initEthers, assertThrowsMessage, signPackedData, getTimestamp, increaseBl
 
 describe("DragonsMaster", function () {
 
+  let EverDragons
+  let everDragons
   let EverDragons2
   let everDragons2
   let DragonsMaster
@@ -17,7 +19,7 @@ describe("DragonsMaster", function () {
       buyer1, buyer2,
       communityMenber1, communityMenber2,
       collector1, collector2,
-      bridge1, bridge2, bridge3
+      bridge1, bridge2
 
   before(async function () {
     ;[
@@ -27,13 +29,13 @@ describe("DragonsMaster", function () {
       buyer1, buyer2,
       communityMenber1, communityMenber2,
       collector1, collector2,
-      bridge1, bridge2, bridge3
+      bridge1, bridge2
     ] = await ethers.getSigners()
 
     conf = {
       validator: validator.address,
       nextTokenId: 1,
-      maxBuyableTokenId: 8000,
+      maxBuyableTokenId: 8800,
       maxPrice: 180, // = 1.8 ETH
       decrementPercentage: 10, // 10%
       minutesBetweenDecrements: 60, // 1 hour
@@ -43,11 +45,14 @@ describe("DragonsMaster", function () {
   })
 
   async function initAndDeploy() {
+    EverDragons = await ethers.getContractFactory("EverDragonsERC721TokenMock")
+    everDragons = await EverDragons.deploy()
+    await everDragons.deployed()
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
     everDragons2 = await EverDragons2.deploy()
     await everDragons2.deployed()
     DragonsMaster = await ethers.getContractFactory("DragonsMaster")
-    dragonsMaster = await DragonsMaster.deploy(everDragons2.address)
+    dragonsMaster = await DragonsMaster.deploy(everDragons2.address, everDragons.address)
     await dragonsMaster.deployed()
     everDragons2.setManager(dragonsMaster.address)
   }
@@ -56,10 +61,11 @@ describe("DragonsMaster", function () {
     conf_.startingTimestamp = (await getTimestamp()) + offset
     await dragonsMaster.init(
         conf_,
-        [bridge1.address, bridge2.address, bridge3.address],
         edo.address,
         ed2.address,
-        ndl.address
+        ndl.address,
+        bridge1.address,
+        bridge2.address
     )
   }
 
@@ -190,99 +196,95 @@ describe("DragonsMaster", function () {
 
   describe('#claimTokens', async function () {
 
+    let tokens1
+    let tokens2
+
     beforeEach(async function () {
       await initAndDeploy()
       await configure()
+      tokens1 = []
+      tokens2 = []
+      let k = 4
+      for (let i = 1; i < k; i++) {
+        tokens1.push(i)
+        await everDragons.mintToken(collector1.address, i)
+        assert.equal(await everDragons.ownerOf(i), collector1.address)
+      }
+      for (let i = k; i < k + 96; i++) {
+        tokens2.push(i)
+        await everDragons.mintToken(collector2.address, i)
+        assert.equal(await everDragons.ownerOf(i), collector2.address)
+      }
     })
 
     it("should throw if sale not started yet", async function () {
 
-      assertThrowsMessage(
-          dragonsMaster.buyTokens([0, 0, 0], {
-            value: ethers.BigNumber.from(await dragonsMaster.currentPrice(0)).mul(3)
-          }),
+      assertThrowsMessage(dragonsMaster.connect(collector1).claimTokens(tokens1),
           'Sale not started yet')
 
     })
 
     it("should collector1 claim 3 tokens on Ethereum", async function () {
 
-      const ownedTokens = [34, 56, 345]
-
       // start the sale:
       await increaseBlockTimestampBy(3601)
+      const max = conf.maxBuyableTokenId
 
-      const hash = await dragonsMaster.encodeForSignature(collector1.address, ownedTokens, 1, 0)
-      const signature = await signPackedData(hash)
-
-      const finalIds = ownedTokens.map(e => conf.maxBuyableTokenId + e)
-
-      expect(await dragonsMaster.connect(collector1).claimTokens(ownedTokens, 1, signature))
+      expect(await dragonsMaster.connect(collector1).claimTokens(tokens1))
           .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[0])
+          .withArgs(addr0, collector1.address, max + 1)
           .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[1])
+          .withArgs(addr0, collector1.address, max + 2)
           .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[2])
-
+          .withArgs(addr0, collector1.address, max + 3)
     })
 
-    it("should collector1 claim 2 tokens on Tron", async function () {
-
-      const ownedTokens = [34, 56]
+    it("should throw if collector2 tries to claim 96 tokens all together", async function () {
 
       // start the sale:
       await increaseBlockTimestampBy(3601)
+      const max = conf.maxBuyableTokenId
 
-      const hash = await dragonsMaster.encodeForSignature(collector1.address, ownedTokens, 2, 0)
-      const signature = await signPackedData(hash)
-
-      const finalIds = ownedTokens.map(e => conf.maxBuyableTokenId + 972 + e)
-
-      expect(await dragonsMaster.connect(collector1).claimTokens(ownedTokens, 2, signature))
-          .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[0])
-          .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[1])
-
+      assertThrowsMessage(dragonsMaster.connect(collector2).claimTokens(tokens2),
+          'contract call run out of gas and made the transaction revert'
+          )
     })
 
-    it("should collector1 claim 2 tokens on POA", async function () {
-
-      const ownedTokens = [34, 56]
+    it("should allow collector2 to claim 96 tokens in 4 steps", async function () {
 
       // start the sale:
       await increaseBlockTimestampBy(3601)
+      const max = conf.maxBuyableTokenId
 
-      const hash = await dragonsMaster.encodeForSignature(collector1.address, ownedTokens, 3, 0)
-      const signature = await signPackedData(hash)
-
-      const finalIds = ownedTokens.map(e => conf.maxBuyableTokenId + 972 + 392 + e)
-
-      expect(await dragonsMaster.connect(collector1).claimTokens(ownedTokens, 3, signature))
+      expect(await dragonsMaster.connect(collector2).claimTokens(tokens2.slice(0, 20)))
           .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[0])
+          .withArgs(addr0, collector2.address, max + 4)
           .to.emit(everDragons2, 'Transfer')
-          .withArgs(addr0, collector1.address, finalIds[1])
-
-    })
-
-    it("should throw if collector1 try to claim tokens out of range", async function () {
-
-      const ownedTokens = [34, 560]
-
-      // start the sale:
-      await increaseBlockTimestampBy(3601)
-
-      const hash = await dragonsMaster.encodeForSignature(collector1.address, ownedTokens, 3, 0)
-      const signature = await signPackedData(hash)
-
-      assertThrowsMessage(dragonsMaster.connect(collector1).claimTokens(ownedTokens, 3, signature),
-          'Id out of range')
-
+          .withArgs(addr0, collector2.address, max + 23)
+      expect(await dragonsMaster.connect(collector2).claimTokens(tokens2.slice(20, 40)))
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 24)
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 43)
+      expect(await dragonsMaster.connect(collector2).claimTokens(tokens2.slice(40, 60)))
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 44)
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 63)
+      expect(await dragonsMaster.connect(collector2).claimTokens(tokens2.slice(60, 80)))
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 64)
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 83)
+      expect(await dragonsMaster.connect(collector2).claimTokens(tokens2.slice(80)))
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 84)
+          .to.emit(everDragons2, 'Transfer')
+          .withArgs(addr0, collector2.address, max + 96)
     })
 
   })
+
 
   describe('#giveAwayTokens', async function () {
 
