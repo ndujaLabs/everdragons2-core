@@ -43,6 +43,7 @@ contract DragonsMaster is Ownable {
   }
 
   mapping(address => Team) public teams;
+  mapping(address => bool) public discounted;
 
   // < 1 word in storage
   struct Conf {
@@ -157,11 +158,12 @@ contract DragonsMaster is Ownable {
     everDragons2.mint(recipients, tokenIds);
   }
 
-  function buyTokens(uint256[] memory tokenIds) external saleActive enoughTokensLeft(tokenIds.length) payable {
+  function buyTokens(uint tokens) external saleActive enoughTokensLeft(tokens) payable {
     uint256 price = currentPrice(currentStep(0));
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+    require(msg.value >= price.mul(tokens), "Insufficient payment");
+    uint[] memory tokenIds = new uint[](tokens);
     uint nextTokenId = uint(conf.nextTokenId);
-    for (uint256 i = 0; i < tokenIds.length; i++) {
+    for (uint256 i = 0; i < tokens; i++) {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
@@ -170,23 +172,26 @@ contract DragonsMaster is Ownable {
   }
 
   function buyDiscountedTokens(
-    uint256[] memory tokenIds,
+    uint256 tokens,
     uint8 skippedSteps,
     bytes memory signature
-  ) external saleActive enoughTokensLeft(tokenIds.length) payable {
+  ) external saleActive enoughTokensLeft(tokens) payable {
     require(
-      isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, 1, skippedSteps), signature),
+      isSignedByValidator(encodeForSignature(_msgSender(), tokens, skippedSteps), signature),
       "Invalid signature"
     );
+    require(discounted[_msgSender()] == false, "Discount already used");
     uint256 price = currentPrice(currentStep(skippedSteps));
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+    require(msg.value >= price.mul(tokens), "Insufficient payment");
+    uint[] memory tokenIds = new uint[](tokens);
     uint nextTokenId = uint(conf.nextTokenId);
-    for (uint256 i = 0; i < tokenIds.length; i++) {
+    for (uint256 i = 0; i < tokens; i++) {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
     ethBalance += msg.value;
     everDragons2.mint(_msgSender(), tokenIds);
+    discounted[_msgSender()] = true;
   }
 
   // cryptography
@@ -197,8 +202,7 @@ contract DragonsMaster is Ownable {
 
   function encodeForSignature(
     address addr,
-    uint256[] memory tokenIds,
-    uint8 chainId,
+    uint256 tokens,
     uint8 skippedSteps
   ) public pure returns (bytes32) {
     return
@@ -206,8 +210,7 @@ contract DragonsMaster is Ownable {
       abi.encodePacked(
         "\x19\x00", // EIP-191
         addr,
-        tokenIds,
-        chainId,
+        tokens,
         skippedSteps
       )
     );

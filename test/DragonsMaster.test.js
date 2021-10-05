@@ -151,7 +151,7 @@ describe("DragonsMaster", function () {
       // start the sale:
       await increaseBlockTimestampBy(3601)
 
-      expect(await dragonsMaster.connect(buyer1).buyTokens([0, 0, 0], {
+      expect(await dragonsMaster.connect(buyer1).buyTokens(3, {
         value: ethers.BigNumber.from(await dragonsMaster.currentPrice(0)).mul(3)
       }))
           .to.emit(everDragons2, 'Transfer')
@@ -168,7 +168,7 @@ describe("DragonsMaster", function () {
       // start the sale:
       await increaseBlockTimestampBy(3601)
 
-      assertThrowsMessage(dragonsMaster.connect(buyer1).buyTokens([0, 0, 0], {
+      assertThrowsMessage(dragonsMaster.connect(buyer1).buyTokens(3, {
         value: ethers.BigNumber.from(await dragonsMaster.currentPrice(0))
       }), 'Insufficient payment')
 
@@ -179,10 +179,10 @@ describe("DragonsMaster", function () {
       // start the sale:
       await increaseBlockTimestampBy(3601)
 
-      const hash = await dragonsMaster.encodeForSignature(communityMenber1.address, [0, 0], 1, 1)
+      const hash = await dragonsMaster.encodeForSignature(communityMenber1.address, 2, 1)
       const signature = await signPackedData(hash)
 
-      expect(await dragonsMaster.connect(communityMenber1).buyDiscountedTokens([0, 0], 1, signature, {
+      expect(await dragonsMaster.connect(communityMenber1).buyDiscountedTokens(2, 1, signature, {
         value: ethers.BigNumber.from(await dragonsMaster.currentPrice(1)).mul(3)
       }))
           .to.emit(everDragons2, 'Transfer')
