@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IEverDragonsERC721Token.sol";
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 interface IEverDragons2 {
 

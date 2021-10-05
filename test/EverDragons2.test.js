@@ -1,4 +1,5 @@
 const {expect, assert} = require("chai")
+const {assertThrowsMessage} = require('./helpers')
 
 describe("EverDragons2", function () {
 
@@ -9,20 +10,6 @@ describe("EverDragons2", function () {
 
   let addr0 = '0x0000000000000000000000000000000000000000'
   let owner, teamMember, validator, collector1, collector2, edOwner1, edOwner2
-
-  async function assertThrowsMessage(promise, message, showError) {
-    try {
-      await promise
-      assert.isTrue(false)
-      console.error('This did not throw: ', message)
-    } catch (e) {
-      if (showError) {
-        console.error('Expected: ', message)
-        console.error(e.message)
-      }
-      assert.isTrue(e.message.indexOf(message) > -1)
-    }
-  }
 
   before(async function () {
     [owner, teamMember, validator, collector1, collector2, edOwner1, edOwner2] = await ethers.getSigners()
