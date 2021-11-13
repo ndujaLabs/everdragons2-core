@@ -8,11 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./IEverDragons2.sol";
-import "./MCIP1.sol";
 
-import "hardhat/console.sol";
-
-contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, MCIP1, Ownable {
+contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, Ownable {
   using Address for address;
   address public manager;
 
@@ -45,7 +42,7 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, MCIP1, Ownable
   }
 
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
-    return interfaceId == type(IMCIP1).interfaceId || super.supportsInterface(interfaceId);
+    return super.supportsInterface(interfaceId);
   }
 
   function setManager(address manager_) external override onlyOwner canMint {
