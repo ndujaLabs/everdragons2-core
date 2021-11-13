@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 ///  Note: the ERC-165 identifier for this interface is 0x4b291b8f.
 /* is ERC165 */
 interface IMCIP1 {
-  /// @dev This emits when the attributes for a token id are set.
-  event MetadataSet(uint256 _tokenId, Metadata _attributes);
+  /// @dev This emits when the metadata for a token id are set.
+  event MetadataSet(uint256 _tokenId, Metadata _metadata);
 
   /// @dev This struct saves info about the token. Some of the fields
   /// will be defined as mutable, some as immutable.
