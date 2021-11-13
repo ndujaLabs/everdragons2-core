@@ -39,9 +39,8 @@ interface IMCIP1 {
     // If, for example, a field requires more than 256 possible value, two bytes can be used for it.
   }
 
-  /// @notice Retrieve version, status and attributes
-  /// @dev It returns a Metadata object
-  /// @param _tokenId The id of the token for whom to query the attributes
-  /// @return The attributes of the token
+  /// @dev It returns the on-chain metadata of a specific token
+  /// @param _tokenId The id of the token for whom to query the on-chain metadata
+  /// @return The metadata of the token
   function metadataOf(uint256 _tokenId) external view returns (Metadata memory);
 }
