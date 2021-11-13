@@ -24,7 +24,7 @@ interface IMCIP1 {
     //   burnable             1 << 2          4
     // with the same approach used, for example, in chmod.
     // For example, if a token at a certain moment, is burnable and transferable
-    // the value will be (1 << 1) + (1 << 2) => 6
+    // the value will be  (1 << 1) | (1 << 2)  => 6
     // If it is bridged and, by consequence, not transferable and not burnable, except
     // than by the bridge, it should be 7
     // If a token is set as not transferable or not burnable, the ERC721 hook
@@ -39,9 +39,8 @@ interface IMCIP1 {
     // If, for example, a field requires more than 256 possible value, two bytes can be used for it.
   }
 
-  /// @notice Retrieve version, status and attributes
-  /// @dev It returns a Metadata object
-  /// @param _tokenId The id of the token for whom to query the attributes
-  /// @return The attributes of the token
+  /// @dev It returns the on-chain metadata of a specific token
+  /// @param _tokenId The id of the token for whom to query the on-chain metadata
+  /// @return The metadata of the token
   function metadataOf(uint256 _tokenId) external view returns (Metadata memory);
 }
