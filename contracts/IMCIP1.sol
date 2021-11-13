@@ -24,7 +24,7 @@ interface IMCIP1 {
     //   burnable             1 << 2          4
     // with the same approach used, for example, in chmod.
     // For example, if a token at a certain moment, is burnable and transferable
-    // the value will be (1 << 1) + (1 << 2) => 6
+    // the value will be  (1 << 1) | (1 << 2)  => 6
     // If it is bridged and, by consequence, not transferable and not burnable, except
     // than by the bridge, it should be 7
     // If a token is set as not transferable or not burnable, the ERC721 hook
