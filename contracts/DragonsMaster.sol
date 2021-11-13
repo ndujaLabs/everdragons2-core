@@ -29,8 +29,8 @@ contract DragonsMaster is Ownable {
   // < 1 word in storage
   struct Conf {
     address validator; //
-  // with block numbers it would have been safer
-  // but in our case the risk of fraud is very low
+    // with block numbers it would have been safer
+    // but in our case the risk of fraud is very low
     uint32 startingTimestamp;
     uint16 nextTokenId;
     uint16 maxBuyableTokenId; // 10000 - 1706 - 21 = 8273
@@ -49,7 +49,7 @@ contract DragonsMaster is Ownable {
   mapping(address => bool) public bridges;
 
   modifier saleActive() {
-    require(block.timestamp >= uint(conf.startingTimestamp), "Sale not started yet");
+    require(block.timestamp >= uint256(conf.startingTimestamp), "Sale not started yet");
     require(!saleEnded(), "Sale is ended or closed");
     _;
   }
@@ -91,7 +91,9 @@ contract DragonsMaster is Ownable {
   }
 
   function currentStep(uint8 skippedSteps) public view saleActive returns (uint8) {
-    uint8 step = uint8(block.timestamp.sub(conf.startingTimestamp).div(uint(conf.minutesBetweenDecrements) * 60).add(skippedSteps));
+    uint8 step = uint8(
+      block.timestamp.sub(conf.startingTimestamp).div(uint256(conf.minutesBetweenDecrements) * 60).add(skippedSteps)
+    );
     if (step > conf.numberOfSteps - 1) {
       step = conf.numberOfSteps - 1;
     }
@@ -103,7 +105,7 @@ contract DragonsMaster is Ownable {
     for (uint8 i = 0; i < currentStep_; i++) {
       price = price.div(10).mul(9);
     }
-    return price.mul(10 ** 18).div(100);
+    return price.mul(10**18).div(100);
   }
 
   function saleEnded() public view returns (bool) {
@@ -120,13 +122,16 @@ contract DragonsMaster is Ownable {
     require(!bridges[_msgSender()], "Bridges can not claim tokens");
     require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, chainId, 0), signature), "Invalid signature");
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      if (chainId == 1) {// ETH
+      if (chainId == 1) {
+        // ETH
         require(tokenIds[i] <= 972, "Id out of range");
         tokenIds[i] += conf.maxBuyableTokenId;
-      } else if (chainId == 2) {// Tron
+      } else if (chainId == 2) {
+        // Tron
         require(tokenIds[i] <= 392, "Id out of range");
         tokenIds[i] += conf.maxBuyableTokenId + 972;
-      } else if (chainId == 3) {// POA
+      } else if (chainId == 3) {
+        // POA
         require(tokenIds[i] <= 342, "Id out of range");
         tokenIds[i] += conf.maxBuyableTokenId + 972 + 392;
       } else {
@@ -142,18 +147,18 @@ contract DragonsMaster is Ownable {
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(
         (saleEnded() && tokenIds[i] > conf.maxBuyableTokenId) ||
-        (!saleEnded() && tokenIds[i] > conf.maxBuyableTokenId + allReserved),
+          (!saleEnded() && tokenIds[i] > conf.maxBuyableTokenId + allReserved),
         "Id out of range"
       );
     }
     everDragons2.mint(recipients, tokenIds);
   }
 
-  function buyTokens(uint256[] memory tokenIds) external saleActive payable {
+  function buyTokens(uint256[] memory tokenIds) external payable saleActive {
     require(conf.nextTokenId + tokenIds.length - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
     uint256 price = currentPrice(currentStep(0));
     require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
-    uint nextTokenId = uint(conf.nextTokenId);
+    uint256 nextTokenId = uint256(conf.nextTokenId);
     for (uint256 i = 0; i < tokenIds.length; i++) {
       // override the value with next tokenId
       tokenIds[i] = nextTokenId++;
@@ -167,15 +172,12 @@ contract DragonsMaster is Ownable {
     uint256[] memory tokenIds,
     uint8 skippedSteps,
     bytes memory signature
-  ) external saleActive payable {
+  ) external payable saleActive {
     require(conf.nextTokenId + tokenIds.length - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
-    require(
-      isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, 1, skippedSteps), signature),
-      "Invalid signature"
-    );
+    require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, 1, skippedSteps), signature), "Invalid signature");
     uint256 price = currentPrice(currentStep(skippedSteps));
     require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
-    uint nextTokenId = uint(conf.nextTokenId);
+    uint256 nextTokenId = uint256(conf.nextTokenId);
     for (uint256 i = 0; i < tokenIds.length; i++) {
       // override the value with next tokenId
       tokenIds[i] = nextTokenId++;
@@ -198,15 +200,15 @@ contract DragonsMaster is Ownable {
     uint8 skippedSteps
   ) public pure returns (bytes32) {
     return
-    keccak256(
-      abi.encodePacked(
-        "\x19\x00", // EIP-191
-        addr,
-        tokenIds,
-        chainId,
-        skippedSteps
-      )
-    );
+      keccak256(
+        abi.encodePacked(
+          "\x19\x00", // EIP-191
+          addr,
+          tokenIds,
+          chainId,
+          skippedSteps
+        )
+      );
   }
 
   // withdraw
@@ -216,7 +218,7 @@ contract DragonsMaster is Ownable {
     uint256 available = withdrawable(_msgSender());
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
-    (bool success,) = _msgSender().call{value : amount}("");
+    (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
   }
 
