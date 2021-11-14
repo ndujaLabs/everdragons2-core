@@ -74,7 +74,7 @@ contract ERC721WithMCIP1 is IMCIP1, ERC721, ERC721Enumerable, Ownable {
   // We have only one version, so _tokenId is ignored
   // solhint-disable-next-line
   function isAttributeMutable(uint256 _tokenId, uint8 _attributeIndex) public view override returns (bool) {
-    return _firstMutable <= _attributeIndex;
+    return _attributeIndex >= _firstMutable && _attributeIndex <= _lastMutable;
   }
 
   function _initMetadata(
