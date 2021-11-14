@@ -4,18 +4,16 @@ pragma solidity ^0.8.0;
 // Author: Francesco Sullo <francesco@sullo.co>
 // EverDragons2, https://everdragons2.com
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./IEverDragons2.sol";
-import "./MCIP1.sol";
+import "./ERC721WithMCIP1.sol";
 
-contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, MCIP1, Ownable {
+contract EverDragons2 is IEverDragons2, ERC721WithMCIP1 {
   using Address for address;
   address public manager;
-
-  string private _uri = "https://everdragons2.com/metadata/ed2/";
   bool private _mintEnded;
+  bool private _baseTokenURIFrozen;
+
+  string private _baseTokenURI;
 
   modifier onlyManager() {
     require(manager != address(0) && _msgSender() == manager, "Forbidden");
@@ -27,23 +25,11 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, MCIP1, Ownable
     _;
   }
 
-  constructor() ERC721("EverDragons2", "ED2") {
-    uint8 version = 1;
-    _firstMutables[version] = 21;
-    _latestAttributeIndexes[version] = 25;
+  constructor() ERC721WithMCIP1("EverDragons2", "ED2") {
+    _firstMutable = 21;
+    _lastMutable = 25;
     _mint(msg.sender, 10001);
-  }
-
-  function _beforeTokenTransfer(
-    address from,
-    address to,
-    uint256 tokenId
-  ) internal override(ERC721, ERC721Enumerable) {
-    super._beforeTokenTransfer(from, to, tokenId);
-  }
-
-  function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
-    return interfaceId == type(IMCIP1).interfaceId || super.supportsInterface(interfaceId);
+    _baseTokenURI = "https://everdragons2.com/metadata/ed2/";
   }
 
   function setManager(address manager_) external override onlyOwner canMint {
@@ -63,13 +49,27 @@ contract EverDragons2 is IEverDragons2, ERC721, ERC721Enumerable, MCIP1, Ownable
     }
   }
 
-  function _baseURI() internal view virtual override returns (string memory) {
-    return _uri;
+  function initMetadata(
+    uint256 _tokenId,
+    uint8 _version,
+    uint8 _initialStatus,
+    uint8[30] memory _initialAttributes
+  ) external onlyOwner returns (bool) {
+    return _initMetadata(_tokenId, _version, _initialStatus, _initialAttributes);
   }
 
-  function updateBaseURI(string memory uri) external override onlyOwner {
-    // this is mostly an emergency command
-    _uri = uri;
+  function _baseURI() internal view virtual override returns (string memory) {
+    return _baseTokenURI;
+  }
+
+  function updateBaseTokenURI(string memory uri) external override onlyOwner {
+    require(!_baseTokenURIFrozen, "baseTokenUri has been frozen");
+    // after revealing, this allows to set up a final uri
+    _baseTokenURI = uri;
+  }
+
+  function freezeBaseTokenURI() external override onlyOwner {
+    _baseTokenURIFrozen = true;
   }
 
   function endMinting() external override onlyOwner {

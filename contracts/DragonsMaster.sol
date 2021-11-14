@@ -43,7 +43,7 @@ contract DragonsMaster is Ownable {
   Conf public conf;
   IEverDragons2 public everDragons2;
 
-  uint256 public ethBalance;
+  uint256 public proceedsBalance;
   uint256 public limit;
 
   mapping(address => bool) public bridges;
@@ -164,7 +164,7 @@ contract DragonsMaster is Ownable {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
-    ethBalance += msg.value;
+    proceedsBalance += msg.value;
     everDragons2.mint(_msgSender(), tokenIds);
   }
 
@@ -183,7 +183,7 @@ contract DragonsMaster is Ownable {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
-    ethBalance += msg.value;
+    proceedsBalance += msg.value;
     everDragons2.mint(_msgSender(), tokenIds);
   }
 
@@ -214,7 +214,6 @@ contract DragonsMaster is Ownable {
   // withdraw
 
   function claimEarnings(uint256 amount) external {
-    require(saleEnded(), "Sale still active");
     uint256 available = withdrawable(_msgSender());
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
@@ -224,7 +223,7 @@ contract DragonsMaster is Ownable {
 
   function withdrawable(address addr) public view returns (uint256) {
     if (teams[addr].percentage > 0) {
-      return ethBalance.div(100).mul(teams[addr].percentage).sub(teams[addr].withdrawnAmount);
+      return proceedsBalance.div(100).mul(teams[addr].percentage).sub(teams[addr].withdrawnAmount);
     } else {
       return 0;
     }

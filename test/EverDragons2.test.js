@@ -43,6 +43,8 @@ describe("EverDragons2", function () {
     expect(await everDragons2.symbol()).to.equal("ED2")
     expect(await everDragons2.manager()).to.equal(dragonsMaster.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
+
+    // console.log(await everDragons2.getInterfaceId())
   })
 
   it("should mint token 23, 100 and 3230 and give them to collector1", async function () {
@@ -65,6 +67,23 @@ describe("EverDragons2", function () {
   })
 
   it("should mint token 23, 100 and 3230 and give two to collector1 and one to collector2", async function () {
+
+    const tokenIds = [23, 100, 3230]
+
+    await expect(dragonsMaster['mint(address[],uint256[])']([collector1.address, collector2.address, collector1.address,], tokenIds))
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[0])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector2.address, tokenIds[1])
+        .to.emit(everDragons2, 'Transfer')
+        .withArgs(addr0, collector1.address, tokenIds[2])
+
+    expect(await everDragons2.ownerOf(tokenIds[0])).to.equal(collector1.address)
+    expect(await everDragons2.ownerOf(tokenIds[1])).to.equal(collector2.address)
+    expect(await everDragons2.ownerOf(tokenIds[2])).to.equal(collector1.address)
+  })
+
+  it("should mint token 1 to 100 and reveal the metadata", async function () {
 
     const tokenIds = [23, 100, 3230]
 
