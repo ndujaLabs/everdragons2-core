@@ -83,23 +83,6 @@ describe("EverDragons2", function () {
     expect(await everDragons2.ownerOf(tokenIds[2])).to.equal(collector1.address)
   })
 
-  it("should mint token 1 to 100 and reveal the metadata", async function () {
-
-    const tokenIds = [23, 100, 3230]
-
-    await expect(dragonsMaster['mint(address[],uint256[])']([collector1.address, collector2.address, collector1.address,], tokenIds))
-        .to.emit(everDragons2, 'Transfer')
-        .withArgs(addr0, collector1.address, tokenIds[0])
-        .to.emit(everDragons2, 'Transfer')
-        .withArgs(addr0, collector2.address, tokenIds[1])
-        .to.emit(everDragons2, 'Transfer')
-        .withArgs(addr0, collector1.address, tokenIds[2])
-
-    expect(await everDragons2.ownerOf(tokenIds[0])).to.equal(collector1.address)
-    expect(await everDragons2.ownerOf(tokenIds[1])).to.equal(collector2.address)
-    expect(await everDragons2.ownerOf(tokenIds[2])).to.equal(collector1.address)
-  })
-
   it("should throw if dragons master tries to mint when minting is ended", async function () {
 
     await everDragons2.endMinting()
