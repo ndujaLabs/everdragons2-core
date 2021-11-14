@@ -43,6 +43,8 @@ describe("EverDragons2", function () {
     expect(await everDragons2.symbol()).to.equal("ED2")
     expect(await everDragons2.manager()).to.equal(dragonsMaster.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
+
+    // console.log(await everDragons2.getInterfaceId())
   })
 
   it("should mint token 23, 100 and 3230 and give them to collector1", async function () {
