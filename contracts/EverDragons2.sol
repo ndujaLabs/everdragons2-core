@@ -5,9 +5,9 @@ pragma solidity ^0.8.0;
 // EverDragons2, https://everdragons2.com
 
 import "./IEverDragons2.sol";
-import "./ERC721WithMCIP1.sol";
+import "./ERC721CrossGameMCIP1.sol";
 
-contract EverDragons2 is IEverDragons2, ERC721WithMCIP1 {
+contract EverDragons2 is IEverDragons2, ERC721CrossGameMCIP1 {
   using Address for address;
   address public manager;
   bool private _mintEnded;
@@ -25,9 +25,7 @@ contract EverDragons2 is IEverDragons2, ERC721WithMCIP1 {
     _;
   }
 
-  constructor() ERC721WithMCIP1("EverDragons2", "ED2") {
-    _firstMutable = 21;
-    _lastMutable = 25;
+  constructor() ERC721CrossGameMCIP1("EverDragons2", "ED2") {
     _mint(msg.sender, 10001);
     _baseTokenURI = "https://everdragons2.com/metadata/ed2/";
   }
@@ -47,15 +45,6 @@ contract EverDragons2 is IEverDragons2, ERC721WithMCIP1 {
     for (uint256 i = 0; i < tokenIds.length; i++) {
       _mint(recipients[i], tokenIds[i]);
     }
-  }
-
-  function initMetadata(
-    uint256 _tokenId,
-    uint8 _version,
-    uint8 _initialStatus,
-    uint8[30] memory _initialAttributes
-  ) external onlyOwner returns (bool) {
-    return _initMetadata(_tokenId, _version, _initialStatus, _initialAttributes);
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
