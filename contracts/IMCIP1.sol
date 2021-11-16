@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Refer to https://github.com/ndujaLabs/MCIPs/blob/main/MCIPs/mcip-1.md
 pragma solidity ^0.8.0;
 
 /// @title IMCIP-1 On chain metadata
