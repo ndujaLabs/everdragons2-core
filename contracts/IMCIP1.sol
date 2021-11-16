@@ -42,9 +42,8 @@ interface IMCIP1 /* is ERC165 */{
 
   /// @notice Initialize the attributes of a token
   /// @dev It must be called by a game's contract to initialize
-  /// the metadata according to its own attributes. This function removes the
-  /// need of an approveGame function, because initializing the metadata for a game,
-  /// implies approving the game.
+  /// the metadata according to its own attributes.
+  /// Question: is there any risk if an unwanted game set attributes?
   /// @param _tokenId The id of the token for whom to change the attributes
   /// @param _version The version of the metadata
   /// @param _initialStatus The initial status (if, for example, it is burnable)
