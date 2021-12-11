@@ -17,7 +17,8 @@ contract DragonsMaster is Ownable {
 
   event TeamAddressUpdated(address oldAddr, address newAddr);
   event DropSet();
-  event WalletWhitelistedForDiscount(address wallet);
+  event WalletWhitelistedForDiscount(address wallet, uint8 skippedSteps);
+  event WinnerWalletWhitelisted(address wallet, uint8 totalWon);
 
   uint8 public constant EDO = 1;
   uint8 public constant ED2 = 2;
@@ -183,6 +184,7 @@ contract DragonsMaster is Ownable {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
+    giveawaysWinners[_msgSender()] = 0;
     everDragons2.mint(_msgSender(), tokenIds);
   }
 
@@ -215,18 +217,29 @@ contract DragonsMaster is Ownable {
     }
     conf.nextTokenId = uint16(nextTokenId);
     proceedsBalance += msg.value;
-    tokenGetByWhitelistedWallet[_msgSender()] -= uint8(quantity);
+    tokenGetByWhitelistedWallet[_msgSender()] += uint8(quantity);
     everDragons2.mint(_msgSender(), tokenIds);
   }
 
   function addWalletsToWhitelists(address[] memory wallets, uint8 numberOfStepsSkipped) external onlyOwner {
     for (uint i=0;i < wallets.length;i++) {
+      require(wallets[i] != address(0), "Null address");
+      levelOfWhitelistedWallet[wallets[i]] = numberOfStepsSkipped;
+      emit WalletWhitelistedForDiscount(wallets[i], numberOfStepsSkipped);
+    }
+  }
+
+  function addWinnerWalletsToWhitelists(address[] memory wallets, uint8[] memory numberOfTokenWon) external onlyOwner {
+    require(wallets.length == numberOfTokenWon.length, "Inconsistent arrays");
+    for (uint i=0;i < wallets.length;i++) {
+      require(wallets[i] != address(0), "Null address");
+
       if (levelOfWhitelistedWallet[wallets[i]] == 0) {
         // wallet whitelisted again by mistake. Let's not revert :-)
         continue;
       } else {
-        levelOfWhitelistedWallet[wallets[i]] = numberOfStepsSkipped;
-        emit WalletWhitelistedForDiscount(wallets[i]);
+        giveawaysWinners[wallets[i]] = numberOfTokenWon[i];
+        emit WinnerWalletWhitelisted(wallets[i], numberOfTokenWon[i]);
       }
     }
   }
