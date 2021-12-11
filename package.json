@@ -11,9 +11,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@ndujalabs/erc721playable": "^0.1.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@poanet/solidity-flattener": "^3.0.6",
     "@openzeppelin/contracts": "^4.0.0",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.3.0",
@@ -22,10 +24,7 @@
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.17",
-    "solhint": "^3.3.6"
-  },
-  "dependencies": {
-    "@poanet/solidity-flattener": "^3.0.6",
+    "solhint": "^3.3.6",
     "ipfs-http-client": "^49.0.4"
   }
 }
