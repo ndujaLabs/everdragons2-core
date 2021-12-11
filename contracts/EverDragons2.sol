@@ -30,9 +30,9 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     _;
   }
 
-  constructor() ERC721Playable("EverDragons2", "ED2") {
-    _mint(msg.sender, 10001);
-    _baseTokenURI = "https://everdragons2.com/metadata/ed2/";
+  constructor(uint lastTokenId) ERC721Playable("Origins Genesis Everdragons2", "OGE") {
+    _mint(msg.sender, lastTokenId);
+    _baseTokenURI = "https://meta.everdragons2.com/oge/";
   }
 
   function _beforeTokenTransfer(
@@ -54,13 +54,13 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
 
   function mint(address recipient, uint256[] memory tokenIds) external override onlyManager canMint {
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      _mint(recipient, tokenIds[i]);
+      _safeMint(recipient, tokenIds[i]);
     }
   }
 
   function mint(address[] memory recipients, uint256[] memory tokenIds) external override onlyManager canMint {
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      _mint(recipients[i], tokenIds[i]);
+      _safeMint(recipients[i], tokenIds[i]);
     }
   }
 

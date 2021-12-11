@@ -34,9 +34,9 @@ describe("DragonsMaster", function () {
       validator: validator.address,
       nextTokenId: 1,
       maxBuyableTokenId: 8000,
-      maxPrice: 180, // = 1.8 ETH
+      maxPrice: 50000, // = 5000 MATIC
       decrementPercentage: 10, // 10%
-      minutesBetweenDecrements: 60, // 1 hour
+      minutesBetweenDecrements: 10, // 10 minutes
       numberOfSteps: 32
     }
     initEthers(ethers)
@@ -44,7 +44,7 @@ describe("DragonsMaster", function () {
 
   async function initAndDeploy() {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    everDragons2 = await EverDragons2.deploy()
+    everDragons2 = await EverDragons2.deploy(10001)
     await everDragons2.deployed()
     DragonsMaster = await ethers.getContractFactory("DragonsMaster")
     dragonsMaster = await DragonsMaster.deploy(everDragons2.address)

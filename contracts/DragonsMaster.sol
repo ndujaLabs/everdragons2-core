@@ -16,10 +16,16 @@ contract DragonsMaster is Ownable {
   using SafeMath for uint256;
 
   event TeamAddressUpdated(address oldAddr, address newAddr);
-  event SaleSet();
+  event DropSet();
+  event WalletWhitelistedForDiscount(address wallet);
+
+  uint8 public constant EDO = 1;
+  uint8 public constant ED2 = 2;
+  uint8 public constant DAO = 3;
+  uint8 public constant NDL = 4;
 
   struct Team {
-    bytes3 name;
+    uint8 name;
     uint8 percentage;
     uint224 withdrawnAmount;
   }
@@ -33,11 +39,15 @@ contract DragonsMaster is Ownable {
     // but in our case the risk of fraud is very low
     uint32 startingTimestamp;
     uint16 nextTokenId;
-    uint16 maxBuyableTokenId; // 10000 - 1706 - 21 = 8273
-    uint8 maxPrice; // 180 = 1.8 ETH
+    uint16 maxBuyableTokenId; // 7900
+    uint8 maxPrice; // from 5000 to 191 in 32 steps
     uint8 decrementPercentage; // 10%
-    uint8 minutesBetweenDecrements; // 60 << 1 hour
-    uint8 numberOfSteps; // 32 << price reduces 10% every hour
+    uint8 minutesBetweenDecrements; // 10 --
+    uint8 numberOfSteps; // 32 << price reduces 10% every time
+    uint16 edOnEthereum; // 972
+    uint16 edOnPoa; // 342
+    uint16 edOnTron; // 392
+    uint8 maxTokenPerWhitelistedWallet; // 3
   }
 
   Conf public conf;
@@ -45,8 +55,9 @@ contract DragonsMaster is Ownable {
 
   uint256 public proceedsBalance;
   uint256 public limit;
-
-  mapping(address => bool) public bridges;
+  mapping (address => uint8) public giveawaysWinners;
+  mapping (address => uint8) public levelOfWhitelistedWallet;
+  mapping (address => uint8) public tokenGetByWhitelistedWallet;
 
   modifier saleActive() {
     require(block.timestamp >= uint256(conf.startingTimestamp), "Sale not started yet");
@@ -59,10 +70,11 @@ contract DragonsMaster is Ownable {
   }
 
   function updateTeamAddress(address addr) external {
+    require(addr != address(0), "No 0x0 allowed");
+    require(teams[addr].percentage == 0, "Address already used");
     Team memory team0 = teams[_msgSender()];
     require(team0.percentage > 0, "Forbidden");
-    require(addr != address(0), "No 0x0 allowed");
-    teams[addr] = Team(team0.name, team0.percentage, 0);
+    teams[addr] = Team(team0.name, team0.percentage, team0.withdrawnAmount);
     delete teams[_msgSender()];
     emit TeamAddressUpdated(_msgSender(), addr);
   }
@@ -73,21 +85,29 @@ contract DragonsMaster is Ownable {
     conf.numberOfSteps = 0;
   }
 
+  mapping (address => bool) private _tmp;
+
   function init(
     Conf memory conf_,
-    address[] memory bridges_,
     address edo,
     address ed2,
+    address dao,
     address ndl
   ) external onlyOwner {
     require(conf.validator == address(0), "Sale already set");
     conf = conf_;
-    teams[edo] = Team(0x65646f, 20, 0);
-    teams[ed2] = Team(0x656432, 20, 0);
-    teams[ndl] = Team(0x6e646c, 60, 0);
-    for (uint256 i = 0; i < bridges_.length; i++) {
-      bridges[bridges_[i]] = true;
-    }
+    require(edo != address(0) && ed2 != address(0) && dao != address(0) && ndl != address(0), "Address null not allowed");
+    _tmp[edo] = true;
+    teams[edo] = Team(EDO, 20, 0);
+    require(!_tmp[ed2], "Address repeated");
+    _tmp[ed2] = true;
+    teams[ed2] = Team(ED2, 20, 0);
+    require(!_tmp[dao], "Address repeated");
+    _tmp[dao] = true;
+    teams[dao] = Team(DAO, 20, 0);
+    require(!_tmp[ndl], "Address repeated");
+    teams[ndl] = Team(NDL, 40, 0);
+    emit DropSet();
   }
 
   function currentStep(uint8 skippedSteps) public view saleActive returns (uint8) {
@@ -119,21 +139,20 @@ contract DragonsMaster is Ownable {
     uint8 chainId,
     bytes memory signature
   ) external saleActive {
-    require(!bridges[_msgSender()], "Bridges can not claim tokens");
     require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, chainId, 0), signature), "Invalid signature");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       if (chainId == 1) {
         // ETH
-        require(tokenIds[i] <= 972, "Id out of range");
+        require(tokenIds[i] <= conf.edOnEthereum, "Id out of range");
         tokenIds[i] += conf.maxBuyableTokenId;
       } else if (chainId == 2) {
-        // Tron
-        require(tokenIds[i] <= 392, "Id out of range");
-        tokenIds[i] += conf.maxBuyableTokenId + 972;
-      } else if (chainId == 3) {
         // POA
-        require(tokenIds[i] <= 342, "Id out of range");
-        tokenIds[i] += conf.maxBuyableTokenId + 972 + 392;
+        require(tokenIds[i] <= conf.edOnPoa, "Id out of range");
+        tokenIds[i] += conf.maxBuyableTokenId + conf.edOnEthereum;
+      } else if (chainId == 3) {
+        // TRON
+        require(tokenIds[i] <= conf.edOnTron, "Id out of range");
+        tokenIds[i] += conf.maxBuyableTokenId + conf.edOnEthereum + conf.edOnPoa;
       } else {
         revert("Chain not supported");
       }
@@ -141,25 +160,39 @@ contract DragonsMaster is Ownable {
     everDragons2.mint(_msgSender(), tokenIds);
   }
 
+
   function giveAwayTokens(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
     require(recipients.length == tokenIds.length, "Inconsistent lengths");
-    uint16 allReserved = 972 + 392 + 342;
+    uint16 allReserved = conf.edOnPoa + conf.edOnEthereum + conf.edOnTron;
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      require(
-        (saleEnded() && tokenIds[i] > conf.maxBuyableTokenId) ||
-          (!saleEnded() && tokenIds[i] > conf.maxBuyableTokenId + allReserved),
+      require(saleEnded() || tokenIds[i] > conf.maxBuyableTokenId + allReserved,
         "Id out of range"
       );
     }
+    // it will revert if any token has already been minted
     everDragons2.mint(recipients, tokenIds);
   }
 
-  function buyTokens(uint256[] memory tokenIds) external payable saleActive {
-    require(conf.nextTokenId + tokenIds.length - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
-    uint256 price = currentPrice(currentStep(0));
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+  function claimWonTokens() external {
+    uint quantity = uint(giveawaysWinners[_msgSender()]);
+    require(quantity > 0, "Not a winner");
     uint256 nextTokenId = uint256(conf.nextTokenId);
-    for (uint256 i = 0; i < tokenIds.length; i++) {
+    uint256[] memory tokenIds = new uint256[](quantity);
+    for (uint256 i = 0; i < quantity; i++) {
+      // override the value with next tokenId
+      tokenIds[i] = nextTokenId++;
+    }
+    conf.nextTokenId = uint16(nextTokenId);
+    everDragons2.mint(_msgSender(), tokenIds);
+  }
+
+  function buyTokens(uint256 quantity) external payable saleActive {
+    require(conf.nextTokenId + quantity - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
+    uint256 price = currentPrice(currentStep(0));
+    require(msg.value >= price.mul(quantity), "Insufficient payment");
+    uint256 nextTokenId = uint256(conf.nextTokenId);
+    uint256[] memory tokenIds = new uint256[](quantity);
+    for (uint256 i = 0; i < quantity; i++) {
       // override the value with next tokenId
       tokenIds[i] = nextTokenId++;
     }
@@ -169,22 +202,33 @@ contract DragonsMaster is Ownable {
   }
 
   function buyDiscountedTokens(
-    uint256[] memory tokenIds,
-    uint8 skippedSteps,
-    bytes memory signature
+    uint256 quantity
   ) external payable saleActive {
-    require(conf.nextTokenId + tokenIds.length - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
-    require(isSignedByValidator(encodeForSignature(_msgSender(), tokenIds, 1, skippedSteps), signature), "Invalid signature");
-    uint256 price = currentPrice(currentStep(skippedSteps));
-    require(msg.value >= price.mul(tokenIds.length), "Insufficient payment");
+    require(conf.nextTokenId + quantity - 1 <= conf.maxBuyableTokenId, "Not enough tokens left");
+    require(tokenGetByWhitelistedWallet[_msgSender()] + quantity <= conf.maxTokenPerWhitelistedWallet, "You are trying to get too many tokens");
+    uint256 price = currentPrice(currentStep(levelOfWhitelistedWallet[_msgSender()]));
+    require(msg.value >= price.mul(quantity), "Insufficient payment");
     uint256 nextTokenId = uint256(conf.nextTokenId);
-    for (uint256 i = 0; i < tokenIds.length; i++) {
-      // override the value with next tokenId
+    uint256[] memory tokenIds = new uint256[](quantity);
+    for (uint256 i = 0; i < quantity; i++) {
       tokenIds[i] = nextTokenId++;
     }
     conf.nextTokenId = uint16(nextTokenId);
     proceedsBalance += msg.value;
+    tokenGetByWhitelistedWallet[_msgSender()] -= uint8(quantity);
     everDragons2.mint(_msgSender(), tokenIds);
+  }
+
+  function addWalletsToWhitelists(address[] memory wallets, uint8 numberOfStepsSkipped) external onlyOwner {
+    for (uint i=0;i < wallets.length;i++) {
+      if (levelOfWhitelistedWallet[wallets[i]] == 0) {
+        // wallet whitelisted again by mistake. Let's not revert :-)
+        continue;
+      } else {
+        levelOfWhitelistedWallet[wallets[i]] = numberOfStepsSkipped;
+        emit WalletWhitelistedForDiscount(wallets[i]);
+      }
+    }
   }
 
   // cryptography
@@ -202,7 +246,7 @@ contract DragonsMaster is Ownable {
     return
       keccak256(
         abi.encodePacked(
-          "\x19\x00", // EIP-191
+          "\x19\x01", // EIP-191
           addr,
           tokenIds,
           chainId,
@@ -215,6 +259,7 @@ contract DragonsMaster is Ownable {
 
   function claimEarnings(uint256 amount) external {
     uint256 available = withdrawable(_msgSender());
+    require(amount != 0, "Unauthorized or depleted");
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
     (bool success, ) = _msgSender().call{value: amount}("");

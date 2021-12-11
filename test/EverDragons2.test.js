@@ -30,7 +30,7 @@ describe("EverDragons2", function () {
 
   beforeEach(async function () {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    everDragons2 = await EverDragons2.deploy()
+    everDragons2 = await EverDragons2.deploy(10001)
     await everDragons2.deployed()
     DragonsMaster = await ethers.getContractFactory("DragonsMasterMock")
     dragonsMaster = await DragonsMaster.deploy(everDragons2.address)
