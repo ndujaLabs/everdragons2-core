@@ -96,18 +96,13 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
   ) public payable returns (uint64 sequence) {
     require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
     burn(tokenID);
-    return _wormholeTransfer(tokenID, recipientChain, recipient, nonce);
+    return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
   }
 
   // Complete a transfer from Wormhole
   function wormholeCompleteTransfer(bytes memory encodedVm) public {
     (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
     _safeMint(to, tokenId);
-  }
-
-  // Return the corresponding contract on a different chain
-  function wormholeGetContract(uint16 chainId) public view returns (bytes32) {
-    return _wormholeGetContract(chainId);
   }
 
 }
