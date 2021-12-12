@@ -5,7 +5,7 @@ contract NFTStructs {
   struct Transfer {
     // PayloadID uint8 = 1
     // TokenID of the token
-    uint256 tokenID;
+    uint256 tokenId;
     // Address of the recipient. Left-zero-padded if shorter than 32 bytes
     bytes32 to;
     // Chain ID of the recipient
