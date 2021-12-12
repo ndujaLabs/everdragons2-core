@@ -6,17 +6,20 @@ const Helpers = {
     this.ethers = ethers
   },
 
-  async assertThrowsMessage(promise, message, showError) {
+  async assertThrowsMessage(promise, message) {
+    let notThrowing
     try {
       await promise
+      notThrowing = true
+      console.error('Not throwing instead of:', message)
       assert.isTrue(false)
-      console.error('This did not throw: ', message)
     } catch (e) {
-      if (showError) {
-        console.error('Expected: ', message)
-        console.error(e.message)
+      const rightMessage = e.message.indexOf(message) > -1
+      if (!rightMessage && !notThrowing) {
+        console.error('Expected:', message)
+        console.error('Returned:', e.message)
       }
-      assert.isTrue(e.message.indexOf(message) > -1)
+      assert.isTrue(rightMessage)
     }
   },
 

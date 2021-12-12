@@ -3,7 +3,7 @@ pragma solidity ^0.8.2;
 
 import "../IEverDragons2.sol";
 
-contract DragonsMasterMock {
+contract DragonsFarmMock {
   IEverDragons2 public everDragons2;
 
   constructor(address everDragons2_) {
