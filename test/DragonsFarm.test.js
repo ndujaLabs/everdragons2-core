@@ -193,18 +193,20 @@ describe("DragonsFarm", function () {
     it.skip("should print the price while it goes down", async function () {
 
       const conf2 = _.clone(conf)
-      conf2.decrementPercentage = 1 // 10%
-      conf2.minutesBetweenDecrements = 1, // 10 minutes
+      conf2.decrementPercentage = 1
+      conf2.minutesBetweenDecrements = 1
       conf2.numberOfSteps = 300
-      conf2.maxPrice = 6000 * 100, // = 6000 MATIC
-          await configure(conf2)
+      conf2.maxPrice = 5000 * 100
+      conf2.minPrice = 200 * 100
+
+      await configure(conf2)
 
       const ts = await getTimestamp()
       // 1 hour passes, sale starts
       await increaseBlockTimestampBy(3601)
 
       for (let i = 0; i < conf2.numberOfSteps; i++) {
-        console.log(ethers.utils.formatEther(await dragonsFarm.currentPrice(i)))
+        console.log(i, ethers.utils.formatEther(await dragonsFarm.currentPrice(i)))
       }
     })
 
