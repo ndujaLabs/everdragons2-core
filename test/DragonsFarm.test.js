@@ -189,6 +189,22 @@ describe("DragonsFarm", function () {
       )
     })
 
+    it.only("should print the price while it goes down", async function () {
+
+      const conf2 = _.clone(conf)
+      conf2.numberOfSteps = 33
+      conf2.maxPrice = 6000 * 100, // = 6000 MATIC
+          await configure(conf2)
+
+      const ts = await getTimestamp()
+      // 1 hour passes, sale starts
+      await increaseBlockTimestampBy(3601)
+
+      for (let i = 0;i< conf2.numberOfSteps; i++) {
+        console.log(ethers.utils.fromWei(await dragonsFarm.currentPrice(step)))
+      }
+    })
+
   })
 
   describe('#buyTokens', async function () {
