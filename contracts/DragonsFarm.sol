@@ -49,11 +49,12 @@ contract DragonsFarm is Ownable {
     // 2nd word
     uint8 decrementPercentage; // 10%
     uint8 minutesBetweenDecrements; // 10 --
-    uint8 numberOfSteps; // 32 << price reduces 10% every time
+    uint16 numberOfSteps; // 32 << price reduces 10% every time
     uint16 edOnEthereum; // 972
     uint16 edOnPoa; // 342
     uint16 edOnTron; // 392
     uint8 maxTokenPerWhitelistedWallet; // 3
+    uint32 minPrice; // floor
 //    uint16 nextWonTokenId;
   }
 
@@ -134,8 +135,8 @@ contract DragonsFarm is Ownable {
     emit DropSet();
   }
 
-  function currentStep(uint8 skippedSteps) public view saleActive returns (uint8) {
-    uint8 step = uint8(
+  function currentStep(uint8 skippedSteps) public view saleActive returns (uint16) {
+    uint16 step = uint16(
       block.timestamp.sub(conf.startingTimestamp).div(uint256(conf.minutesBetweenDecrements) * 60).add(skippedSteps)
     );
     if (step > conf.numberOfSteps - 1) {
@@ -144,10 +145,13 @@ contract DragonsFarm is Ownable {
     return step;
   }
 
-  function currentPrice(uint8 currentStep_) public view returns (uint256) {
+  function currentPrice(uint16 currentStep_) public view returns (uint256) {
     uint256 price = uint256(conf.maxPrice);
-    for (uint8 i = 0; i < currentStep_; i++) {
-      price = price.div(10).mul(9);
+    for (uint16 i = 0; i < currentStep_; i++) {
+      price = price.div(100).mul(100 - conf.decrementPercentage);
+      if (price < conf.minPrice) {
+        price = conf.minPrice;
+      }
     }
     return price.mul(10**18).div(100);
   }
