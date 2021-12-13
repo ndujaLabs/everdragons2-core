@@ -767,7 +767,6 @@ describe("DragonsFarm", function () {
         edOnTron: 5,
         maxTokenPerWhitelistedWallet: 3
       }
-
       await configure(conf2)
 
     })
