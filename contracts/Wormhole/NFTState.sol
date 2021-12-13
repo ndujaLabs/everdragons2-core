@@ -4,5 +4,5 @@ pragma solidity ^0.8.2;
 import "./NFTStorage.sol";
 
 contract NFTState {
-  NFTStorage.State _state;
+  NFTStorage.State _wormholeState;
 }

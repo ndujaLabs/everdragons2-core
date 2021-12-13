@@ -12,43 +12,24 @@ import "./NFTSetters.sol";
 contract WormholeERC721 is Ownable, NFTGetters, NFTSetters {
   using BytesLib for bytes;
 
-  function wormholeSetup(uint16 chainId, address wormhole) public onlyOwner {
-    // _setOwner(_msgSender());
+  function wormholeInit(uint16 chainId, address wormhole) public onlyOwner {
     _setChainId(chainId);
     _setWormhole(wormhole);
   }
 
-  function wormholeRegisterChain(uint16 chainId_, bytes32 bridgeContract_) public onlyOwner {
-    _setBridgeImplementation(chainId_, bridgeContract_);
+  function wormholeRegisterContract(uint16 chainId_, bytes32 nftContract_) public onlyOwner {
+    _setNftContract(chainId_, nftContract_);
   }
 
-  function _wormholeTransfer(
-    uint256 tokenID,
-    uint16 recipientChain,
-    bytes32 recipient,
-    uint32 nonce
-  ) internal returns (uint64 sequence) {
-    //require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
-    require(bridgeContracts(recipientChain) != 0, "ERC721: recipientChain not allowed");
-    sequence = logTransfer(NFTStructs.Transfer({tokenID: tokenID, to: recipient, toChain: recipientChain}), msg.value, nonce);
-    return sequence;
-  }
-
-  function logTransfer(
-    NFTStructs.Transfer memory transfer,
-    uint256 callValue,
-    uint32 nonce
-  ) internal returns (uint64 sequence) {
-    bytes memory encoded = encodeTransfer(transfer);
-
-    sequence = wormhole().publishMessage{value: callValue}(nonce, encoded, 15);
+  function wormholeGetContract(uint16 chainId) public view returns (bytes32) {
+    return nftContract(chainId);
   }
 
   function _wormholeCompleteTransfer(bytes memory encodedVm) internal returns (address to, uint256 tokenId) {
     (IWormhole.VM memory vm, bool valid, string memory reason) = wormhole().parseAndVerifyVM(encodedVm);
 
     require(valid, reason);
-    require(verifyBridgeVM(vm), "invalid emitter");
+    require(verifyNftContractVM(vm), "invalid emitter");
 
     NFTStructs.Transfer memory transfer = parseTransfer(vm.payload);
 
@@ -60,30 +41,60 @@ contract WormholeERC721 is Ownable, NFTGetters, NFTSetters {
     // transfer bridged NFT to recipient
     address transferRecipient = address(uint160(uint256(transfer.to)));
 
-    return (transferRecipient, transfer.tokenID);
+    return (transferRecipient, transfer.tokenId);
   }
 
-  function verifyBridgeVM(IWormhole.VM memory vm) internal view returns (bool) {
-    if (bridgeContracts(vm.emitterChainId) == vm.emitterAddress) {
+  function _wormholeTransfer(
+    uint256 tokenId,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) internal returns (uint64 sequence) {
+    // TODO msg.value - Wormhole fees
+    return _wormholeTransferWithValue(tokenId, recipientChain, recipient, nonce, msg.value);
+  }
+
+  function _wormholeTransferWithValue(
+    uint256 tokenId,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce,
+    uint256 value
+  ) internal returns (uint64 sequence) {
+    require(nftContract(recipientChain) != 0, "ERC721: recipientChain not allowed");
+    sequence = logTransfer(NFTStructs.Transfer({tokenId: tokenId, to: recipient, toChain: recipientChain}), value, nonce);
+    return sequence;
+  }
+
+  function logTransfer(
+    NFTStructs.Transfer memory transfer,
+    uint256 callValue,
+    uint32 nonce
+  ) internal returns (uint64 sequence) {
+    bytes memory encoded = encodeTransfer(transfer);
+    sequence = wormhole().publishMessage{value: callValue}(nonce, encoded, 15);
+  }
+
+  function verifyNftContractVM(IWormhole.VM memory vm) internal view returns (bool) {
+    if (nftContract(vm.emitterChainId) == vm.emitterAddress) {
       return true;
     }
-
     return false;
   }
 
   function encodeTransfer(NFTStructs.Transfer memory transfer) internal pure returns (bytes memory encoded) {
-    encoded = abi.encodePacked(uint8(1), transfer.tokenID, transfer.to, transfer.toChain);
+    encoded = abi.encodePacked(uint8(1), transfer.tokenId, transfer.to, transfer.toChain);
   }
 
   function parseTransfer(bytes memory encoded) internal pure returns (NFTStructs.Transfer memory transfer) {
     uint256 index = 0;
 
-    uint8 payloadID = encoded.toUint8(index);
+    uint8 payloadId = encoded.toUint8(index);
     index += 1;
 
-    require(payloadID == 1, "invalid Transfer");
+    require(payloadId == 1, "invalid Transfer");
 
-    transfer.tokenID = encoded.toUint256(index);
+    transfer.tokenId = encoded.toUint256(index);
     index += 32;
 
     transfer.to = encoded.toBytes32(index);
@@ -94,9 +105,5 @@ contract WormholeERC721 is Ownable, NFTGetters, NFTSetters {
 
     require(encoded.length == index, "invalid Transfer");
     return transfer;
-  }
-
-  function _wormholeGetContract(uint16 chainId) internal view returns (bytes32) {
-    return bridgeContracts(chainId);
   }
 }

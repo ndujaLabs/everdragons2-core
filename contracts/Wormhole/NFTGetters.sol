@@ -6,18 +6,18 @@ import "./NFTState.sol";
 
 contract NFTGetters is NFTState {
   function isTransferCompleted(bytes32 hash) public view returns (bool) {
-    return _state.completedTransfers[hash];
+    return _wormholeState.completedTransfers[hash];
   }
 
-  function bridgeContracts(uint16 chainId_) public view returns (bytes32) {
-    return _state.bridgeImplementations[chainId_];
+  function nftContract(uint16 chainId_) public view returns (bytes32) {
+    return _wormholeState.nftContracts[chainId_];
   }
 
   function wormhole() public view returns (IWormhole) {
-    return IWormhole(_state.wormhole);
+    return IWormhole(_wormholeState.wormhole);
   }
 
   function chainId() public view returns (uint16) {
-    return _state.chainId;
+    return _wormholeState.chainId;
   }
 }
