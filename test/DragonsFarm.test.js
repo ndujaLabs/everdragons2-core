@@ -750,4 +750,95 @@ describe("DragonsFarm", function () {
 
   })
 
+  describe('#claimEarnings', async function () {
+
+    beforeEach(async function () {
+      await initAndDeploy()
+      const conf2 = {
+        validator: validator.address,
+        nextTokenId: 1,
+        maxTokenIdForSale: 40,
+        maxPrice: 50 * 100, // = 50 MATIC
+        decrementPercentage: 10, // 10%
+        minutesBetweenDecrements: 10, // 10 minutes
+        numberOfSteps: 5,
+        edOnEthereum: 10,
+        edOnPoa: 5,
+        edOnTron: 5,
+        maxTokenPerWhitelistedWallet: 3
+      }
+
+      await configure(conf2)
+
+    })
+
+    it("should mint unminted tokens", async function () {
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+      await dragonsFarm.connect(buyer1).buyTokens(3, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(3)
+      })
+
+      let ownedTokens = [4, 7, 1]
+
+      let chainId = await dragonsFarm.getChainId()
+
+      let hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 1, chainId)
+      let signature = await signPackedData(hash)
+
+      let finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 1, signature)
+
+      ownedTokens = [3, 5]
+
+      hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 2, chainId)
+      signature = await signPackedData(hash)
+
+      finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 2, signature)
+
+      ownedTokens = [2, 3, 4, 5]
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+
+      hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 3, chainId)
+      signature = await signPackedData(hash)
+
+      finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + conf.edOnPoa + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 3, signature)
+
+      expect(await everDragons2.balanceOf(owner.address)).equal(1)
+
+      await assertThrowsMessage(dragonsFarm.mintUnmintedTokens(4),
+          'Mint not ended'
+      )
+
+      await dragonsFarm.endMinting()
+
+      await dragonsFarm.mintUnmintedTokens(4)
+
+      assert.isTrue((await everDragons2.balanceOf(owner.address)).toNumber() > 40)
+
+    })
+
+    it("should throw if buyer1 try to mint 3 tokens with bad balance", async function () {
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+      await assertThrowsMessage(dragonsFarm.connect(buyer1).buyTokens(3, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0))
+      }), 'Insufficient payment')
+
+    })
+
+  })
+
 })
