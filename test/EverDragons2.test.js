@@ -17,7 +17,8 @@ describe("EverDragons2", function () {
 
   beforeEach(async function () {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    everDragons2 = await EverDragons2.deploy(10001, false)
+    // everDragons2 = await EverDragons2.deploy(10001, false)
+    everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, false]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
@@ -80,7 +81,8 @@ describe("EverDragons2", function () {
 
   it("should not mint if secondary token", async function () {
 
-    everDragons2 = await EverDragons2.deploy(10001, true)
+    // everDragons2 = await EverDragons2.deploy(10001, true)
+    everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, true]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)

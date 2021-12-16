@@ -5,17 +5,23 @@ pragma solidity ^0.8.2;
 //          Emanuele Cesena <emanuele@ndujalabs.com>
 // EverDragons2, https://everdragons2.com
 
-import "@ndujalabs/erc721playable/contracts/ERC721Playable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+//import "@ndujalabs/erc721playable/contracts/ERC721Playable.sol";
+//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
 
 import "./IEverDragons2.sol";
 import "./Wormhole/WormholeERC721.sol";
 
 import "hardhat/console.sol";
 
-contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721Enumerable, WormholeERC721 {
-  using Address for address;
+contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, WormholeERC721 {
+  //using Address for address;
   address public manager;
   bool private _mintEnded;
   bool private _baseTokenURIFrozen;
@@ -23,18 +29,7 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
   string private _baseTokenURI;
   uint256 private _lastTokenId;
 
-  address[] private _teamWallets = [
-    0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
-    //
-    0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
-    0x16244cdFb0D364ac5c4B42Aa530497AA762E7bb3,
-    0xe360cDb9B5348DB79CD630d0D1DE854b44638C64,
-    0xE14615C5B0d4f262153343e1590f196DCd52164e,
-    0x777eFBFd78D38Acd0753ef2eBe7cdA620C0f409a,
-    0xca17b266C872aAa553d2fC2e13187EcE3e2Bc54a,
-    0xE73B2AEB8A9f360FB16F7D8Df721B1b40076Aa5E,
-    0x231540a54823De2EFC7631E40A5DD9dD2Ee965bc
-  ];
+  address[] private _teamWallets;
 
   mapping(uint256 => bool) private _isMinted;
 
@@ -48,7 +43,28 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     _;
   }
 
-  constructor(uint256 lastTokenId_, bool secondaryChain) ERC721Playable("Everdragons2 Genesis Token", "E2GT") {
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor() initializer {}
+
+  function initialize(uint256 lastTokenId_, bool secondaryChain) initializer public {
+    __ERC721_init("Everdragons2 Genesis Token", "E2GT");
+    __ERC721Enumerable_init();
+    __ERC721Burnable_init();
+    __Ownable_init();
+
+    _teamWallets = [
+      0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
+      //
+      0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
+      0x16244cdFb0D364ac5c4B42Aa530497AA762E7bb3,
+      0xe360cDb9B5348DB79CD630d0D1DE854b44638C64,
+      0xE14615C5B0d4f262153343e1590f196DCd52164e,
+      0x777eFBFd78D38Acd0753ef2eBe7cdA620C0f409a,
+      0xca17b266C872aAa553d2fC2e13187EcE3e2Bc54a,
+      0xE73B2AEB8A9f360FB16F7D8Df721B1b40076Aa5E,
+      0x231540a54823De2EFC7631E40A5DD9dD2Ee965bc
+    ];
+
     _lastTokenId = lastTokenId_;
     _mint(msg.sender, lastTokenId_);
     if (secondaryChain) {
@@ -60,6 +76,38 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     }
     _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
   }
+
+  // The following functions are overrides required by Solidity.
+
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+      internal
+      override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+  {
+      super._beforeTokenTransfer(from, to, tokenId);
+  }
+
+  function supportsInterface(bytes4 interfaceId)
+      public
+      view
+      override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+      returns (bool)
+  {
+      return super.supportsInterface(interfaceId);
+  }
+
+  /*
+  constructor(uint256 lastTokenId_, bool secondaryChain) ERC721Playable("Everdragons2 Genesis Token", "E2GT") {
+    _lastTokenId = lastTokenId_;
+    _mint(msg.sender, lastTokenId_);
+    if (secondaryChain) {
+      // if so, it is a bridged version of the token and cannot be minted by a manager
+      _mintEnded = true;
+    }
+    for (uint256 i = 0; i < _teamWallets.length; i++) {
+      _mint(_teamWallets[i], --lastTokenId_);
+    }
+    _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
+  }*/
 
   function isMinted(uint256 tokenId) external view override returns (bool) {
     return _isMinted[tokenId];
@@ -73,6 +121,7 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     return _teamWallets;
   }
 
+  /*
   function _beforeTokenTransfer(
     address _from,
     address _to,
@@ -84,6 +133,7 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Playable, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
+  */
 
   function setManager(address manager_) external override onlyOwner canMint {
     require(manager_ != address(0), "Manager cannot be 0x0");

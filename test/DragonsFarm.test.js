@@ -51,7 +51,8 @@ describe("DragonsFarm", function () {
 
   async function initAndDeploy() {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    everDragons2 = await EverDragons2.deploy(151, false)
+    // everDragons2 = await EverDragons2.deploy(151, false)
+    everDragons2 = await upgrades.deployProxy(EverDragons2, [151, false]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarm")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
