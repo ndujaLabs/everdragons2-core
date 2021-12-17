@@ -49,8 +49,9 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     __ERC721Enumerable_init();
     __ERC721Burnable_init();
     __Ownable_init();
+    __UUPSUpgradeable_init();
 
-    _teamWallets = [
+  _teamWallets = [
       0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
       0x0ECE90EF4a12273E9c2C06E7C86075d021DB5A6A,
       //
