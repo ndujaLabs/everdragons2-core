@@ -1,7 +1,7 @@
 const {expect, assert} = require("chai")
 const {assertThrowsMessage} = require('./helpers')
 
-describe("EverDragons2", function () {
+describe.only("EverDragons2", function () {
 
   let EverDragons2
   let everDragons2
