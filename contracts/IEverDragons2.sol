@@ -19,7 +19,7 @@ interface IEverDragons2 {
 
   function endMinting() external;
 
-  function mintingIsEnded() external view returns(bool);
+  function mintingIsEnded() external view returns (bool);
 
   function lastTokenId() external view returns (uint256);
 
