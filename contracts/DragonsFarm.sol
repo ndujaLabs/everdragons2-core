@@ -15,7 +15,6 @@ contract DragonsFarm is Ownable {
   using ECDSA for bytes32;
   using SafeMath for uint256;
 
-
   event TeamAddressUpdated(address oldAddr, address newAddr);
   event DropSet();
   event WalletWhitelistedForDiscount(address wallet, uint8 skippedSteps);
@@ -33,8 +32,8 @@ contract DragonsFarm is Ownable {
     uint224 withdrawnAmount;
   }
 
-  mapping(address => Team) public teams;
-  mapping(uint8 => address) public teamAddressById;
+  mapping(address => Team) private _teams;
+  mapping(uint8 => address) private _teamAddressById;
 
   // < 1 word in storage
   struct Conf {
@@ -55,12 +54,12 @@ contract DragonsFarm is Ownable {
     uint16 edOnTron; // 392
     uint8 maxTokenPerWhitelistedWallet; // 3
     uint32 minPrice; // floor
-//    uint16 nextWonTokenId;
+    //    uint16 nextWonTokenId;
   }
 
   Conf public conf;
   IEverDragons2 public everDragons2;
-  uint private _nextWonTokenId;
+  uint256 private _nextWonTokenId;
 
   uint256 public proceedsBalance;
   uint256 public limit;
@@ -79,24 +78,12 @@ contract DragonsFarm is Ownable {
     everDragons2 = IEverDragons2(everDragons2_);
   }
 
-
   function endMinting() external onlyOwner {
     _mintEnded = true;
   }
 
-  function mintingIsEnded() external view returns(bool) {
+  function mintingIsEnded() external view returns (bool) {
     return _mintEnded;
-  }
-
-  function updateTeamAddress(address addr) external {
-    require(addr != address(0), "No 0x0 allowed");
-    require(teams[addr].percentage == 0, "Address already used");
-    Team memory team0 = teams[_msgSender()];
-    require(team0.percentage > 0, "Forbidden");
-    teams[addr] = Team(team0.id, team0.percentage, team0.withdrawnAmount);
-    teamAddressById[team0.id] = addr;
-    delete teams[_msgSender()];
-    emit TeamAddressUpdated(_msgSender(), addr);
   }
 
   function closeSale() external onlyOwner {
@@ -119,19 +106,19 @@ contract DragonsFarm is Ownable {
     conf = conf_;
     require(edo != address(0) && ed2 != address(0) && dao != address(0) && ndl != address(0), "Address null not allowed");
     _tmp[edo] = true;
-    teams[edo] = Team(EDO, 20, 0);
-    teamAddressById[EDO] = edo;
+    _teams[edo] = Team(EDO, 20, 0);
+    _teamAddressById[EDO] = edo;
     require(!_tmp[ed2], "Address repeated");
     _tmp[ed2] = true;
-    teams[ed2] = Team(ED2, 20, 0);
-    teamAddressById[ED2] = ed2;
+    _teams[ed2] = Team(ED2, 20, 0);
+    _teamAddressById[ED2] = ed2;
     require(!_tmp[dao], "Address repeated");
     _tmp[dao] = true;
-    teams[dao] = Team(DAO, 20, 0);
-    teamAddressById[DAO] = dao;
+    _teams[dao] = Team(DAO, 20, 0);
+    _teamAddressById[DAO] = dao;
     require(!_tmp[ndl], "Address repeated");
-    teams[ndl] = Team(NDL, 40, 0);
-    teamAddressById[NDL] = ndl;
+    _teams[ndl] = Team(NDL, 40, 0);
+    _teamAddressById[NDL] = ndl;
     emit DropSet();
   }
 
@@ -215,7 +202,7 @@ contract DragonsFarm is Ownable {
     require(quantity > 0, "Tokens already minted");
     uint256 nextTokenId = _nextWonTokenId;
     uint256[] memory tokenIds = new uint256[](quantity);
-    uint cap = uint(everDragons2.lastTokenId() - everDragons2.teamWallets().length);
+    uint256 cap = uint256(everDragons2.lastTokenId() - everDragons2.teamWallets().length);
     for (uint256 i = 0; i < quantity; i++) {
       require(nextTokenId < cap, "Id out of range");
       tokenIds[i] = nextTokenId++;
@@ -288,13 +275,13 @@ contract DragonsFarm is Ownable {
     }
   }
 
-  function mintUnmintedTokens(uint startFrom) external onlyOwner {
+  function mintUnmintedTokens(uint256 startFrom) external onlyOwner {
     require(_mintEnded, "Mint not ended");
-    uint initialGas = gasleft();
+    uint256 initialGas = gasleft();
     // we assume that the start is the first not minted token
     everDragons2.mint(owner(), startFrom);
-    uint requiredGas = initialGas - gasleft();
-    for (uint i = startFrom + 1; i< everDragons2.lastTokenId(); i++) {
+    uint256 requiredGas = initialGas - gasleft();
+    for (uint256 i = startFrom + 1; i < everDragons2.lastTokenId(); i++) {
       if (gasleft() < requiredGas + 10000) {
         return;
       }
@@ -338,11 +325,34 @@ contract DragonsFarm is Ownable {
 
   // withdraw
 
+  function getTeamByAddress(address addr) external view returns (Team memory) {
+    return _teams[addr];
+  }
+
+  function getTeamById(uint8 id) external view returns (Team memory) {
+    return _teams[_teamAddressById[id]];
+  }
+
+  function getTeamAddressById(uint8 id) external view returns (address) {
+    return _teamAddressById[id];
+  }
+
+  function updateTeamAddress(address newAddress) external {
+    require(newAddress != address(0), "No 0x0 allowed");
+    require(_teams[newAddress].percentage == 0, "Address already used");
+    Team memory team0 = _teams[_msgSender()];
+    require(team0.percentage > 0, "Forbidden");
+    _teams[newAddress] = Team(team0.id, team0.percentage, team0.withdrawnAmount);
+    _teamAddressById[team0.id] = newAddress;
+    delete _teams[_msgSender()];
+    emit TeamAddressUpdated(_msgSender(), newAddress);
+  }
+
   function claimEarnings(uint256 amount) public {
     uint256 available = withdrawable(_msgSender());
     require(amount != 0, "Unauthorized or depleted");
     require(amount <= available, "Insufficient funds");
-    teams[_msgSender()].withdrawnAmount += uint224(amount);
+    _teams[_msgSender()].withdrawnAmount += uint224(amount);
     (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
   }
@@ -353,8 +363,8 @@ contract DragonsFarm is Ownable {
   }
 
   function withdrawable(address addr) public view returns (uint256) {
-    if (teams[addr].percentage > 0) {
-      return proceedsBalance.div(100).mul(teams[addr].percentage).sub(teams[addr].withdrawnAmount);
+    if (_teams[addr].percentage > 0) {
+      return proceedsBalance.div(100).mul(_teams[addr].percentage).sub(_teams[addr].withdrawnAmount);
     } else {
       return 0;
     }

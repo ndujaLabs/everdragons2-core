@@ -18,7 +18,7 @@ describe("DragonsFarm", function () {
       buyer1, buyer2,
       communityMember1, communityMember2,
       collector1, collector2,
-      buyer3, buyer4, buyer5
+      buyer3, buyer4, buyer5, edo2
 
   before(async function () {
     ;[
@@ -29,7 +29,7 @@ describe("DragonsFarm", function () {
       buyer1, buyer2,
       communityMember1, communityMember2,
       collector1, collector2,
-      buyer3, buyer4, buyer5
+      buyer3, buyer4, buyer5, edo2
     ] = await ethers.getSigners()
 
     conf = {
@@ -910,6 +910,57 @@ describe("DragonsFarm", function () {
       assert.isTrue(diff > 249 && diff < 250)
 
       expect(await dragonsFarm.withdrawable(ed2.address)).equal(0)
+
+
+    })
+
+    it("should throw if not a team", async function () {
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+      await dragonsFarm.connect(buyer1).buyTokens(3, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(3)
+      })
+
+      await dragonsFarm.connect(buyer2).buyTokens(10, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(10)
+      })
+
+      await dragonsFarm.connect(buyer3).buyTokens(5, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(5)
+      })
+
+      await dragonsFarm.connect(buyer4).buyTokens(5, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(5)
+      })
+
+      await dragonsFarm.connect(buyer5).buyTokens(12, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(12)
+      })
+
+      let proceeds = await dragonsFarm.withdrawable(buyer3.address)
+
+      assert.equal(ethers.utils.formatUnits(proceeds), 0)
+
+      await assertThrowsMessage(dragonsFarm.connect(buyer3).claimAllEarnings(),
+      'Unauthorized or depleted')
+
+      let ndlproceeds = await dragonsFarm.withdrawable(ndl.address)
+
+      await assertThrowsMessage(dragonsFarm.connect(ndl).claimEarnings(ndlproceeds.mul(2)),
+          'Insufficient funds')
+
+    })
+
+    it("should change the address of a team", async function () {
+
+      let edoTeam = await dragonsFarm.getTeamAddressById(1)
+      assert.equal(edoTeam, edo.address)
+
+      await dragonsFarm.connect(edo).updateTeamAddress(edo2.address)
+      edoTeam = await dragonsFarm.getTeamAddressById(1)
+      assert.equal(edoTeam, edo2.address)
 
 
     })

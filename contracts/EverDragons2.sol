@@ -107,7 +107,6 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     _safeMint(recipient, tokenId);
   }
 
-
   function _baseURI() internal view virtual override returns (string memory) {
     return _baseTokenURI;
   }
@@ -126,7 +125,7 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     _mintEnded = true;
   }
 
-  function mintingIsEnded() external view override returns(bool) {
+  function mintingIsEnded() external view override returns (bool) {
     return _mintEnded;
   }
 
@@ -153,5 +152,4 @@ contract EverDragons2 is IEverDragons2, ERC721Playable, ERC721Burnable, ERC721En
     // _isMinted is needed only during the drop sale. Not here
     _safeMint(to, tokenId);
   }
-
 }
