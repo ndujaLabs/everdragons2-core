@@ -18,7 +18,7 @@ describe("DragonsFarm", function () {
       buyer1, buyer2,
       communityMember1, communityMember2,
       collector1, collector2,
-      bridge1, bridge2, bridge3
+      buyer3, buyer4, buyer5
 
   before(async function () {
     ;[
@@ -29,7 +29,7 @@ describe("DragonsFarm", function () {
       buyer1, buyer2,
       communityMember1, communityMember2,
       collector1, collector2,
-      bridge1, bridge2, bridge3
+      buyer3, buyer4, buyer5
     ] = await ethers.getSigners()
 
     conf = {
@@ -772,94 +772,149 @@ describe("DragonsFarm", function () {
 
   })
 
-  // describe('#claimEarnings', async function () {
-  //
-  //   beforeEach(async function () {
-  //     await initAndDeploy()
-  //     const conf2 = {
-  //       validator: validator.address,
-  //       nextTokenId: 1,
-  //       maxTokenIdForSale: 40,
-  //       maxPrice: 50 * 100, // = 50 MATIC
-  //       decrementPercentage: 10, // 10%
-  //       minutesBetweenDecrements: 10, // 10 minutes
-  //       numberOfSteps: 5,
-  //       edOnEthereum: 10,
-  //       edOnPoa: 5,
-  //       edOnTron: 5,
-  //       maxTokenPerWhitelistedWallet: 3
-  //     }
-  //     await configure(conf2)
-  //
-  //   })
-  //
-  //   it("should mint unminted tokens", async function () {
-  //
-  //     // start the sale:
-  //     await increaseBlockTimestampBy(3601)
-  //
-  //     await dragonsFarm.connect(buyer1).buyTokens(3, {
-  //       value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(3)
-  //     })
-  //
-  //     let ownedTokens = [4, 7, 1]
-  //
-  //     let chainId = await dragonsFarm.getChainId()
-  //
-  //     let hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 1, chainId)
-  //     let signature = await signPackedData(hash)
-  //
-  //     let finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + e)
-  //
-  //     await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 1, signature)
-  //
-  //     ownedTokens = [3, 5]
-  //
-  //     hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 2, chainId)
-  //     signature = await signPackedData(hash)
-  //
-  //     finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + e)
-  //
-  //     await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 2, signature)
-  //
-  //     ownedTokens = [2, 3, 4, 5]
-  //
-  //     // start the sale:
-  //     await increaseBlockTimestampBy(3601)
-  //
-  //
-  //     hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 3, chainId)
-  //     signature = await signPackedData(hash)
-  //
-  //     finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + conf.edOnPoa + e)
-  //
-  //     await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 3, signature)
-  //
-  //     expect(await everDragons2.balanceOf(owner.address)).equal(1)
-  //
-  //     await assertThrowsMessage(dragonsFarm.mintUnmintedTokens(4),
-  //         'Mint not ended'
-  //     )
-  //
-  //     await dragonsFarm.endMinting()
-  //
-  //     await dragonsFarm.mintUnmintedTokens(4)
-  //
-  //     assert.isTrue((await everDragons2.balanceOf(owner.address)).toNumber() > 40)
-  //
-  //   })
-  //
-  //   it("should throw if buyer1 try to mint 3 tokens with bad balance", async function () {
-  //
-  //     // start the sale:
-  //     await increaseBlockTimestampBy(3601)
-  //
-  //     await assertThrowsMessage(dragonsFarm.connect(buyer1).buyTokens(3, {
-  //       value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0))
-  //     }), 'Insufficient payment')
-  //
-  //   })
-  //
-  // })
+  describe('#claimEarnings', async function () {
+
+    beforeEach(async function () {
+      await initAndDeploy()
+      const conf2 = {
+        validator: validator.address,
+        nextTokenId: 1,
+        maxTokenIdForSale: 40,
+        maxPrice: 50 * 100, // = 50 MATIC
+        decrementPercentage: 10, // 10%
+        minutesBetweenDecrements: 10, // 10 minutes
+        numberOfSteps: 5,
+        edOnEthereum: 10,
+        edOnPoa: 5,
+        edOnTron: 5,
+        maxTokenPerWhitelistedWallet: 3,
+        minPrice: 200
+      }
+      await configure(conf2)
+
+    })
+
+    it("should get rewards", async function () {
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+      await dragonsFarm.connect(buyer1).buyTokens(3, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(3)
+      })
+
+      let ownedTokens = [4, 7, 1]
+
+      let chainId = await dragonsFarm.getChainId()
+
+      let hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 1, chainId)
+      let signature = await signPackedData(hash)
+
+      let finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 1, signature)
+
+      ownedTokens = [3, 5]
+
+      hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 2, chainId)
+      signature = await signPackedData(hash)
+
+      finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 2, signature)
+
+      ownedTokens = [2, 3, 4, 5]
+
+      // start the sale:
+      await increaseBlockTimestampBy(3601)
+
+
+      hash = await dragonsFarm.encodeForSignature(collector1.address, ownedTokens, 3, chainId)
+      signature = await signPackedData(hash)
+
+      finalIds = ownedTokens.map(e => conf.maxTokenIdForSale + conf.edOnEthereum + conf.edOnPoa + e)
+
+      await dragonsFarm.connect(collector1).claimTokens(ownedTokens, 3, signature)
+
+      await dragonsFarm.connect(buyer2).buyTokens(10, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(10)
+      })
+
+      let edoproceeds = await dragonsFarm.withdrawable(edo.address)
+      let ed2proceeds = await dragonsFarm.withdrawable(ed2.address)
+      let daoproceeds = await dragonsFarm.withdrawable(dao.address)
+      let ndlproceeds = await dragonsFarm.withdrawable(ndl.address)
+
+      assert.equal(ethers.utils.formatUnits(edoproceeds), 130)
+      assert.equal(ethers.utils.formatUnits(ed2proceeds), 130)
+      assert.equal(ethers.utils.formatUnits(daoproceeds), 130)
+      assert.equal(ethers.utils.formatUnits(ndlproceeds), 260)
+
+      let edobalance = ethers.utils.formatUnits(await ethers.provider.getBalance(edo.address))
+      assert.equal(edobalance, 10000)
+
+      await dragonsFarm.connect(edo).claimEarnings(edoproceeds.div(2))
+      edoproceeds = await dragonsFarm.withdrawable(edo.address)
+      assert.equal(ethers.utils.formatUnits(edoproceeds), 65)
+
+      edobalance = ethers.utils.formatUnits(await ethers.provider.getBalance(edo.address))
+      assert.isTrue(edobalance > 10064 && edobalance < 10066)
+
+      await dragonsFarm.connect(buyer3).buyTokens(5, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(5)
+      })
+
+      await dragonsFarm.connect(buyer4).buyTokens(5, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(5)
+      })
+
+      await dragonsFarm.connect(buyer5).buyTokens(2, {
+        value: ethers.BigNumber.from(await dragonsFarm.currentPrice(0)).mul(2)
+      })
+
+      edoproceeds = await dragonsFarm.withdrawable(edo.address)
+      ed2proceeds = await dragonsFarm.withdrawable(ed2.address)
+      daoproceeds = await dragonsFarm.withdrawable(dao.address)
+      ndlproceeds = await dragonsFarm.withdrawable(ndl.address)
+
+      assert.equal(ethers.utils.formatUnits(edoproceeds), 185)
+      assert.equal(ethers.utils.formatUnits(ed2proceeds), 250)
+      assert.equal(ethers.utils.formatUnits(daoproceeds), 250)
+      assert.equal(ethers.utils.formatUnits(ndlproceeds), 500)
+
+      await dragonsFarm.connect(edo).claimEarnings(edoproceeds)
+      edoproceeds = await dragonsFarm.withdrawable(edo.address)
+      assert.equal(edoproceeds.toNumber(), 0)
+
+      let ndlbalance = await ethers.provider.getBalance(ndl.address)
+
+      await dragonsFarm.connect(ndl).claimEarnings(ndlproceeds)
+      edoproceeds = await dragonsFarm.withdrawable(ndl.address)
+      assert.equal(edoproceeds.toNumber(), 0)
+
+      let ndlbalance2 = await ethers.provider.getBalance(ndl.address)
+      let diff = ethers.utils.formatUnits(ndlbalance2.sub(ndlbalance))
+      assert.isTrue(diff > 499 && diff < 500)
+
+      expect(await dragonsFarm.withdrawable(ndl.address)).equal(0)
+
+
+      let ed2balance = await ethers.provider.getBalance(ed2.address)
+
+      await dragonsFarm.connect(ed2).claimAllEarnings()
+      edoproceeds = await dragonsFarm.withdrawable(ed2.address)
+      assert.equal(edoproceeds.toNumber(), 0)
+
+      let ed2balance2 = await ethers.provider.getBalance(ed2.address)
+      diff = ethers.utils.formatUnits(ed2balance2.sub(ed2balance))
+      assert.isTrue(diff > 249 && diff < 250)
+
+      expect(await dragonsFarm.withdrawable(ed2.address)).equal(0)
+
+
+    })
+
+
+  })
 
 })

@@ -338,13 +338,18 @@ contract DragonsFarm is Ownable {
 
   // withdraw
 
-  function claimEarnings(uint256 amount) external {
+  function claimEarnings(uint256 amount) public {
     uint256 available = withdrawable(_msgSender());
     require(amount != 0, "Unauthorized or depleted");
     require(amount <= available, "Insufficient funds");
     teams[_msgSender()].withdrawnAmount += uint224(amount);
     (bool success, ) = _msgSender().call{value: amount}("");
     require(success);
+  }
+
+  function claimAllEarnings() external {
+    uint256 available = withdrawable(_msgSender());
+    claimEarnings(available);
   }
 
   function withdrawable(address addr) public view returns (uint256) {
