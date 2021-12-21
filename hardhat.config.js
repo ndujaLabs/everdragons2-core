@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require('@openzeppelin/hardhat-upgrades');
 // require("hardhat-gas-reporter");
 
 let env = require('./env.json');
@@ -27,7 +28,7 @@ task("accounts", "Prints the list of accounts", async () => {
  */
 module.exports = {
   solidity: {
-    version: '0.8.2',
+    version: '0.8.3',
     settings: {
       optimizer: {
         enabled: true,
@@ -70,7 +71,7 @@ module.exports = {
       accounts: [env.privateKey]
     },
     mumbai: {
-      url: "https://rpc-mumbai.matic.today/",
+      url: 'https://rpc-mumbai.maticvigil.com',
       chainId: 80001,
       gasPrice: 20000000000,
       accounts: [env.privateKey]

@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: Apache2
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./interfaces/IWormhole.sol";
 import "./libraries/BytesLib.sol";
 import "./NFTStructs.sol";
 import "./NFTGetters.sol";
 import "./NFTSetters.sol";
 
-contract WormholeERC721 is Ownable, NFTGetters, NFTSetters {
+contract WormholeERC721 is OwnableUpgradeable, NFTGetters, NFTSetters {
   using BytesLib for bytes;
 
   function wormholeInit(uint16 chainId, address wormhole) public onlyOwner {

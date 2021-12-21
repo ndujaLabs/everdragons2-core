@@ -7,6 +7,8 @@ describe("EverDragons2", function () {
   let everDragons2
   let DragonsFarm
   let dragonsFarm
+  let PlayerMock
+  let playerMock
 
   let addr0 = '0x0000000000000000000000000000000000000000'
   let owner, teamMember, validator, collector1, collector2, edOwner1, edOwner2
@@ -17,12 +19,16 @@ describe("EverDragons2", function () {
 
   beforeEach(async function () {
     EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    everDragons2 = await EverDragons2.deploy(10001, false)
+    // everDragons2 = await EverDragons2.deploy(10001, false)
+    everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, false]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
     await dragonsFarm.deployed()
     await everDragons2.setManager(dragonsFarm.address)
+    PlayerMock =  await ethers.getContractFactory("GameMock")
+    playerMock = await upgrades.deployProxy(PlayerMock)
+    await playerMock.deployed()
   })
 
   it("should return the EverDragons2 name and symbol", async function () {
@@ -80,14 +86,77 @@ describe("EverDragons2", function () {
 
   it("should not mint if secondary token", async function () {
 
-    everDragons2 = await EverDragons2.deploy(10001, true)
+    // everDragons2 = await EverDragons2.deploy(10001, true)
+    let everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, true]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
-    dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
+    let dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
     await dragonsFarm.deployed()
     await assertThrowsMessage(
         everDragons2.setManager(dragonsFarm.address),
         'Minting ended or not allowed')
+  })
+
+  it("should mint token and verify that the player is not initiated", async function () {
+    const tokenIds = [1]
+    await dragonsFarm['mint(address,uint256[])'](collector1.address, tokenIds)
+    expect(await everDragons2.ownerOf(1)).to.equal(collector1.address)
+
+    const attributes = await everDragons2.attributesOf(collector1.address, playerMock.address)
+    expect(attributes.version).to.equal(0)
+
+  })
+
+  it("should allow token collector1 to set a player", async function () {
+    const tokenIds = [1]
+    await dragonsFarm['mint(address,uint256[])'](collector1.address, tokenIds)
+    await everDragons2.connect(collector1).initAttributes(1, playerMock.address)
+    await playerMock.fillInitialAttributes(
+        everDragons2.address,
+        1,
+        0, // keeps the existent version
+        [1, 5, 34, 21, 8, 0, 34, 12, 31, 65, 178, 243, 2]
+    )
+
+    const attributes = await everDragons2.attributesOf(1, playerMock.address)
+    expect(attributes.version).to.equal(1)
+    expect(attributes.attributes[2]).to.equal(34)
+
+  })
+
+  it("should update the levels in PlayerMock", async function () {
+
+    const tokenIds = [1]
+    await dragonsFarm['mint(address,uint256[])'](collector1.address, tokenIds)
+
+    await everDragons2.connect(collector1).initAttributes(1, playerMock.address)
+    await playerMock.fillInitialAttributes(
+        everDragons2.address,
+        1,
+        0, // keeps the existent version
+        [1, 5, 34, 21, 8, 0, 34, 12, 31, 65, 178, 243, 2]
+    )
+
+    let attributes = await everDragons2.attributesOf(1, playerMock.address)
+    let levelIndex = 3
+    expect(attributes.attributes[levelIndex]).to.equal(21)
+
+    await playerMock.levelUp(
+        everDragons2.address,
+        1,
+        levelIndex,
+        63
+    )
+
+    attributes = await everDragons2.attributesOf(1, playerMock.address)
+    expect(attributes.attributes[levelIndex]).to.equal(63)
+
+  })
+
+  it("should check if nft is playable", async function () {
+
+    assert.isTrue(await everDragons2.supportsInterface('0xac517b2e'))
+
   })
 
 })
