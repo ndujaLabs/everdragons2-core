@@ -108,20 +108,6 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
       return super.supportsInterface(interfaceId);
   }
 
-  /*
-  constructor(uint256 lastTokenId_, bool secondaryChain) ERC721Playable("Everdragons2 Genesis Token", "E2GT") {
-    _lastTokenId = lastTokenId_;
-    _mint(msg.sender, lastTokenId_);
-    if (secondaryChain) {
-      // if so, it is a bridged version of the token and cannot be minted by a manager
-      _mintEnded = true;
-    }
-    for (uint256 i = 0; i < _teamWallets.length; i++) {
-      _mint(_teamWallets[i], --lastTokenId_);
-    }
-    _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
-  }*/
-
   function isMinted(uint256 tokenId) external view override returns (bool) {
     return _isMinted[tokenId];
   }
@@ -133,20 +119,6 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
   function teamWallets() external view override returns (address[] memory) {
     return _teamWallets;
   }
-
-  /*
-  function _beforeTokenTransfer(
-    address _from,
-    address _to,
-    uint256 _tokenId
-  ) internal override(ERC721, ERC721Playable, ERC721Enumerable) {
-    super._beforeTokenTransfer(_from, _to, _tokenId);
-  }
-
-  function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Playable, ERC721Enumerable) returns (bool) {
-    return super.supportsInterface(interfaceId);
-  }
-  */
 
   function setManager(address manager_) external override onlyOwner canMint {
     require(manager_ != address(0), "Manager cannot be 0x0");
