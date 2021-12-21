@@ -1,26 +1,24 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.3;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
 //          Emanuele Cesena <emanuele@ndujalabs.com>
 // EverDragons2, https://everdragons2.com
 
-//import "@ndujalabs/erc721playable/contracts/ERC721Playable.sol";
-//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./IEverDragons2.sol";
 import "./Wormhole/WormholeERC721.sol";
 
 import "hardhat/console.sol";
 
-contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, WormholeERC721 {
+contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, WormholeERC721, UUPSUpgradeable {
   //using Address for address;
   address public manager;
   bool private _mintEnded;
@@ -51,8 +49,9 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     __ERC721Enumerable_init();
     __ERC721Burnable_init();
     __Ownable_init();
+    __UUPSUpgradeable_init();
 
-    _teamWallets = [
+  _teamWallets = [
       0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
       0x0ECE90EF4a12273E9c2C06E7C86075d021DB5A6A,
       //
@@ -62,8 +61,7 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
       0xE14615C5B0d4f262153343e1590f196DCd52164e,
       0x777eFBFd78D38Acd0753ef2eBe7cdA620C0f409a,
       0xca17b266C872aAa553d2fC2e13187EcE3e2Bc54a,
-      0xE73B2AEB8A9f360FB16F7D8Df721B1b40076Aa5E,
-      0x231540a54823De2EFC7631E40A5DD9dD2Ee965bc
+      0xE73B2AEB8A9f360FB16F7D8Df721B1b40076Aa5E
     ];
 
     _lastTokenId = lastTokenId_;
@@ -78,11 +76,17 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
   }
 
+  function _authorizeUpgrade(address newImplementation)
+  internal
+  onlyOwner
+  override
+  {}
+
   // The following functions are overrides required by Solidity.
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId)
       internal
-      override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+      override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
   {
       super._beforeTokenTransfer(from, to, tokenId);
   }
@@ -90,7 +94,7 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
   function supportsInterface(bytes4 interfaceId)
       public
       view
-      override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+      override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
       returns (bool)
   {
       return super.supportsInterface(interfaceId);
