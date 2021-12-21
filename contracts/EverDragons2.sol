@@ -7,10 +7,11 @@ pragma solidity ^0.8.3;
 
 import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+//import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./IEverDragons2.sol";
@@ -18,7 +19,7 @@ import "./Wormhole/WormholeERC721.sol";
 
 import "hardhat/console.sol";
 
-contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, WormholeERC721, UUPSUpgradeable {
+contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable, PausableUpgradeable, OwnableUpgradeable, WormholeERC721, UUPSUpgradeable {
   //using Address for address;
   address public manager;
   bool private _mintEnded;
@@ -30,6 +31,7 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
   address[] private _teamWallets;
 
   mapping(uint256 => bool) private _isMinted;
+  bool public notSellableYet;
 
   modifier onlyManager() {
     require(manager != address(0) && _msgSender() == manager, "Forbidden");
@@ -41,14 +43,19 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     _;
   }
 
+  modifier whenSellable() {
+    require(!notSellableYet, "Approval not allowed yet");
+    _;
+  }
+
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
   function initialize(uint256 lastTokenId_, bool secondaryChain) initializer public {
     __ERC721_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
-    __ERC721Burnable_init();
     __Ownable_init();
+    __Pausable_init();
     __UUPSUpgradeable_init();
 
   _teamWallets = [
@@ -74,6 +81,7 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
       _mint(_teamWallets[i], --lastTokenId_);
     }
     _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
+    notSellableYet = true;
   }
 
   function _authorizeUpgrade(address newImplementation)
@@ -162,6 +170,19 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     _safeMint(recipient, tokenId);
   }
 
+
+  function approve(address to, uint256 tokenId) public virtual override whenSellable {
+    super.approve(to, tokenId);
+  }
+
+  function setApprovalForAll(address operator, bool approved) public virtual override whenSellable {
+    super.setApprovalForAll(operator, approved);
+  }
+
+  function makeItSellable() external override onlyOwner {
+    notSellableYet = false;
+  }
+
   function _baseURI() internal view virtual override returns (string memory) {
     return _baseTokenURI;
   }
@@ -197,7 +218,7 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     uint32 nonce
   ) public payable returns (uint64 sequence) {
     require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
-    burn(tokenID);
+    _burn(tokenID);
     return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
   }
 

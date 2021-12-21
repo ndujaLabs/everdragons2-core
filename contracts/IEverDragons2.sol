@@ -13,6 +13,8 @@ interface IEverDragons2 {
 
   function mint(address recipient, uint256 tokenId) external;
 
+  function makeItSellable() external;
+
   function updateBaseTokenURI(string memory uri) external;
 
   function freezeBaseTokenURI() external;
