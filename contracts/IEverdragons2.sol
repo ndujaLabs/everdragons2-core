@@ -2,9 +2,9 @@
 pragma solidity ^0.8.3;
 
 // Author: Francesco Sullo <francesco@sullo.co>
-// EverDragons2, https://everdragons2.com
+// Everdragons2, https://everdragons2.com
 
-interface IEverDragons2 {
+interface IEverdragons2 {
   function setManager(address manager_) external;
 
   function mint(address recipient, uint256[] memory tokenIds) external;

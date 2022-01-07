@@ -186,7 +186,7 @@ library BytesLib {
         // Copy over the first `submod` bytes of the new data as in
         // case 1 above.
         let slengthmod := mod(slength, 32)
-        let mlengthmod := mod(mlength, 32)
+        //        let mlengthmod := mod(mlength, 32)
         let submod := sub(32, slengthmod)
         let mc := add(_postBytes, submod)
         let end := add(_postBytes, mlength)
