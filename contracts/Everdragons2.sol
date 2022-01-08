@@ -103,7 +103,7 @@ contract Everdragons2 is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(WormholeERC721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
@@ -181,5 +181,24 @@ contract Everdragons2 is
     return _baseURI();
   }
 
+  // Wormhole
+
+  function wormholeTransfer(
+    uint256 tokenID,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) public payable override returns (uint64 sequence) {
+    require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
+    _burn(tokenID);
+    return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
+  }
+
+  // Complete a transfer from Wormhole
+  function wormholeCompleteTransfer(bytes memory encodedVm)  public override {
+    (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
+    // _isMinted is needed only during the drop sale. Not here
+    _safeMint(to, tokenId);
+  }
 
 }
