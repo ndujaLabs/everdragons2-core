@@ -8,8 +8,7 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
-import "./Wormhole/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
 import "hardhat/console.sol";
 
