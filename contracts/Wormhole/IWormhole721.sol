@@ -2,7 +2,7 @@
 pragma solidity ^0.8.3;
 
 /// ERC165 interfaceId is 0x647bffff
-interface IWormholeERC721 /* is IERC165 */ {
+interface IWormhole721 /* is IERC165 */ {
   function wormholeInit(uint16 chainId, address wormhole) external;
 
   function wormholeRegisterContract(uint16 chainId, bytes32 nftContract) external;

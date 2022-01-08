@@ -10,19 +10,19 @@ import "./libraries/BytesLib.sol";
 import "./NFTStructs.sol";
 import "./NFTGetters.sol";
 import "./NFTSetters.sol";
-import "./IWormholeERC721.sol";
+import "./IWormhole721.sol";
 
 // notice that this is not an ERC721
 // but it is supposed to be extended by an ERC721
-contract WormholeERC721Upgradeable is OwnableUpgradeable, NFTGetters, NFTSetters, IWormholeERC721, ERC165Upgradeable {
+abstract contract Wormhole721Upgradeable is OwnableUpgradeable, NFTGetters, NFTSetters, IWormhole721, ERC165Upgradeable {
   using BytesLib for bytes;
 
-//  function getIWormholeERC721InterfaceId() external pure returns(bytes4) {
-//    return type(IWormholeERC721).interfaceId;
+//  function getIWormhole721InterfaceId() external pure returns(bytes4) {
+//    return type(IWormhole721).interfaceId;
 //  }
 
   function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-    return interfaceId == type(IWormholeERC721).interfaceId || super.supportsInterface(interfaceId);
+    return interfaceId == type(IWormhole721).interfaceId || super.supportsInterface(interfaceId);
   }
 
   function wormholeInit(uint16 chainId, address wormhole) public override onlyOwner {
@@ -56,11 +56,6 @@ contract WormholeERC721Upgradeable is OwnableUpgradeable, NFTGetters, NFTSetters
 
     return (transferRecipient, transfer.tokenId);
   }
-
-    function getInterfaceId2() external view returns(bytes4) {
-      return type(IWormholeERC721).interfaceId;
-    }
-
 
   function _wormholeTransfer(
     uint256 tokenId,
@@ -128,16 +123,16 @@ contract WormholeERC721Upgradeable is OwnableUpgradeable, NFTGetters, NFTSetters
   //
   //
   // the following MUST be implemented and overridden
-
-  function wormholeTransfer(
-    uint256 tokenID,
-    uint16 recipientChain,
-    bytes32 recipient,
-    uint32 nonce
-  ) public payable override returns (uint64 sequence) {
-    return 0;
-  }
-
-  function wormholeCompleteTransfer(bytes memory encodedVm) public override {
-  }
+//
+//  function wormholeTransfer(
+//    uint256 tokenID,
+//    uint16 recipientChain,
+//    bytes32 recipient,
+//    uint32 nonce
+//  ) public payable override returns (uint64 sequence) {
+//    return 0;
+//  }
+//
+//  function wormholeCompleteTransfer(bytes memory encodedVm) public override {
+//  }
 }

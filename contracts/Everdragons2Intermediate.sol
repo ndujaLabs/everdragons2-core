@@ -9,15 +9,15 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "./Wormhole/WormholeERC721Upgradeable.sol";
+import "./Wormhole/Wormhole721Upgradeable.sol";
 
 import "hardhat/console.sol";
 
-contract Everdragons2Intermediate is
+abstract contract Everdragons2Intermediate is
   PausableUpgradeable,
   OwnableUpgradeable,
   UUPSUpgradeable,
-  WormholeERC721Upgradeable
+  Wormhole721Upgradeable
 {
 
   function __Everdragons2Intermediate_init() internal virtual initializer {
