@@ -5,7 +5,7 @@ const {initEthers, assertThrowsMessage, signPackedData, getTimestamp, increaseBl
 
 describe("DragonsFarm", function () {
 
-  let EverDragons2
+  let Everdragons2
   let everDragons2
   let DragonsFarm
   let dragonsFarm
@@ -50,9 +50,9 @@ describe("DragonsFarm", function () {
   })
 
   async function initAndDeploy() {
-    EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    // everDragons2 = await EverDragons2.deploy(151, false)
-    everDragons2 = await upgrades.deployProxy(EverDragons2, [151, false]);
+    Everdragons2 = await ethers.getContractFactory("Everdragons2")
+    // everDragons2 = await Everdragons2.deploy(151, false)
+    everDragons2 = await upgrades.deployProxy(Everdragons2, [151, false]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarm")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
@@ -78,7 +78,7 @@ describe("DragonsFarm", function () {
     })
 
 
-    it("should return the EverDragons2 address", async function () {
+    it("should return the Everdragons2 address", async function () {
       expect(await dragonsFarm.everDragons2()).to.equal(everDragons2.address)
     })
 

@@ -1,9 +1,9 @@
 const {expect, assert} = require("chai")
 const {assertThrowsMessage} = require('./helpers')
 
-describe("EverDragons2", function () {
+describe("Everdragons2", function () {
 
-  let EverDragons2
+  let Everdragons2
   let everDragons2
   let DragonsFarm
   let dragonsFarm
@@ -18,9 +18,9 @@ describe("EverDragons2", function () {
   })
 
   beforeEach(async function () {
-    EverDragons2 = await ethers.getContractFactory("EverDragons2")
-    // everDragons2 = await EverDragons2.deploy(10001, false)
-    everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, false]);
+    Everdragons2 = await ethers.getContractFactory("Everdragons2")
+    // everDragons2 = await Everdragons2.deploy(10001, false)
+    everDragons2 = await upgrades.deployProxy(Everdragons2, [10001, false]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
     dragonsFarm = await DragonsFarm.deploy(everDragons2.address)
@@ -31,13 +31,13 @@ describe("EverDragons2", function () {
     await playerMock.deployed()
   })
 
-  it("should return the EverDragons2 name and symbol", async function () {
+  it("should return the Everdragons2 name and symbol", async function () {
     expect(await everDragons2.name()).to.equal("Everdragons2 Genesis Token")
     expect(await everDragons2.symbol()).to.equal("E2GT")
     expect(await everDragons2.manager()).to.equal(dragonsFarm.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
 
-    // console.log(await everDragons2.getInterfaceId())
+    // console.log(await everDragons2.getIWormholeERC721InterfaceId())
   })
 
   it("should mint token 23, 100 and 3230 and give them to collector1", async function () {
@@ -86,8 +86,8 @@ describe("EverDragons2", function () {
 
   it("should not mint if secondary token", async function () {
 
-    // everDragons2 = await EverDragons2.deploy(10001, true)
-    let everDragons2 = await upgrades.deployProxy(EverDragons2, [10001, true]);
+    // everDragons2 = await Everdragons2.deploy(10001, true)
+    let everDragons2 = await upgrades.deployProxy(Everdragons2, [10001, true]);
     await everDragons2.deployed()
     DragonsFarm = await ethers.getContractFactory("DragonsFarmMock")
     let dragonsFarm = await DragonsFarm.deploy(everDragons2.address)

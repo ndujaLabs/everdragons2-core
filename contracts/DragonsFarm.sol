@@ -2,12 +2,12 @@
 pragma solidity ^0.8.3;
 
 // Author: Francesco Sullo <francesco@sullo.co>
-// EverDragons2 website: https://everdragons2.com
+// Everdragons2 website: https://everdragons2.com
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IEverDragons2.sol";
+import "./IEverdragons2.sol";
 
 import "hardhat/console.sol";
 
@@ -58,7 +58,7 @@ contract DragonsFarm is Ownable {
   }
 
   Conf public conf;
-  IEverDragons2 public everDragons2;
+  IEverdragons2 public everDragons2;
   uint256 private _nextWonTokenId;
 
   uint256 public proceedsBalance;
@@ -75,7 +75,7 @@ contract DragonsFarm is Ownable {
   }
 
   constructor(address everDragons2_) {
-    everDragons2 = IEverDragons2(everDragons2_);
+    everDragons2 = IEverdragons2(everDragons2_);
   }
 
   function endMinting() external onlyOwner {

@@ -3,7 +3,7 @@ pragma solidity ^0.8.3;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
 //          Emanuele Cesena <emanuele@ndujalabs.com>
-// EverDragons2, https://everdragons2.com
+// Everdragons2, https://everdragons2.com
 
 import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
@@ -11,15 +11,21 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-//import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "./IEverDragons2.sol";
-import "./Wormhole/WormholeERC721.sol";
+import "./IEverdragons2.sol";
+import "./Everdragons2Intermediate.sol";
 
 import "hardhat/console.sol";
 
-contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable, PausableUpgradeable, OwnableUpgradeable, WormholeERC721, UUPSUpgradeable {
+contract Everdragons2 is
+  IEverdragons2,
+  Initializable,
+  ERC721Upgradeable,
+  ERC721PlayableUpgradeable,
+  ERC721EnumerableUpgradeable,
+  Everdragons2Intermediate
+{
   //using Address for address;
   address public manager;
   bool private _mintEnded;
@@ -51,14 +57,12 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
-  function initialize(uint256 lastTokenId_, bool secondaryChain) initializer public {
+  function initialize(uint256 lastTokenId_, bool secondaryChain) public initializer {
     __ERC721_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
-    __Ownable_init();
-    __Pausable_init();
-    __UUPSUpgradeable_init();
+    __Everdragons2Intermediate_init();
 
-  _teamWallets = [
+    _teamWallets = [
       0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
       0x0ECE90EF4a12273E9c2C06E7C86075d021DB5A6A,
       //
@@ -84,28 +88,25 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     notSellableYet = true;
   }
 
-  function _authorizeUpgrade(address newImplementation)
-  internal
-  onlyOwner
-  override
-  {}
+  function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
   // The following functions are overrides required by Solidity.
 
-  function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-      internal
-      override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
-  {
-      super._beforeTokenTransfer(from, to, tokenId);
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 tokenId
+  ) internal override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable) {
+    super._beforeTokenTransfer(from, to, tokenId);
   }
 
   function supportsInterface(bytes4 interfaceId)
-      public
-      view
-      override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
-      returns (bool)
+    public
+    view
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    returns (bool)
   {
-      return super.supportsInterface(interfaceId);
+    return super.supportsInterface(interfaceId);
   }
 
   function isMinted(uint256 tokenId) external view override returns (bool) {
@@ -141,7 +142,6 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     _isMinted[tokenId] = true;
     _safeMint(recipient, tokenId);
   }
-
 
   function approve(address to, uint256 tokenId) public virtual override whenSellable {
     super.approve(to, tokenId);
@@ -188,16 +188,17 @@ contract EverDragons2 is IEverDragons2, Initializable, ERC721Upgradeable, ERC721
     uint16 recipientChain,
     bytes32 recipient,
     uint32 nonce
-  ) public payable returns (uint64 sequence) {
+  ) public payable override returns (uint64 sequence) {
     require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
     _burn(tokenID);
     return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
   }
 
   // Complete a transfer from Wormhole
-  function wormholeCompleteTransfer(bytes memory encodedVm) public {
+  function wormholeCompleteTransfer(bytes memory encodedVm)  public override {
     (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
     // _isMinted is needed only during the drop sale. Not here
     _safeMint(to, tokenId);
   }
+
 }
