@@ -31,9 +31,11 @@
     "solhint": "^3.3.6"
   },
   "dependencies": {
-    "@ndujalabs/wormhole721": "0.2.0-beta.0",
+    "@ndujalabs/wormhole721": "0.2.0",
     "@openzeppelin/contracts-upgradeable": "^4.4.1",
+    "dotenv": "^11.0.0",
     "hardhat-contract-sizer": "^2.1.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "require-or-mock": "^0.2.1"
   }
 }
