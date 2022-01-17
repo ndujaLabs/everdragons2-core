@@ -13,8 +13,9 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
+import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+
 import "./IEverdragons2.sol";
-import "./Everdragons2Intermediate.sol";
 
 import "hardhat/console.sol";
 
@@ -24,7 +25,7 @@ contract Everdragons2 is
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
-  Everdragons2Intermediate
+  Wormhole721Upgradeable
 {
   //using Address for address;
   address public manager;
@@ -58,9 +59,8 @@ contract Everdragons2 is
   constructor() initializer {}
 
   function initialize(uint256 lastTokenId_, bool secondaryChain) public initializer {
-    __ERC721_init("Everdragons2 Genesis Token", "E2GT");
+    __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
-    __Everdragons2Intermediate_init();
 
     _teamWallets = [
       0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
@@ -181,24 +181,5 @@ contract Everdragons2 is
     return _baseURI();
   }
 
-  // Wormhole
-
-  function wormholeTransfer(
-    uint256 tokenID,
-    uint16 recipientChain,
-    bytes32 recipient,
-    uint32 nonce
-  ) public payable override returns (uint64 sequence) {
-    require(_isApprovedOrOwner(_msgSender(), tokenID), "ERC721: transfer caller is not owner nor approved");
-    _burn(tokenID);
-    return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
-  }
-
-  // Complete a transfer from Wormhole
-  function wormholeCompleteTransfer(bytes memory encodedVm)  public override {
-    (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
-    // _isMinted is needed only during the drop sale. Not here
-    _safeMint(to, tokenId);
-  }
 
 }
