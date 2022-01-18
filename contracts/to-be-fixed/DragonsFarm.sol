@@ -7,9 +7,15 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IEverdragons2.sol";
+import "../IEverdragons2.sol";
 
 import "hardhat/console.sol";
+
+/*
+
+MUST BE UPDATED
+
+*/
 
 contract DragonsFarm is Ownable {
   using ECDSA for bytes32;
@@ -58,7 +64,7 @@ contract DragonsFarm is Ownable {
   }
 
   Conf public conf;
-  IEverdragons2 public everDragons2;
+  IEverdragons2 public everdragons2;
   uint256 private _nextWonTokenId;
 
   uint256 public proceedsBalance;
@@ -74,8 +80,8 @@ contract DragonsFarm is Ownable {
     _;
   }
 
-  constructor(address everDragons2_) {
-    everDragons2 = IEverdragons2(everDragons2_);
+  constructor(address everdragons2_) {
+    everdragons2 = IEverdragons2(everdragons2_);
   }
 
   function endMinting() external onlyOwner {
@@ -176,23 +182,23 @@ contract DragonsFarm is Ownable {
         revert("Chain not supported");
       }
     }
-    everDragons2.mint(_msgSender(), tokenIds);
+    everdragons2.mint(_msgSender(), tokenIds);
   }
 
   function giveAwayTokens(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
     require(recipients.length == tokenIds.length, "Inconsistent lengths");
     uint16 allReserved = conf.edOnPoa + conf.edOnEthereum + conf.edOnTron;
     for (uint256 i = 0; i < tokenIds.length; i++) {
-      require(tokenIds[i] < everDragons2.lastTokenId(), "Id out of range");
+      require(tokenIds[i] < everdragons2.lastTokenId(), "Id out of range");
       require(
         saleEnded() ||
           (tokenIds[i] > conf.maxTokenIdForSale + allReserved &&
-            tokenIds[i] < everDragons2.lastTokenId() - everDragons2.teamWallets().length),
+            tokenIds[i] < everdragons2.lastTokenId()),
         "Id out of range"
       );
     }
     // it will revert if any token has already been minted
-    everDragons2.mint(recipients, tokenIds);
+    everdragons2.mint(recipients, tokenIds);
   }
 
   function claimWonTokens() external {
@@ -202,7 +208,7 @@ contract DragonsFarm is Ownable {
     require(quantity > 0, "Tokens already minted");
     uint256 nextTokenId = _nextWonTokenId;
     uint256[] memory tokenIds = new uint256[](quantity);
-    uint256 cap = uint256(everDragons2.lastTokenId() - everDragons2.teamWallets().length);
+    uint256 cap = uint256(everdragons2.lastTokenId());
     for (uint256 i = 0; i < quantity; i++) {
       require(nextTokenId < cap, "Id out of range");
       tokenIds[i] = nextTokenId++;
@@ -211,7 +217,7 @@ contract DragonsFarm is Ownable {
     // it will remain different than zero so that we avoid
     // adding to the whitelist again after the first mint
     giveawaysWinners[_msgSender()] = 1;
-    everDragons2.mint(_msgSender(), tokenIds);
+    everdragons2.mint(_msgSender(), tokenIds);
   }
 
   function buyTokens(uint256 quantity) external payable saleActive {
@@ -226,7 +232,7 @@ contract DragonsFarm is Ownable {
     }
     conf.nextTokenId = uint16(nextTokenId);
     proceedsBalance += msg.value;
-    everDragons2.mint(_msgSender(), tokenIds);
+    everdragons2.mint(_msgSender(), tokenIds);
   }
 
   function buyDiscountedTokens(uint256 quantity) external payable saleActive {
@@ -247,7 +253,7 @@ contract DragonsFarm is Ownable {
     conf.nextTokenId = uint16(nextTokenId);
     proceedsBalance += msg.value;
     tokenGetByWhitelistedWallet[_msgSender()] += uint8(quantity);
-    everDragons2.mint(_msgSender(), tokenIds);
+    everdragons2.mint(_msgSender(), tokenIds);
   }
 
   function addWalletsToWhitelists(address[] memory wallets, uint8 numberOfStepsSkipped) external onlyOwner {
@@ -279,14 +285,14 @@ contract DragonsFarm is Ownable {
     require(_mintEnded, "Mint not ended");
     uint256 initialGas = gasleft();
     // we assume that the start is the first not minted token
-    everDragons2.mint(owner(), startFrom);
+    everdragons2.mint(owner(), startFrom);
     uint256 requiredGas = initialGas - gasleft();
-    for (uint256 i = startFrom + 1; i < everDragons2.lastTokenId(); i++) {
+    for (uint256 i = startFrom + 1; i < everdragons2.lastTokenId(); i++) {
       if (gasleft() < requiredGas + 10000) {
         return;
       }
-      if (!everDragons2.isMinted(i)) {
-        everDragons2.mint(owner(), i);
+      if (!everdragons2.isMinted(i)) {
+        everdragons2.mint(owner(), i);
       }
     }
   }
