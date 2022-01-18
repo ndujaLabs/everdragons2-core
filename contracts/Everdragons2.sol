@@ -20,12 +20,12 @@ import "./IEverdragons2.sol";
 import "hardhat/console.sol";
 
 contract Everdragons2 is
-  IEverdragons2,
-  Initializable,
-  ERC721Upgradeable,
-  ERC721PlayableUpgradeable,
-  ERC721EnumerableUpgradeable,
-  Wormhole721Upgradeable
+IEverdragons2,
+Initializable,
+ERC721Upgradeable,
+ERC721PlayableUpgradeable,
+ERC721EnumerableUpgradeable,
+Wormhole721Upgradeable
 {
   //using Address for address;
   address public manager;
@@ -35,10 +35,7 @@ contract Everdragons2 is
   string private _baseTokenURI;
   uint256 private _lastTokenId;
 
-  address[] private _teamWallets;
-
   mapping(uint256 => bool) private _isMinted;
-  bool public notSellableYet;
 
   modifier onlyManager() {
     require(manager != address(0) && _msgSender() == manager, "Forbidden");
@@ -50,42 +47,22 @@ contract Everdragons2 is
     _;
   }
 
-  modifier whenSellable() {
-    require(!notSellableYet, "Approval not allowed yet");
-    _;
-  }
-
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
   function initialize(uint256 lastTokenId_, bool secondaryChain) public initializer {
-    __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
+    __Wormhole721_init("Everdragons2 Genesis", "E2G");
     __ERC721Enumerable_init();
-
-    _teamWallets = [
-      0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
-      0x0ECE90EF4a12273E9c2C06E7C86075d021DB5A6A,
-      //
-      0x70f41fE744657DF9cC5BD317C58D3e7928e22E1B,
-      0x16244cdFb0D364ac5c4B42Aa530497AA762E7bb3,
-      0xe360cDb9B5348DB79CD630d0D1DE854b44638C64,
-      0xE14615C5B0d4f262153343e1590f196DCd52164e,
-      0x777eFBFd78D38Acd0753ef2eBe7cdA620C0f409a,
-      0xca17b266C872aAa553d2fC2e13187EcE3e2Bc54a,
-      0xE73B2AEB8A9f360FB16F7D8Df721B1b40076Aa5E
-    ];
-
     _lastTokenId = lastTokenId_;
-    _mint(msg.sender, lastTokenId_);
     if (secondaryChain) {
       // if so, it is a bridged version of the token and cannot be minted by a manager
       _mintEnded = true;
+    } else {
+      // Agdaroth
+      _mint(msg.sender, lastTokenId_);
     }
-    for (uint256 i = 0; i < _teamWallets.length; i++) {
-      _mint(_teamWallets[i], --lastTokenId_);
-    }
-    _baseTokenURI = "https://meta.everdragons2.com/e2gt/";
-    notSellableYet = true;
+    // temporary tokenURI:
+    _baseTokenURI = "https://img.everdragons2.com/e2g/";
   }
 
   function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -101,10 +78,10 @@ contract Everdragons2 is
   }
 
   function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
-    returns (bool)
+  public
+  view
+  override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+  returns (bool)
   {
     return super.supportsInterface(interfaceId);
   }
@@ -115,10 +92,6 @@ contract Everdragons2 is
 
   function lastTokenId() external view override returns (uint256) {
     return _lastTokenId;
-  }
-
-  function teamWallets() external view override returns (address[] memory) {
-    return _teamWallets;
   }
 
   function setManager(address manager_) external override onlyOwner canMint {
@@ -141,18 +114,6 @@ contract Everdragons2 is
   function mint(address recipient, uint256 tokenId) public override onlyManager canMint {
     _isMinted[tokenId] = true;
     _safeMint(recipient, tokenId);
-  }
-
-  function approve(address to, uint256 tokenId) public virtual override whenSellable {
-    super.approve(to, tokenId);
-  }
-
-  function setApprovalForAll(address operator, bool approved) public virtual override whenSellable {
-    super.setApprovalForAll(operator, approved);
-  }
-
-  function makeItSellable() external override onlyOwner {
-    notSellableYet = false;
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
@@ -180,6 +141,4 @@ contract Everdragons2 is
   function contractURI() public view returns (string memory) {
     return _baseURI();
   }
-
-
 }

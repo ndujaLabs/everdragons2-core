@@ -32,8 +32,8 @@ describe("Everdragons2", function () {
   })
 
   it("should return the Everdragons2 name and symbol", async function () {
-    expect(await everDragons2.name()).to.equal("Everdragons2 Genesis Token")
-    expect(await everDragons2.symbol()).to.equal("E2GT")
+    expect(await everDragons2.name()).to.equal("Everdragons2 Genesis")
+    expect(await everDragons2.symbol()).to.equal("E2G")
     expect(await everDragons2.manager()).to.equal(dragonsFarm.address)
     expect(await everDragons2.ownerOf(10001)).to.equal(owner.address)
 

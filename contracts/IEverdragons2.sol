@@ -13,8 +13,6 @@ interface IEverdragons2 {
 
   function mint(address recipient, uint256 tokenId) external;
 
-  function makeItSellable() external;
-
   function updateBaseTokenURI(string memory uri) external;
 
   function freezeBaseTokenURI() external;
@@ -24,8 +22,6 @@ interface IEverdragons2 {
   function mintingIsEnded() external view returns (bool);
 
   function lastTokenId() external view returns (uint256);
-
-  function teamWallets() external view returns (address[] memory);
 
   function isMinted(uint256 tokenId) external view returns (bool);
 }
