@@ -11,11 +11,12 @@ const Helpers = {
     try {
       await promise
       notThrowing = true
-      console.error('Not throwing instead of:', message)
-      assert.isTrue(false)
+      throw new Error('Not throwing')
     } catch (e) {
       const rightMessage = e.message.indexOf(message) > -1
-      if (!rightMessage && !notThrowing) {
+      if (notThrowing) {
+        console.log('Not throwing')
+      } else if (!rightMessage) {
         console.error('Expected:', message)
         console.error('Returned:', e.message)
       }
@@ -37,11 +38,13 @@ const Helpers = {
     return (await this.ethers.provider.getBlock()).timestamp
   },
 
-  addr0: '0x0000000000000000000000000000000000000000',
-
   async increaseBlockTimestampBy(offset) {
     await this.ethers.provider.send("evm_increaseTime", [offset])
     await this.ethers.provider.send('evm_mine')
+  },
+
+  normalize(val, n = 18) {
+    return '' + val + '0'.repeat(n)
   }
 
 }

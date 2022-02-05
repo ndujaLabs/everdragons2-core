@@ -20,12 +20,12 @@ import "./IEverdragons2.sol";
 import "hardhat/console.sol";
 
 contract Everdragons2 is
-IEverdragons2,
-Initializable,
-ERC721Upgradeable,
-ERC721PlayableUpgradeable,
-ERC721EnumerableUpgradeable,
-Wormhole721Upgradeable
+  IEverdragons2,
+  Initializable,
+  ERC721Upgradeable,
+  ERC721PlayableUpgradeable,
+  ERC721EnumerableUpgradeable,
+  Wormhole721Upgradeable
 {
   //using Address for address;
   address public manager;
@@ -78,10 +78,10 @@ Wormhole721Upgradeable
   }
 
   function supportsInterface(bytes4 interfaceId)
-  public
-  view
-  override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
-  returns (bool)
+    public
+    view
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    returns (bool)
   {
     return super.supportsInterface(interfaceId);
   }
@@ -134,7 +134,7 @@ Wormhole721Upgradeable
     _mintEnded = true;
   }
 
-  function mintingIsEnded() external view override returns (bool) {
+  function mintEnded() external view override returns (bool) {
     return _mintEnded;
   }
 

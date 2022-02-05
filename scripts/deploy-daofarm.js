@@ -26,24 +26,24 @@ async function main() {
   const Everdragons2 = await ethers.getContractFactory("Everdragons2")
   const everDragons2 = Everdragons2.attach(deployed[chainId].Everdragons2)
 
-  const DAOFarm = await ethers.getContractFactory("DAOFarm")
-  const dAOFarm = await DAOFarm.deploy(everDragons2.address)
-  await dAOFarm.deployed()
-  console.log("DAOFarm deployed to:", dAOFarm.address);
+  const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
+  const genesisFarm = await GenesisFarm.deploy(everDragons2.address)
+  await genesisFarm.deployed()
+  console.log("GenesisFarm deployed to:", genesisFarm.address);
 
-  everDragons2.setManager(dAOFarm.address)
+  everDragons2.setManager(genesisFarm.address)
 
   console.log(`
-To verify DAOFarm source code:
+To verify GenesisFarm source code:
     
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
-      ${dAOFarm.address}  \\
+      ${genesisFarm.address}  \\
       ${everDragons2.address}
       
 `)
 
-  await deployUtils.saveDeployed(chainId, ['DAOFarm'], [dAOFarm.address])
+  await deployUtils.saveDeployed(chainId, ['GenesisFarm'], [genesisFarm.address])
 }
 
 main()
