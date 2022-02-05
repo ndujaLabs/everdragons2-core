@@ -1,18 +1,29 @@
 const {expect, assert} = require("chai")
 const _ = require('lodash')
+const keccak256 = require('keccak256')
+const {MerkleTree} = require('merkletreejs')
 
-const {initEthers, assertThrowsMessage, signPackedData, normalize, getTimestamp, increaseBlockTimestampBy} = require('./helpers')
+const {
+  initEthers,
+  assertThrowsMessage,
+  signPackedData,
+  normalize,
+  getTimestamp,
+  increaseBlockTimestampBy
+} = require('./helpers')
 
-describe("GenesisFarm", function () {
+describe("GenesisFarm", async function () {
 
   let Everdragons2Genesis
   let everdragons2Genesis
   let GenesisFarm
   let genesisFarm
-  let owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2
+  let owner, wallet, buyer1, buyer2, treasury, member, beneficiary1, beneficiary2,
+      whitelisted1, whitelisted2, whitelisted3, whitelisted4
 
   before(async function () {
-    [owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2] = await ethers.getSigners()
+    [owner, wallet, buyer1, buyer2, treasury, member, beneficiary1, beneficiary2,
+      whitelisted1, whitelisted2, whitelisted3, whitelisted4] = await ethers.getSigners()
     Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
     GenesisFarm = await ethers.getContractFactory("GenesisFarm")
     initEthers(ethers)
@@ -24,7 +35,7 @@ describe("GenesisFarm", function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address, 25, 10, saleStartAt)
+    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address, 25, 35, 10, saleStartAt)
     await genesisFarm.deployed()
     await everdragons2Genesis.setManager(genesisFarm.address)
   }
@@ -96,14 +107,14 @@ describe("GenesisFarm", function () {
       await genesisFarm.connect(buyer2).buyTokens(9, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(9)
       })
-      await genesisFarm.connect(buyer3).buyTokens(4, {
+      await genesisFarm.connect(treasury).buyTokens(4, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(4)
       })
       await assertThrowsMessage(genesisFarm.connect(buyer1).buyTokens(3, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(3)
       }), 'Not enough tokens left')
 
-      await genesisFarm.connect(buyer3).buyTokens(2, {
+      await genesisFarm.connect(treasury).buyTokens(2, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(2)
       })
 
@@ -115,8 +126,7 @@ describe("GenesisFarm", function () {
 
   })
 
-
-  describe('#giveAway350Tokens', async function () {
+  describe('#claimWhitelistedTokens', async function () {
 
     beforeEach(async function () {
       await initAndDeploy()
@@ -126,32 +136,110 @@ describe("GenesisFarm", function () {
     it("should throw if sale not ended yet", async function () {
 
       await assertThrowsMessage(
-          genesisFarm.giveAway350Tokens([member.address], [26]),
-          'Sale not ended yet')
+          genesisFarm.claimWhitelistedTokens([26], []),
+          'Root not set yet')
+    })
+
+  })
+
+  describe('#claimWhitelistedTokens', async function () {
+
+    let leaves = []
+    let tree
+    let root
+
+    before(async function () {
+      await initAndDeploy()
+      let whitelist = [
+        {
+          address: whitelisted1.address,
+          tokenIds: [26, 32]
+        },
+        {
+          address: whitelisted2.address,
+          tokenIds: [27]
+        },
+        {
+          address: whitelisted3.address,
+          tokenIds: [28, 29, 33]
+        },
+        {
+          address: whitelisted4.address,
+          tokenIds: [30, 31]
+        }
+      ]
+      for (let i = 0; i < whitelist.length; i++) {
+        leaves[i] = await genesisFarm.encodeLeaf(whitelist[i].address, whitelist[i].tokenIds)
+      }
+      tree = new MerkleTree(leaves, keccak256, {sort: true})
+      root = tree.getHexRoot()
+    })
+
+    beforeEach(async function () {
+      await initAndDeploy()
+      await increaseBlockTimestampBy(11)
+      await genesisFarm.setRoot(root)
+    })
+
+
+    it("should allow whitelisted1 to claim 2 dragons", async function () {
+      const leaf = leaves[0]
+      const proof = tree.getHexProof(leaf)
+      await expect(await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([26, 32], proof))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 26)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 32)
+    })
+
+    it("should allow whitelisted2 and 3 to claim 4 dragons", async function () {
+      let leaf = leaves[1]
+      let proof = tree.getHexProof(leaf)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof)
+      leaf = leaves[2]
+      proof = tree.getHexProof(leaf)
+      await genesisFarm.connect(whitelisted3).claimWhitelistedTokens([28, 29, 33], proof)
+    })
+
+    it("should throw if wrong proof", async function () {
+      let leaf = leaves[0]
+      let proof = tree.getHexProof(leaf)
+
+      await assertThrowsMessage(
+          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof),
+          'Invalid proof')
+    })
+
+    it("should throw if repeating the claim", async function () {
+      let leaf = leaves[1]
+      let proof = tree.getHexProof(leaf)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof)
+
+      await assertThrowsMessage(
+          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof),
+          'token already minted')
+    })
+
+  })
+
+  describe('#claimRemainingTokens', async function () {
+
+    beforeEach(async function () {
+      await initAndDeploy()
+      await increaseBlockTimestampBy(11)
+    })
+
+    it("should throw if sale not ended yet", async function () {
+
+      await assertThrowsMessage(
+          genesisFarm.claimRemainingTokens(treasury.address, 20),
+          'Claiming not ended yet')
 
     })
 
   })
 
-  describe('#giveAway350Tokens', async function () {
-
-    const addresses = []
-    const quantities = []
-    let total = 0
-
-    before(async function () {
-      while (total < 350) {
-        let wallet = ethers.Wallet.createRandom().address
-        let rand = 100 * Math.random()
-        let quantity = rand < 90 ? 1 : rand < 98 ? 2 : 3
-        if (total + quantity > 350) {
-          quantity = 350 - total
-        }
-        addresses.push(wallet)
-        quantities.push(quantity)
-        total += quantity
-      }
-    })
+  describe('#claimRemainingTokens', async function () {
 
     beforeEach(async function () {
       await initAndDeploy()
@@ -159,38 +247,84 @@ describe("GenesisFarm", function () {
       await genesisFarm.connect(buyer1).buyTokens(25, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(25)
       })
-    })
-
-
-    it("should airdrop 350 token to winners", async function () {
-
-      assert.equal((await everdragons2Genesis.totalSupply()).toNumber(), 25)
-
-      // then airdrop to the winners
-
-      for (let i = 0; i < addresses.length; i += 25) {
-        let addrs = addresses.slice(i, i + 25)
-        let qty = quantities.slice(i, i + 25)
-        await genesisFarm.giveAway350Tokens(addrs, qty)
+      let whitelist = [
+        {
+          address: whitelisted1.address,
+          tokenIds: [26, 32]
+        },
+        {
+          address: whitelisted2.address,
+          tokenIds: [29]
+        },
+        {
+          address: whitelisted3.address,
+          tokenIds: [27, 28, 33]
+        },
+        {
+          address: whitelisted4.address,
+          tokenIds: [30, 31]
+        }
+      ]
+      let leaves = []
+      for (let i = 0; i < whitelist.length; i++) {
+        leaves[i] = await genesisFarm.encodeLeaf(whitelist[i].address, whitelist[i].tokenIds)
       }
-      assert.equal((await everdragons2Genesis.totalSupply()).toNumber(), 375)
+      let tree = new MerkleTree(leaves, keccak256, {sort: true})
+      let root = tree.getHexRoot()
+      await increaseBlockTimestampBy(11)
+      await genesisFarm.setRoot(root)
+      let leaf = leaves[0]
+      let proof = tree.getHexProof(leaf)
+      await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([26, 32], proof)
+      leaf = leaves[1]
+      proof = tree.getHexProof(leaf)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([29], proof)
+      await genesisFarm.endClaiming()
     })
 
-    it("should skip double winners", async function () {
+    it("should give treasury tokens 27, 28, 30, 31 and 33", async function () {
 
-      let addrs = addresses.slice(43, 57)
-      let qty = quantities.slice(43, 57)
+      await expect(await genesisFarm.claimRemainingTokens(treasury.address, 5))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 27)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 28)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 30)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 31)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 33)
 
-      await genesisFarm.giveAway350Tokens(addrs, qty)
-
-      for (let i = 0; i < addresses.length; i += 25) {
-        addrs = addresses.slice(i, i + 25)
-        qty = quantities.slice(i, i + 25)
-        await genesisFarm.giveAway350Tokens(addrs, qty)
-      }
-      assert.equal((await everdragons2Genesis.totalSupply()).toNumber(), 375)
     })
 
+    it("should give treasury tokens 27, 28, 30 and later 31, 33 and 34", async function () {
+
+      await expect(await genesisFarm.claimRemainingTokens(treasury.address, 3))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 27)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 28)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 30)
+      await expect(await genesisFarm.claimRemainingTokens(treasury.address, 3))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 31)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 33)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 34)
+
+    })
+
+    it("should give treasury tokens 27, 28, 30, 31, 33, 34 and 35", async function () {
+
+      await expect(await genesisFarm.claimRemainingTokens(treasury.address, 10))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, treasury.address, 35)
+
+      expect(await everdragons2Genesis.balanceOf(treasury.address)).equal(7)
+    })
 
   })
 
@@ -224,7 +358,6 @@ describe("GenesisFarm", function () {
       await assertThrowsMessage(
           genesisFarm.withdrawProceeds(beneficiary2.address, normalize(20)),
           'Insufficient funds')
-
     })
 
   })
