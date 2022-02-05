@@ -28,7 +28,7 @@ contract GenesisFarm is Ownable, IManager {
     address everdragons2_,
     uint256 maxForSale_,
     uint16 price_,
-    uint saleStartAt_
+    uint256 saleStartAt_
   ) {
     everdragons2Genesis = IEverdragons2Genesis(everdragons2_);
     require(everdragons2Genesis.mintEnded() == false, "Not an E2 token");
@@ -80,10 +80,8 @@ contract GenesisFarm is Ownable, IManager {
     require(success);
   }
 
-  function updateMaxForSale(uint maxForSale_) external onlyOwner {
+  function updateMaxForSale(uint256 maxForSale_) external onlyOwner {
     require(maxForSale_ != maxForSale, "Not a change");
     maxForSale = maxForSale_;
   }
-
-
 }

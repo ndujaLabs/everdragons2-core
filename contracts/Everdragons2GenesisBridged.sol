@@ -19,12 +19,12 @@ import "./IManager.sol";
 import "hardhat/console.sol";
 
 contract Everdragons2GenesisBridged is
-IEverdragons2GenesisBridged,
-Initializable,
-ERC721Upgradeable,
-ERC721PlayableUpgradeable,
-ERC721EnumerableUpgradeable,
-Wormhole721Upgradeable
+  IEverdragons2GenesisBridged,
+  Initializable,
+  ERC721Upgradeable,
+  ERC721PlayableUpgradeable,
+  ERC721EnumerableUpgradeable,
+  Wormhole721Upgradeable
 {
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
@@ -50,10 +50,10 @@ Wormhole721Upgradeable
   }
 
   function supportsInterface(bytes4 interfaceId)
-  public
-  view
-  override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
-  returns (bool)
+    public
+    view
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    returns (bool)
   {
     return super.supportsInterface(interfaceId);
   }

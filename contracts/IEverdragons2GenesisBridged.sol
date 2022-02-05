@@ -5,9 +5,7 @@ pragma solidity 0.8.3;
 // Everdragons2, https://everdragons2.com
 
 interface IEverdragons2GenesisBridged {
-
   function updateBaseTokenURI(string memory uri) external;
 
   function freezeBaseTokenURI() external;
-
 }

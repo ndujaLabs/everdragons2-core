@@ -16,5 +16,4 @@ interface IEverdragons2Genesis {
   function endMinting() external;
 
   function mintEnded() external view returns (bool);
-
 }
