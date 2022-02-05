@@ -27,12 +27,12 @@ contract GenesisFarm is Ownable, IManager {
   uint256 public maxClaimable;
   uint256 private _lastUnclaimed;
   mapping(uint256 => bool) private _claimed;
-  bool public _claimingEnded;
+  bool public claimingEnded;
 
   constructor(
     address everdragons2_,
     uint256 maxForSale_,
-    uint maxClaimable_,
+    uint256 maxClaimable_,
     uint16 price_,
     uint256 saleStartAt_
   ) {
@@ -50,7 +50,7 @@ contract GenesisFarm is Ownable, IManager {
   }
 
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {
-    require(_claimingEnded, "Claiming not ended yet");
+    require(claimingEnded, "Claiming not ended yet");
     uint256 j = 0;
     uint256 min = 1 + (_lastUnclaimed > 0 ? _lastUnclaimed : maxForSale);
     uint256 k = 0;
@@ -73,16 +73,16 @@ contract GenesisFarm is Ownable, IManager {
   }
 
   function endClaiming() external onlyOwner {
-    _claimingEnded = true;
+    claimingEnded = true;
   }
 
-  function encodeLeaf(address recipient, uint256[] calldata tokenIds) public view returns (bytes32) {
+  function encodeLeaf(address recipient, uint256[] calldata tokenIds) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(recipient, tokenIds));
   }
 
   function claimWhitelistedTokens(uint256[] calldata tokenIds, bytes32[] calldata proof) external {
     require(root != 0, "Root not set yet");
-    require(!_claimingEnded, "Claiming ended");
+    require(!claimingEnded, "Claiming ended");
     bytes32 leaf = encodeLeaf(_msgSender(), tokenIds);
     require(MerkleProof.verify(proof, root, leaf), "Invalid proof");
     for (uint256 i = 0; i < tokenIds.length; i++) {

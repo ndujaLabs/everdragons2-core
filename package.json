@@ -30,14 +30,12 @@
     "hardhat-contract-sizer": "^2.1.1",
     "hardhat-gas-reporter": "^1.0.6",
     "ipfs-http-client": "^49.0.4",
+    "keccak256": "^1.0.6",
     "lodash": "^4.17.21",
     "merkletreejs": "^0.2.27",
     "prettier": "^2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "require-or-mock": "^0.2.1",
     "solhint": "^3.3.6"
-  },
-  "dependencies": {
-    "keccak256": "^1.0.6"
   }
 }
