@@ -35,7 +35,11 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address, 25, 35, 10, saleStartAt)
+    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address,
+        25, // maxForSale
+        10, // maxClaimable
+        10, // price in MATIC
+        saleStartAt)
     await genesisFarm.deployed()
     await everdragons2Genesis.setManager(genesisFarm.address)
   }
@@ -84,11 +88,11 @@ describe("GenesisFarm", async function () {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(3)
       }))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer1.address, 1)
+          .withArgs(ethers.constants.AddressZero, buyer1.address, 11)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer1.address, 2)
+          .withArgs(ethers.constants.AddressZero, buyer1.address, 12)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer1.address, 3)
+          .withArgs(ethers.constants.AddressZero, buyer1.address, 13)
     })
 
     it("should throw if buyer1 try to mint 3 tokens with insufficient balance", async function () {
@@ -136,7 +140,7 @@ describe("GenesisFarm", async function () {
     it("should throw if sale not ended yet", async function () {
 
       await assertThrowsMessage(
-          genesisFarm.claimWhitelistedTokens([26], []),
+          genesisFarm.claimWhitelistedTokens([6], []),
           'Root not set yet')
     })
 
@@ -153,19 +157,19 @@ describe("GenesisFarm", async function () {
       let whitelist = [
         {
           address: whitelisted1.address,
-          tokenIds: [26, 32]
+          tokenIds: [6, 3]
         },
         {
           address: whitelisted2.address,
-          tokenIds: [27]
+          tokenIds: [2]
         },
         {
           address: whitelisted3.address,
-          tokenIds: [28, 29, 33]
+          tokenIds: [8, 7, 1]
         },
         {
           address: whitelisted4.address,
-          tokenIds: [30, 31]
+          tokenIds: [4, 5]
         }
       ]
       for (let i = 0; i < whitelist.length; i++) {
@@ -185,20 +189,20 @@ describe("GenesisFarm", async function () {
     it("should allow whitelisted1 to claim 2 dragons", async function () {
       const leaf = leaves[0]
       const proof = tree.getHexProof(leaf)
-      await expect(await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([26, 32], proof))
+      await expect(await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([6, 3], proof))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 26)
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 6)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 32)
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 3)
     })
 
     it("should allow whitelisted2 and 3 to claim 4 dragons", async function () {
       let leaf = leaves[1]
       let proof = tree.getHexProof(leaf)
-      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([2], proof)
       leaf = leaves[2]
       proof = tree.getHexProof(leaf)
-      await genesisFarm.connect(whitelisted3).claimWhitelistedTokens([28, 29, 33], proof)
+      await genesisFarm.connect(whitelisted3).claimWhitelistedTokens([8, 7, 1], proof)
     })
 
     it("should throw if wrong proof", async function () {
@@ -206,17 +210,17 @@ describe("GenesisFarm", async function () {
       let proof = tree.getHexProof(leaf)
 
       await assertThrowsMessage(
-          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof),
+          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([2], proof),
           'Invalid proof')
     })
 
     it("should throw if repeating the claim", async function () {
       let leaf = leaves[1]
       let proof = tree.getHexProof(leaf)
-      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([2], proof)
 
       await assertThrowsMessage(
-          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([27], proof),
+          genesisFarm.connect(whitelisted2).claimWhitelistedTokens([2], proof),
           'token already minted')
     })
 
@@ -234,9 +238,7 @@ describe("GenesisFarm", async function () {
       await assertThrowsMessage(
           genesisFarm.claimRemainingTokens(treasury.address, 20),
           'Claiming not ended yet')
-
     })
-
   })
 
   describe('#claimRemainingTokens', async function () {
@@ -250,19 +252,19 @@ describe("GenesisFarm", async function () {
       let whitelist = [
         {
           address: whitelisted1.address,
-          tokenIds: [26, 32]
+          tokenIds: [6, 3]
         },
         {
           address: whitelisted2.address,
-          tokenIds: [29]
+          tokenIds: [7]
         },
         {
           address: whitelisted3.address,
-          tokenIds: [27, 28, 33]
+          tokenIds: [2, 8, 1]
         },
         {
           address: whitelisted4.address,
-          tokenIds: [30, 31]
+          tokenIds: [4, 5]
         }
       ]
       let leaves = []
@@ -275,53 +277,53 @@ describe("GenesisFarm", async function () {
       await genesisFarm.setRoot(root)
       let leaf = leaves[0]
       let proof = tree.getHexProof(leaf)
-      await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([26, 32], proof)
+      await genesisFarm.connect(whitelisted1).claimWhitelistedTokens([6, 3], proof)
       leaf = leaves[1]
       proof = tree.getHexProof(leaf)
-      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([29], proof)
+      await genesisFarm.connect(whitelisted2).claimWhitelistedTokens([7], proof)
       await genesisFarm.endClaiming()
     })
 
-    it("should give treasury tokens 27, 28, 30, 31 and 33", async function () {
+    it("should give treasury tokens 1, 2, 4, 5 and 8", async function () {
 
       await expect(await genesisFarm.claimRemainingTokens(treasury.address, 5))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 27)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 1)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 28)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 2)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 30)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 4)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 31)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 5)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 33)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 8)
 
     })
 
-    it("should give treasury tokens 27, 28, 30 and later 31, 33 and 34", async function () {
+    it("should give treasury tokens 1, 2, 4 and later 5, 8 and 9", async function () {
 
       await expect(await genesisFarm.claimRemainingTokens(treasury.address, 3))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 27)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 1)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 28)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 2)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 30)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 4)
       await expect(await genesisFarm.claimRemainingTokens(treasury.address, 3))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 31)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 5)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 33)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 8)
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 34)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 9)
 
     })
 
-    it("should give treasury tokens 27, 28, 30, 31, 33, 34 and 35", async function () {
+    it("should give treasury tokens 1, 2, 4, 5, 8, 9 and 10", async function () {
 
       await expect(await genesisFarm.claimRemainingTokens(treasury.address, 10))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, treasury.address, 35)
+          .withArgs(ethers.constants.AddressZero, treasury.address, 10)
 
       expect(await everdragons2Genesis.balanceOf(treasury.address)).equal(7)
     })
@@ -343,9 +345,9 @@ describe("GenesisFarm", async function () {
       let balance1Before = await ethers.provider.getBalance(beneficiary1.address)
       let balance2Before = await ethers.provider.getBalance(beneficiary2.address)
 
-      await genesisFarm.withdrawProceeds(beneficiary1.address, normalize(30))
+      await genesisFarm.withdrawProceeds(beneficiary1.address, normalize(4))
       let balance1After = await ethers.provider.getBalance(beneficiary1.address)
-      assert.equal(balance1After.sub(balance1Before).toString(), normalize(30))
+      assert.equal(balance1After.sub(balance1Before).toString(), normalize(4))
 
       await genesisFarm.withdrawProceeds(beneficiary2.address, normalize(220))
       let balance2After = await ethers.provider.getBalance(beneficiary2.address)

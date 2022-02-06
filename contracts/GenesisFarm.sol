@@ -18,7 +18,7 @@ contract GenesisFarm is Ownable, IManager {
   IEverdragons2Genesis public everdragons2Genesis;
 
   bytes32 public root;
-  uint256 private _nextTokenId = 1;
+  uint256 private _nextTokenId;
   uint256 public maxForSale;
   uint256 public proceedsBalance;
   uint256 public price;
@@ -40,7 +40,8 @@ contract GenesisFarm is Ownable, IManager {
     require(everdragons2Genesis.mintEnded() == false, "Not an E2 token");
     require(saleStartAt_ > block.timestamp, "Invalid sale start time");
     maxForSale = maxForSale_; // 250
-    maxClaimable = maxClaimable_; // 600
+    maxClaimable = maxClaimable_; // 350
+    _nextTokenId = maxClaimable_ + 1;
     price = uint256(price_).mul(10**18);
     saleStartAt = saleStartAt_;
   }
@@ -52,9 +53,8 @@ contract GenesisFarm is Ownable, IManager {
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {
     require(claimingEnded, "Claiming not ended yet");
     uint256 j = 0;
-    uint256 min = 1 + (_lastUnclaimed > 0 ? _lastUnclaimed : maxForSale);
     uint256 k = 0;
-    for (uint256 i = min; i <= maxClaimable; i++) {
+    for (uint256 i = _lastUnclaimed + 1; i <= maxClaimable; i++) {
       if (!_claimed[i]) {
         j++;
         k = i;
@@ -94,7 +94,7 @@ contract GenesisFarm is Ownable, IManager {
 
   function buyTokens(uint256 quantity) external payable {
     require(block.timestamp >= saleStartAt, "Sale not started yet");
-    require(_nextTokenId + quantity - 1 <= maxForSale, "Not enough tokens left");
+    require(_nextTokenId + quantity - 1 <= maxForSale + maxClaimable, "Not enough tokens left");
     require(msg.value >= price.mul(quantity), "Insufficient payment");
     uint256 nextId = _nextTokenId;
     for (uint256 i = 0; i < quantity; i++) {
