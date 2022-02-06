@@ -16,6 +16,7 @@ import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
 import "./interfaces/IEverdragons2Genesis.sol";
 import "./interfaces/IManager.sol";
+
 //import "hardhat/console.sol";
 
 contract Everdragons2Genesis is
