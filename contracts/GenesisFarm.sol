@@ -7,8 +7,8 @@ pragma solidity 0.8.3;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IEverdragons2Genesis.sol";
-import "./IManager.sol";
+import "./interfaces/IEverdragons2Genesis.sol";
+import "./interfaces/IManager.sol";
 
 import "hardhat/console.sol";
 
