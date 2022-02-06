@@ -16,7 +16,7 @@ async function main() {
           // for now:
           : 'localhost'
 
-  const secondaryChain = chainId !== 137 && chainId !== 80001 && chainId !== 1337
+  // const secondaryChain = chainId !== 137 && chainId !== 80001 && chainId !== 1337
 
   console.log(
       "Deploying contracts with the account:",
@@ -25,21 +25,21 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  Everdragons2 = await ethers.getContractFactory("Everdragons2")
-  everDragons2 = await upgrades.deployProxy(Everdragons2, [10001, secondaryChain])
-  await everDragons2.deployed()
-  console.log("Everdragons2 deployed to:", everDragons2.address);
+  Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
+  everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, [])
+  await everdragons2Genesis.deployed()
+  console.log("Everdragons2Genesis deployed to:", everdragons2Genesis.address);
 
   console.log(`
-To verify Everdragons2 source code:
+To verify Everdragons2Genesis source code:
     
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
-      ${everDragons2.address}
+      ${everdragons2Genesis.address}
       
 `)
 
-  await deployUtils.saveDeployed(chainId, ['Everdragons2'], [everDragons2.address])
+  await deployUtils.saveDeployed(chainId, ['Everdragons2Genesis'], [everdragons2Genesis.address])
 
 }
 

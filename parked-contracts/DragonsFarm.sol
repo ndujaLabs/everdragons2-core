@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.3;
+pragma solidity 0.8.3;
 
 // Author: Francesco Sullo <francesco@sullo.co>
 // Everdragons2 website: https://everdragons2.com
@@ -88,7 +88,7 @@ contract DragonsFarm is Ownable {
     _mintEnded = true;
   }
 
-  function mintingIsEnded() external view returns (bool) {
+  function mintEnded() external view returns (bool) {
     return _mintEnded;
   }
 
@@ -191,9 +191,7 @@ contract DragonsFarm is Ownable {
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(tokenIds[i] < everdragons2.lastTokenId(), "Id out of range");
       require(
-        saleEnded() ||
-          (tokenIds[i] > conf.maxTokenIdForSale + allReserved &&
-            tokenIds[i] < everdragons2.lastTokenId()),
+        saleEnded() || (tokenIds[i] > conf.maxTokenIdForSale + allReserved && tokenIds[i] < everdragons2.lastTokenId()),
         "Id out of range"
       );
     }
