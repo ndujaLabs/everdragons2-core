@@ -2,6 +2,8 @@ const {expect, assert} = require("chai")
 const _ = require('lodash')
 const keccak256 = require('keccak256')
 const {MerkleTree} = require('merkletreejs')
+const fs = require('fs-extra')
+const path = require('path')
 
 const {
   initEthers,
@@ -364,4 +366,23 @@ describe("GenesisFarm", async function () {
 
   })
 
+  describe('test and generate whitelist for Merkle Tree', async function () {
+
+    it("should generate the leaves", async function () {
+      await initAndDeploy()
+      let whitelist = require('./fixtures/whitelist.json')
+      let leaves = []
+      for (let i = 0; i < whitelist.length; i++) {
+        leaves[i] = await genesisFarm.encodeLeaf(whitelist[i].address, whitelist[i].tokenIds)
+      }
+      await fs.writeFile(path.resolve(__dirname, 'fixtures/leaves.json'), JSON.stringify(leaves, null, 2))
+      let tree = new MerkleTree(leaves, keccak256, {sort: true})
+      let root = tree.getHexRoot()
+      await increaseBlockTimestampBy(11)
+      await genesisFarm.setRoot(root)
+      let leaf = leaves[0]
+      let proof = tree.getHexProof(leaf)
+      expect(proof.length).equal(9)
+    })
+  })
 })
