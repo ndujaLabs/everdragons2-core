@@ -15,6 +15,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
 import "./interfaces/IEverdragons2GenesisBridged.sol";
+
 //import "hardhat/console.sol";
 
 contract Everdragons2GenesisBridged is
