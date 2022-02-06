@@ -14,9 +14,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
-import "./IEverdragons2Genesis.sol";
-import "./IManager.sol";
-import "hardhat/console.sol";
+import "./interfaces/IEverdragons2Genesis.sol";
+import "./interfaces/IManager.sol";
+//import "hardhat/console.sol";
 
 contract Everdragons2Genesis is
   IEverdragons2Genesis,
