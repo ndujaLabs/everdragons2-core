@@ -5,7 +5,8 @@ const requireOrMock = require('require-or-mock')
 
 const {
   initEthers,
-  getTimestamp
+  getTimestamp,
+  normalize
 } = require('../test/helpers')
 
 const DeployUtils = require('./lib/DeployUtils')
@@ -33,9 +34,18 @@ async function main() {
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
-  const genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address, 250, 600, 500,
+
+  const price = normalize(network === 'matic' ? 500 : 0.1)
+  const delay = network === 'matic' ? 3600 : 10
+
+  const genesisFarm = await GenesisFarm.deploy(
+      everdragons2Genesis.address,
+      250,
+      600,
+      price,
       // sale start after one hour
-      (await getTimestamp()) + 3600)
+      (await getTimestamp()) + delay
+  )
   await genesisFarm.deployed()
   console.log("GenesisFarm deployed to:", genesisFarm.address);
 

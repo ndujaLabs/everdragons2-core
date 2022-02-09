@@ -44,7 +44,7 @@ const Helpers = {
   },
 
   normalize(val, n = 18) {
-    return '' + val + '0'.repeat(n)
+    return ('' + val + '0'.repeat(n)).replace(/^0+/, '').replace(/\./, '')
   }
 
 }

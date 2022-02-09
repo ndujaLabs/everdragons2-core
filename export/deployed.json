@@ -1,6 +1,10 @@
 {
   "1337": {
-    "Everdragons2Genesis": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
-    "GenesisFarm": "0xA7c59f010700930003b33aB25a7a0679C860f29c"
+    "Everdragons2Genesis": "0xffa7CA1AEEEbBc30C874d32C7e22F052BbEa0429",
+    "GenesisFarm": "0x3aAde2dCD2Df6a8cAc689EE797591b2913658659"
+  },
+  "80001": {
+    "Everdragons2Genesis": "0xeC3a1a418203827AD24391F6f44D4d60223270Df",
+    "GenesisFarm": "0x87Ab04CC86A72349e63021413F461539b14C130c"
   }
 }

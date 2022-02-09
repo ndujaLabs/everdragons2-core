@@ -37,10 +37,11 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address,
+    genesisFarm = await GenesisFarm.deploy(
+        everdragons2Genesis.address,
         25, // maxForSale
         10, // maxClaimable
-        10, // price in MATIC
+        normalize(10), // price in MATIC
         saleStartAt)
     await genesisFarm.deployed()
     await everdragons2Genesis.setManager(genesisFarm.address)

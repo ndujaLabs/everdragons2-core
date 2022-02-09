@@ -2,8 +2,11 @@ require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 require('@openzeppelin/hardhat-upgrades');
 // require("hardhat-gas-reporter");
+const requireOrMock = require('require-or-mock')
 
-let env = require('./env.json');
+let env = requireOrMock('env.js', {
+
+});
 
 if (process.env.GAS_REPORT === 'yes') {
   require("hardhat-gas-reporter");
@@ -48,11 +51,11 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKey]
+      accounts: [env.privateKeyTestnet]
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKey]
+      accounts: [env.privateKeyTestnet]
     },
     ethereum: {
       url: `https://mainnet.infura.io/v3/${env.infuraApiKey}`,
@@ -62,19 +65,19 @@ module.exports = {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,
-      accounts: [env.privateKey]
+      accounts: [env.privateKeyTestnet]
     },
     bsc: {
-      url: "https://bsc-dataseed.binance.org/",
+      url: "https://bsc-dataseed.binance.org",
       chainId: 56,
       gasPrice: 20000000000,
       accounts: [env.privateKey]
     },
     mumbai: {
-      url: 'https://rpc-mumbai.maticvigil.com',
+      url: 'https://rpc-mumbai.matic.today',
       chainId: 80001,
       gasPrice: 20000000000,
-      accounts: [env.privateKey]
+      accounts: [env.privateKeyTestnet]
     },
     matic: {
       url: `https://rpc-mainnet.maticvigil.com/v1/${env.maticvigilKey}`,

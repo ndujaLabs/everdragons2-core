@@ -33,16 +33,16 @@ contract GenesisFarm is Ownable, IManager {
     IEverdragons2Genesis everdragons2_,
     uint256 maxForSale_,
     uint256 maxClaimable_,
-    uint16 price_,
+    uint256 price_,
     uint256 saleStartAt_
   ) {
     everdragons2Genesis = everdragons2_;
     require(everdragons2Genesis.mintEnded() == false, "Not an E2 token");
-    require(saleStartAt_ > block.timestamp, "Invalid sale start time");
+    require(saleStartAt_ > 0, "Invalid sale start time");
     maxForSale = maxForSale_; // 250
     maxClaimable = maxClaimable_; // 350
     _nextTokenId = maxClaimable_ + 1;
-    price = uint256(price_).mul(10**18);
+    price = price_;
     saleStartAt = saleStartAt_;
   }
 
