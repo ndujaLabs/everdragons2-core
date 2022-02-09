@@ -22,7 +22,7 @@ async function main() {
   let [, , localSuperAdmin] = await ethers.getSigners();
 
   const network = chainId === 137 ? 'matic'
-      : chainId == 80001 ? 'mumbai'
+      : chainId === 80001 ? 'mumbai'
           : 'localhost'
 
   if (!deployed[chainId]) {
