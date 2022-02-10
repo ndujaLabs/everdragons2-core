@@ -96,6 +96,8 @@ describe("GenesisFarm", async function () {
           .withArgs(ethers.constants.AddressZero, buyer1.address, 12)
           .to.emit(everdragons2Genesis, 'Transfer')
           .withArgs(ethers.constants.AddressZero, buyer1.address, 13)
+
+      expect(await genesisFarm.nextTokenId()).equal(14)
     })
 
     it("should throw if buyer1 try to mint 3 tokens with insufficient balance", async function () {

@@ -35,21 +35,22 @@ async function main() {
 
   const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
 
-  const price = normalize(network === 'matic' ? 500 : 0.1)
+  const price = network === 'matic' ? normalize(500) : '50000000000000000'
   const delay = network === 'matic' ? 3600 : 10
+  const timestamp = (await getTimestamp()) + delay
 
   const genesisFarm = await GenesisFarm.deploy(
       everdragons2Genesis.address,
       250,
-      600,
+      350,
       price,
       // sale start after one hour
-      (await getTimestamp()) + delay
+      timestamp
   )
   await genesisFarm.deployed()
   console.log("GenesisFarm deployed to:", genesisFarm.address);
 
-  everdragons2Genesis.setManager(genesisFarm.address)
+  await everdragons2Genesis.setManager(genesisFarm.address)
 
   console.log(`
 To verify GenesisFarm source code:
@@ -57,7 +58,11 @@ To verify GenesisFarm source code:
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
       ${genesisFarm.address}  \\
-      ${everdragons2Genesis.address}
+      ${everdragons2Genesis.address} \\
+      250 \\
+      350 \\
+      ${price} \\
+      ${timestamp}
       
 `)
 

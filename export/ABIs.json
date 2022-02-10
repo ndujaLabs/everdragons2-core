@@ -1,5 +1,5 @@
 {
-  "when": "2022-02-06T01:56:43.893Z",
+  "when": "2022-02-10T00:47:14.082Z",
   "contracts": {
     "Everdragons2Genesis": [
       {
@@ -1863,7 +1863,7 @@
       {
         "inputs": [
           {
-            "internalType": "address",
+            "internalType": "contract IEverdragons2Genesis",
             "name": "everdragons2_",
             "type": "address"
           },
@@ -1878,9 +1878,9 @@
             "type": "uint256"
           },
           {
-            "internalType": "uint16",
+            "internalType": "uint256",
             "name": "price_",
-            "type": "uint16"
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -2045,6 +2045,19 @@
       {
         "inputs": [],
         "name": "maxForSale",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "nextTokenId",
         "outputs": [
           {
             "internalType": "uint256",
