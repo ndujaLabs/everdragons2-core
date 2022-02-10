@@ -37,6 +37,7 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
+    // expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
     genesisFarm = await GenesisFarm.deploy(
         everdragons2Genesis.address,
         25, // maxForSale
