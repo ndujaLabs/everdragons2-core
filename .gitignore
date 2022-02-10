@@ -28,6 +28,8 @@ npm-debug.log
 
 # local env variables
 .env
+.env.*
+env.*
 
 # truffle build directory
 build/
@@ -59,6 +61,5 @@ artifacts
 
 #local data
 db
-env.json
 /etherscan
 .openzeppelin

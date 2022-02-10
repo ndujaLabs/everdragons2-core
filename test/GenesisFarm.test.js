@@ -37,10 +37,12 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address,
+    // expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
+    genesisFarm = await GenesisFarm.deploy(
+        everdragons2Genesis.address,
         25, // maxForSale
         10, // maxClaimable
-        10, // price in MATIC
+        normalize(10), // price in MATIC
         saleStartAt)
     await genesisFarm.deployed()
     await everdragons2Genesis.setManager(genesisFarm.address)
@@ -95,6 +97,8 @@ describe("GenesisFarm", async function () {
           .withArgs(ethers.constants.AddressZero, buyer1.address, 12)
           .to.emit(everdragons2Genesis, 'Transfer')
           .withArgs(ethers.constants.AddressZero, buyer1.address, 13)
+
+      expect(await genesisFarm.nextTokenId()).equal(14)
     })
 
     it("should throw if buyer1 try to mint 3 tokens with insufficient balance", async function () {

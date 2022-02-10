@@ -20,7 +20,8 @@ async function main() {
 
   console.log(
       "Deploying contracts with the account:",
-      deployer.address
+      deployer.address,
+      'to', network
   );
 
   console.log("Account balance:", (await deployer.getBalance()).toString());

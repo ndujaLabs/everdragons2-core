@@ -5,7 +5,8 @@ const requireOrMock = require('require-or-mock')
 
 const {
   initEthers,
-  getTimestamp
+  getTimestamp,
+  normalize
 } = require('../test/helpers')
 
 const DeployUtils = require('./lib/DeployUtils')
@@ -21,7 +22,7 @@ async function main() {
   let [, , localSuperAdmin] = await ethers.getSigners();
 
   const network = chainId === 137 ? 'matic'
-      : chainId == 80001 ? 'mumbai'
+      : chainId === 80001 ? 'mumbai'
           : 'localhost'
 
   if (!deployed[chainId]) {
@@ -33,13 +34,23 @@ async function main() {
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
-  const genesisFarm = await GenesisFarm.deploy(everdragons2Genesis.address, 250, 600, 500,
+
+  const price = network === 'matic' ? normalize(500) : '50000000000000000'
+  const delay = network === 'matic' ? 3600 : 10
+  const timestamp = (await getTimestamp()) + delay
+
+  const genesisFarm = await GenesisFarm.deploy(
+      everdragons2Genesis.address,
+      250,
+      350,
+      price,
       // sale start after one hour
-      (await getTimestamp()) + 3600)
+      timestamp
+  )
   await genesisFarm.deployed()
   console.log("GenesisFarm deployed to:", genesisFarm.address);
 
-  everdragons2Genesis.setManager(genesisFarm.address)
+  await everdragons2Genesis.setManager(genesisFarm.address)
 
   console.log(`
 To verify GenesisFarm source code:
@@ -47,7 +58,11 @@ To verify GenesisFarm source code:
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
       ${genesisFarm.address}  \\
-      ${everdragons2Genesis.address}
+      ${everdragons2Genesis.address} \\
+      250 \\
+      350 \\
+      ${price} \\
+      ${timestamp}
       
 `)
 
