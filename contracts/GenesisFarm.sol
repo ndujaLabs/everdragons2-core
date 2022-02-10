@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.11;
 
 // Author: Francesco Sullo <francesco@sullo.co>
 // Everdragons2 website: https://everdragons2.com

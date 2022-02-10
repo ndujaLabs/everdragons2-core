@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.11;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
 //          Emanuele Cesena <emanuele@ndujalabs.com>
