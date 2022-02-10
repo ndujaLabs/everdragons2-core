@@ -104,6 +104,6 @@ contract Everdragons2Genesis is
   }
 
   function contractURI() public view returns (string memory) {
-    return _baseURI();
+    return string(abi.encodePacked(_baseTokenURI, "0"));
   }
 }
