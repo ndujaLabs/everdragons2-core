@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.3;
+pragma solidity ^0.8.0;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
 //          Emanuele Cesena <emanuele@ndujalabs.com>
@@ -27,10 +27,11 @@ contract Everdragons2Genesis is
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-  address public manager;
   bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
+
+  address public manager;
 
   modifier onlyManager() {
     require(manager != address(0) && _msgSender() == manager, "Forbidden");
@@ -93,13 +94,13 @@ contract Everdragons2Genesis is
     return _baseTokenURI;
   }
 
-  function updateBaseTokenURI(string memory uri) external override onlyOwner {
+  function updateTokenURI(string memory uri) external override onlyOwner {
     require(!_baseTokenURIFrozen, "baseTokenUri has been frozen");
     // after revealing, this allows to set up a final uri
     _baseTokenURI = uri;
   }
 
-  function freezeBaseTokenURI() external override onlyOwner {
+  function freezeTokenURI() external override onlyOwner {
     _baseTokenURIFrozen = true;
   }
 
