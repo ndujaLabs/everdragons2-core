@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.3;
+pragma solidity 0.8.11;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
 //          Emanuele Cesena <emanuele@ndujalabs.com>
@@ -62,13 +62,13 @@ contract Everdragons2GenesisBridged is
     return _baseTokenURI;
   }
 
-  function updateBaseTokenURI(string memory uri) external override onlyOwner {
+  function updateTokenURI(string memory uri) external override onlyOwner {
     require(!_baseTokenURIFrozen, "baseTokenUri has been frozen");
     // after revealing, this allows to set up a final uri
     _baseTokenURI = uri;
   }
 
-  function freezeBaseTokenURI() external override onlyOwner {
+  function freezeTokenURI() external override onlyOwner {
     _baseTokenURIFrozen = true;
   }
 

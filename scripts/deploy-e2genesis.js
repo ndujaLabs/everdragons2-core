@@ -13,6 +13,8 @@ async function main() {
 
   const network = chainId === 137 ? 'matic'
       : chainId == 80001 ? 'mumbai'
+          : chainId == 42 ? 'kovan'
+              : chainId == 3 ? 'ropsten'
           // for now:
           : 'localhost'
 
@@ -28,17 +30,19 @@ async function main() {
 
   Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
   everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, [])
+  // everdragons2Genesis = await upgrades.upgradeProxy('0xE37760c7933176679951A5328a5Cd11fa800c60b', Everdragons2Genesis);
+
   await everdragons2Genesis.deployed()
   console.log("Everdragons2Genesis deployed to:", everdragons2Genesis.address);
 
-  console.log(`
-To verify Everdragons2Genesis source code:
-    
-  npx hardhat verify --show-stack-traces \\
-      --network ${network} \\
-      ${everdragons2Genesis.address}
-      
-`)
+//   console.log(`
+// To verify Everdragons2Genesis source code:
+//
+//   npx hardhat verify --show-stack-traces \\
+//       --network ${network} \\
+//       ${everdragons2Genesis.address}
+//
+// `)
 
   await deployUtils.saveDeployed(chainId, ['Everdragons2Genesis'], [everdragons2Genesis.address])
 

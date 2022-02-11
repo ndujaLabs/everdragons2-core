@@ -31,7 +31,7 @@ task("accounts", "Prints the list of accounts", async () => {
  */
 module.exports = {
   solidity: {
-    version: '0.8.3',
+    version: '0.8.11',
     settings: {
       optimizer: {
         enabled: true,
@@ -49,12 +49,12 @@ module.exports = {
     ganache: {
       url: "http://localhost:7545"
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${env.infuraApiKey}`,
+    ropsten: {
+      url: `https://ropsten.infura.io/v3/${env.infuraApiKey}`,
       accounts: [env.privateKeyTestnet]
     },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${env.infuraApiKey}`,
+    kovan: {
+      url: `https://kovan.infura.io/v3/${env.infuraApiKey}`,
       accounts: [env.privateKeyTestnet]
     },
     ethereum: {
@@ -87,9 +87,9 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: env.etherscanKey
+    // apiKey: env.etherscanKey
     // apiKey: env.bscscanKey
-    // apiKey: env.polygonscanAPIKey
+    apiKey: env.polygonscanAPIKey
   },
   gasReporter: {
     currency: 'USD',
