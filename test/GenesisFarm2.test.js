@@ -104,6 +104,9 @@ describe("GenesisFarm2", async function () {
       expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(45)
       expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
 
+      await genesisFarm2.giveExtraTokens()
+      expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
+
       let proceeds = await genesisFarm2.proceedsBalance()
       let balance1Before = await ethers.provider.getBalance(beneficiary1.address)
       await genesisFarm2.withdrawProceeds(beneficiary1.address, 0)
