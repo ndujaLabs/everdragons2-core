@@ -40,8 +40,8 @@ contract GenesisFarm2 is Ownable, IManager {
     uint256 extraTokens_
   ) {
     everdragons2Genesis = everdragons2_;
+    require(everdragons2Genesis.mintEnded() == false, "Not an E2 token");
     uint256 temporaryTotalSupply = everdragons2Genesis.totalSupply();
-    require(temporaryTotalSupply > 10, "Not an E2 token");
     maxForSale = maxForSale_;
     maxClaimable = maxClaimable_;
     extraTokens = extraTokens_;
