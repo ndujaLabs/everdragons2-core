@@ -138,7 +138,7 @@ contract GenesisFarm2 is Ownable, IManager {
     }
     require(amount <= proceedsBalance, "Insufficient funds");
     proceedsBalance -= amount;
-    (bool success,) = beneficiary.call{value : amount}("");
+    (bool success, ) = beneficiary.call{value: amount}("");
     require(success);
   }
 
