@@ -80,7 +80,7 @@ module.exports = {
       accounts: [env.privateKeyTestnet]
     },
     matic: {
-      url: `https://rpc-mainnet.maticvigil.com/v1/${env.maticvigilKey}`,
+      url: `https://polygon-mainnet.infura.io/v3/${env.infuraApiKey}`,
       chainId: 137,
       gasPrice: 20000000000,
       accounts: [env.privateKey]

@@ -19,7 +19,7 @@ async function main() {
   initEthers(ethers)
   deployUtils = new DeployUtils(ethers)
   const chainId = await deployUtils.currentChainId()
-  let [, , localSuperAdmin] = await ethers.getSigners();
+  let [deployer] = await ethers.getSigners();
 
   const network = chainId === 137 ? 'matic'
       : chainId === 80001 ? 'mumbai'
@@ -30,13 +30,19 @@ async function main() {
     process.exit(1)
   }
 
+  console.log(
+      "Deploying contracts with the account:",
+      deployer.address,
+      'to', network
+  );
+
   const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
 
   const price = network === 'matic' ? normalize(500) : '50000000000000000'
-  const delay = network === 'matic' ? 3600 : 10
+  const delay = network === 'matic' ? 63000 : 10
   const timestamp = (await getTimestamp()) + delay
 
   const genesisFarm = await GenesisFarm.deploy(
@@ -47,6 +53,7 @@ async function main() {
       // sale start after one hour
       timestamp
   )
+  console.log("Deploying GenesisFarm");
   await genesisFarm.deployed()
   console.log("GenesisFarm deployed to:", genesisFarm.address);
 

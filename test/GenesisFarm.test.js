@@ -37,7 +37,7 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    // expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
+    expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
     genesisFarm = await GenesisFarm.deploy(
         everdragons2Genesis.address,
         25, // maxForSale
@@ -360,7 +360,7 @@ describe("GenesisFarm", async function () {
       assert.equal(balance2After.sub(balance2Before).toString(), normalize(220))
     })
 
-    it("should throw if sale not ended yet", async function () {
+    it("should throw if insufficient funds", async function () {
 
       await genesisFarm.withdrawProceeds(beneficiary1.address, 0)
       await assertThrowsMessage(
