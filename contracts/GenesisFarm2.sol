@@ -60,19 +60,27 @@ contract GenesisFarm2 is Ownable, IManager {
     return true;
   }
 
-  function giveExtraTokens() external onlyOwner {
-    uint256 max;
+  function giveExtraTokens(uint256 max) external onlyOwner {
+    require(!extraTokensDistributed(), "All extra tokens have been distributed");
+    uint256 count;
     uint256 nextId = nextTokenId;
     for (uint256 i = 0; i < firstBuyers.length; i++) {
-      for (uint256 j = 0; j < _firstBuyersBalance[firstBuyers[i]] * extraTokens; j++) {
-        everdragons2Genesis.mint(firstBuyers[i], nextId++);
-      }
-      _firstBuyersBalance[firstBuyers[i]] = 0;
-      if (++max == 5) {
-        break;
+      if (_firstBuyersBalance[firstBuyers[i]] > 0) {
+        for (uint256 j = 0; j < _firstBuyersBalance[firstBuyers[i]] * extraTokens; j++) {
+          everdragons2Genesis.mint(firstBuyers[i], nextId++);
+        }
+        _firstBuyersBalance[firstBuyers[i]] = 0;
+        if (++count == max) {
+          break;
+        }
       }
     }
     nextTokenId = nextId;
+  }
+
+  function extraTokensDistributed() public view returns (bool) {
+    address lastAddress = firstBuyers[firstBuyers.length - 1];
+    return _firstBuyersBalance[lastAddress] == 0;
   }
 
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {

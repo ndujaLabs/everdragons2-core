@@ -99,13 +99,19 @@ describe("GenesisFarm2", async function () {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(3)
       }), 'Forbidden')
 
-      await genesisFarm2.giveExtraTokens()
+      await genesisFarm2.giveExtraTokens(2)
+      expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
+      expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(45)
+      expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(4)
+      expect(await genesisFarm2.extraTokensDistributed()).equal(false)
+
+      await genesisFarm2.giveExtraTokens(2)
       expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
       expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(45)
       expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
+      expect(await genesisFarm2.extraTokensDistributed()).equal(true)
 
-      await genesisFarm2.giveExtraTokens()
-      expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
+      await assertThrowsMessage(genesisFarm2.giveExtraTokens(2), 'All extra tokens have been distributed')
 
       let proceeds = await genesisFarm2.proceedsBalance()
       let balance1Before = await ethers.provider.getBalance(beneficiary1.address)
