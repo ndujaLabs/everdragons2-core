@@ -1,5 +1,5 @@
 {
-  "when": "2022-02-13T03:34:16.237Z",
+  "when": "2022-02-13T05:35:14.150Z",
   "contracts": {
     "Everdragons2Genesis": [
       {
@@ -2395,19 +2395,6 @@
         "type": "function"
       },
       {
-        "inputs": [],
-        "name": "extraTokensDistributed",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
         "inputs": [
           {
             "internalType": "uint256",
@@ -2428,6 +2415,30 @@
       },
       {
         "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "name": "firstBuyersBalance",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          },
           {
             "internalType": "uint256",
             "name": "max",
@@ -2561,6 +2572,19 @@
         "name": "setRoot",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalFirstBuyers",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       },
       {

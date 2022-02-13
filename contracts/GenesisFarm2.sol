@@ -29,7 +29,7 @@ contract GenesisFarm2 is Ownable, IManager {
   mapping(uint256 => bool) private _claimed;
   bool public claimingEnded;
 
-  mapping(address => uint256) private _firstBuyersBalance;
+  mapping(address => uint256) public firstBuyersBalance;
   address[] public firstBuyers;
 
   constructor(
@@ -49,37 +49,37 @@ contract GenesisFarm2 is Ownable, IManager {
     price = price_;
     for (uint256 i = maxClaimable + 1; i < maxClaimable + 1 + temporaryTotalSupply; i++) {
       address buyer = everdragons2Genesis.ownerOf(i);
-      if (_firstBuyersBalance[buyer] == 0) {
+      if (firstBuyersBalance[buyer] == 0) {
         firstBuyers.push(buyer);
       }
-      _firstBuyersBalance[buyer] += 1;
+      firstBuyersBalance[buyer] += 1;
     }
+  }
+
+  function totalFirstBuyers() external view returns(uint) {
+    return firstBuyers.length;
   }
 
   function isManager() external pure override returns (bool) {
     return true;
   }
 
-  function giveExtraTokens(uint256 max) external onlyOwner {
-    uint256 count;
+  function giveExtraTokens(uint256 index, uint256 max) external onlyOwner {
+    address buyer = firstBuyers[index];
+    uint remaining = firstBuyersBalance[buyer];
     uint256 nextId = nextTokenId;
-    for (uint256 i = 0; i < firstBuyers.length; i++) {
-      if (_firstBuyersBalance[firstBuyers[i]] > 0) {
-        for (uint256 j = 0; j < _firstBuyersBalance[firstBuyers[i]] * extraTokens; j++) {
-          everdragons2Genesis.mint(firstBuyers[i], nextId++);
-        }
-        _firstBuyersBalance[firstBuyers[i]] = 0;
-        if (++count == max) {
-          break;
-        }
+    if (remaining > 0) {
+      if (remaining > max) {
+        remaining = max;
       }
+      for (uint256 j = 0; j < remaining; j++) {
+        for (uint k=0;k<extraTokens;k++) {
+          everdragons2Genesis.mint(buyer, nextId++);
+        }
+        firstBuyersBalance[buyer]--;
+      }
+      nextTokenId = nextId;
     }
-    nextTokenId = nextId;
-  }
-
-  function extraTokensDistributed() public view returns (bool) {
-    address lastAddress = firstBuyers[firstBuyers.length - 1];
-    return _firstBuyersBalance[lastAddress] == 0;
   }
 
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {
@@ -135,6 +135,7 @@ contract GenesisFarm2 is Ownable, IManager {
     for (uint256 i = 0; i < quantity; i++) {
       everdragons2Genesis.mint(_msgSender(), nextId++);
     }
+    require(nextId <= maxForSale + maxClaimable + 1, "Id out of range");
     nextTokenId = nextId;
     proceedsBalance += msg.value;
   }

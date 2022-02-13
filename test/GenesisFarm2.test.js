@@ -99,19 +99,26 @@ describe("GenesisFarm2", async function () {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(3)
       }), 'Forbidden')
 
-      await genesisFarm2.giveExtraTokens(2)
-      expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
-      expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(45)
-      expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(4)
-      expect(await genesisFarm2.extraTokensDistributed()).equal(false)
+      expect(await genesisFarm2.totalFirstBuyers(), 3)
 
-      await genesisFarm2.giveExtraTokens(2)
+      await genesisFarm2.giveExtraTokens(0, 2)
+      expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(18)
+      await genesisFarm2.giveExtraTokens(0, 8)
       expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(38)
+
+      await genesisFarm2.giveExtraTokens(1, 2)
+      expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(41)
+
+      await genesisFarm2.giveExtraTokens(2, 2)
+      expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(12)
+
+      await genesisFarm2.giveExtraTokens(1, 2)
       expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(45)
+
+      await genesisFarm2.giveExtraTokens(2, 3)
       expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
-      expect(await genesisFarm2.extraTokensDistributed()).equal(true)
 
-      await genesisFarm2.giveExtraTokens(2)
+      await genesisFarm2.giveExtraTokens(2, 4)
       expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
 
       let proceeds = await genesisFarm2.proceedsBalance()
