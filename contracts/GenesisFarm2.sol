@@ -61,7 +61,6 @@ contract GenesisFarm2 is Ownable, IManager {
   }
 
   function giveExtraTokens(uint256 max) external onlyOwner {
-    require(!extraTokensDistributed(), "All extra tokens have been distributed");
     uint256 count;
     uint256 nextId = nextTokenId;
     for (uint256 i = 0; i < firstBuyers.length; i++) {

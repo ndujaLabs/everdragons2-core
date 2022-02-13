@@ -50,7 +50,7 @@ describe("GenesisFarm2", async function () {
     await everdragons2Genesis.setManager(genesisFarm.address)
   }
 
-  describe.only('#integration test', async function () {
+  describe('#integration test', async function () {
 
     beforeEach(async function () {
       await initAndDeploy()
@@ -111,7 +111,8 @@ describe("GenesisFarm2", async function () {
       expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
       expect(await genesisFarm2.extraTokensDistributed()).equal(true)
 
-      await assertThrowsMessage(genesisFarm2.giveExtraTokens(2), 'All extra tokens have been distributed')
+      await genesisFarm2.giveExtraTokens(2)
+      expect(await everdragons2Genesis.balanceOf(buyer3.address)).equal(20)
 
       let proceeds = await genesisFarm2.proceedsBalance()
       let balance1Before = await ethers.provider.getBalance(beneficiary1.address)

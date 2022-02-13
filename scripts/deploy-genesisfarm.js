@@ -41,14 +41,16 @@ async function main() {
 
   const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
 
-  const price = network === 'matic' ? normalize(500) : '50000000000000000'
+  const price = network === 'matic' ? normalize(500) : '1000000000000000'
   const delay = network === 'matic' ? 63000 : 10
   const timestamp = (await getTimestamp()) + delay
+  const maxForSale = network === 'matic' ? 250 : 60
+  const maxClaimable = network === 'matic' ? 350 : 90
 
   const genesisFarm = await GenesisFarm.deploy(
       everdragons2Genesis.address,
-      250,
-      350,
+      maxForSale,
+      maxClaimable,
       price,
       // sale start after one hour
       timestamp
@@ -66,8 +68,8 @@ To verify GenesisFarm source code:
       --network ${network} \\
       ${genesisFarm.address}  \\
       ${everdragons2Genesis.address} \\
-      250 \\
-      350 \\
+      ${maxForSale} \\
+      ${maxClaimable} \\
       ${price} \\
       ${timestamp}
       
