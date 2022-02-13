@@ -45,7 +45,7 @@ async function main() {
 
   const genesisFarm2 = await GenesisFarm2.deploy(
       everdragons2Genesis.address,
-      1250,
+      1000,
       350,
       price,
       4
@@ -63,7 +63,7 @@ To verify GenesisFarm2 source code:
       --network ${network} \\
       ${genesisFarm2.address}  \\
       ${everdragons2Genesis.address} \\
-      1250 \\
+      1000 \\
       350 \\
       ${price} \\
       4
