@@ -82,7 +82,6 @@ module.exports = {
     matic: {
       url: `https://polygon-mainnet.infura.io/v3/${env.infuraApiKey}`,
       chainId: 137,
-      gasPrice: 20000000000,
       accounts: [env.privateKey]
     },
   },

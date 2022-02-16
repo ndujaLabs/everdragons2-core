@@ -22,12 +22,10 @@ describe("GenesisFarm2", async function () {
   let genesisFarm
   let GenesisFarm2
   let genesisFarm2
-  let owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2,
-      whitelisted1, whitelisted2, whitelisted3, whitelisted4
+  let owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2
 
   before(async function () {
-    [owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2,
-      whitelisted1, whitelisted2, whitelisted3, whitelisted4] = await ethers.getSigners()
+    [owner, wallet, buyer1, buyer2, buyer3, member, beneficiary1, beneficiary2] = await ethers.getSigners()
     Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
     GenesisFarm = await ethers.getContractFactory("GenesisFarm")
     GenesisFarm2 = await ethers.getContractFactory("GenesisFarm2")

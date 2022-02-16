@@ -12,8 +12,10 @@ import "./interfaces/IManager.sol";
 
 import "hardhat/console.sol";
 
-contract GenesisFarm2 is Ownable, IManager {
+contract GenesisFarm3 is Ownable, IManager {
   using SafeMath for uint256;
+
+  event OperatorSet(address operator);
 
   IEverdragons2GenesisExtended public everdragons2Genesis;
 
@@ -22,64 +24,38 @@ contract GenesisFarm2 is Ownable, IManager {
   uint256 public maxForSale;
   uint256 public proceedsBalance;
   uint256 public price;
-  uint256 public extraTokens;
+  address public operator;
 
   uint256 public maxClaimable;
   uint256 private _lastUnclaimed;
   mapping(uint256 => bool) private _claimed;
   bool public claimingEnded;
 
-  mapping(address => uint256) public firstBuyersBalance;
-  address[] public firstBuyers;
-
   constructor(
     IEverdragons2GenesisExtended everdragons2_,
     uint256 maxForSale_,
     uint256 maxClaimable_,
     uint256 price_,
-    uint256 extraTokens_
+    address operator_
   ) {
     everdragons2Genesis = everdragons2_;
     require(everdragons2Genesis.mintEnded() == false, "Not an E2 token");
     uint256 temporaryTotalSupply = everdragons2Genesis.totalSupply();
     maxForSale = maxForSale_;
     maxClaimable = maxClaimable_;
-    extraTokens = extraTokens_;
     nextTokenId = maxClaimable + temporaryTotalSupply + 1;
     price = price_;
-    for (uint256 i = maxClaimable + 1; i < maxClaimable + 1 + temporaryTotalSupply; i++) {
-      address buyer = everdragons2Genesis.ownerOf(i);
-      if (firstBuyersBalance[buyer] == 0) {
-        firstBuyers.push(buyer);
-      }
-      firstBuyersBalance[buyer] += 1;
-    }
+    setOperator(operator_);
   }
 
-  function totalFirstBuyers() external view returns (uint256) {
-    return firstBuyers.length;
+  function setOperator(address operator_) public onlyOwner {
+    require(operator_ != address(0), "operator cannot be 0x0");
+    operator = operator_;
+    emit OperatorSet(operator);
   }
 
   function isManager() external pure override returns (bool) {
     return true;
-  }
-
-  function giveExtraTokens(uint256 index, uint256 max) external onlyOwner {
-    address buyer = firstBuyers[index];
-    uint256 remaining = firstBuyersBalance[buyer];
-    uint256 nextId = nextTokenId;
-    if (remaining > 0) {
-      if (remaining > max) {
-        remaining = max;
-      }
-      for (uint256 j = 0; j < remaining; j++) {
-        for (uint256 k = 0; k < extraTokens; k++) {
-          everdragons2Genesis.mint(buyer, nextId++);
-        }
-        firstBuyersBalance[buyer]--;
-      }
-      nextTokenId = nextId;
-    }
   }
 
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {
@@ -138,6 +114,17 @@ contract GenesisFarm2 is Ownable, IManager {
     require(nextId <= maxForSale + maxClaimable + 1, "Id out of range");
     nextTokenId = nextId;
     proceedsBalance += msg.value;
+  }
+
+  function deliverCrossChainPurchase(address buyer, uint quantity) external {
+    require(operator != address(0) && _msgSender() == operator, "Sender not the operator");
+    require(nextTokenId + quantity - 1 <= maxForSale + maxClaimable, "Not enough tokens left");
+    uint256 nextId = nextTokenId;
+    for (uint256 i = 0; i < quantity; i++) {
+      everdragons2Genesis.mint(buyer, nextId++);
+    }
+    require(nextId <= maxForSale + maxClaimable + 1, "Id out of range");
+    nextTokenId = nextId;
   }
 
   function withdrawProceeds(address beneficiary, uint256 amount) public onlyOwner {

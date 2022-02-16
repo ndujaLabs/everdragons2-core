@@ -43,18 +43,21 @@ async function main() {
 
   const price = network === 'matic' ? normalize(100) : '50000000000000000'
 
-  const genesisFarm2 = await GenesisFarm2.deploy(
-      everdragons2Genesis.address,
-      650,
-      350,
-      price,
-      4
-  )
-  console.log("Deploying GenesisFarm2");
-  await genesisFarm2.deployed()
-  console.log("GenesisFarm2 deployed to:", genesisFarm2.address);
+  // const genesisFarm2 = await GenesisFarm2.deploy(
+  //     everdragons2Genesis.address,
+  //     650,
+  //     350,
+  //     price,
+  //     4
+  // )
+  // console.log("Deploying GenesisFarm2");
+  // await genesisFarm2.deployed()
+  // console.log("GenesisFarm2 deployed to:", genesisFarm2.address);
 
-  await everdragons2Genesis.setManager(genesisFarm2.address)
+  // await everdragons2Genesis.setManager(genesisFarm2.address)
+  const tx = await everdragons2Genesis.setManager('0xb9081406c720abc2b8b88609ab83c0b70caca04f')
+  console.log(tx)
+  await tx.wait()
 
   console.log(`
 To verify GenesisFarm2 source code:
