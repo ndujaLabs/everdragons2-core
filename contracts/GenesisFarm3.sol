@@ -101,7 +101,7 @@ contract GenesisFarm3 is Ownable, IManager {
     address recipient,
     uint256[] calldata tokenIds,
     bytes32[] calldata proof
-  ) external onlyOwner {
+  ) external {
     _claimWhitelistedTokens(recipient, tokenIds, proof);
   }
 
