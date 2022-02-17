@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev Interface of the ERC165 standard, as defined in the
@@ -34,7 +34,7 @@ interface IERC165Upgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/IERC721.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev Required interface of an ERC721 compliant contract.
@@ -179,7 +179,7 @@ interface IERC721Upgradeable is IERC165Upgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/IERC721Receiver.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @title ERC721 token receiver interface
@@ -210,7 +210,7 @@ interface IERC721ReceiverUpgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/IERC721Metadata.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
@@ -438,7 +438,7 @@ library AddressUpgradeable {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (proxy/utils/Initializable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
@@ -520,7 +520,7 @@ abstract contract Initializable {
 
 // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev Provides information about the current execution context, including the
@@ -560,7 +560,7 @@ abstract contract ContextUpgradeable is Initializable {
 
 // OpenZeppelin Contracts v4.4.1 (utils/Strings.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev String operations.
@@ -631,7 +631,7 @@ library StringsUpgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 /**
@@ -675,7 +675,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC721/ERC721.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 
@@ -1134,7 +1134,7 @@ contract ERC721Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradeab
 // File @ndujalabs/erc721playable/contracts/IERC721Playable.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 // Initial proposal
 // https://github.com/ndujaLabs/MCIPs/blob/main/MCIPs/mcip-1.md
@@ -1200,7 +1200,7 @@ interface IERC721Playable /* is IERC165 */ {
 // File @ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 // Authors:
 // Francesco Sullo <francesco@sullo.co>
@@ -1272,7 +1272,7 @@ contract ERC721PlayableUpgradeable is IERC721Playable, ERC721Upgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (security/Pausable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 /**
@@ -1377,7 +1377,7 @@ abstract contract PausableUpgradeable is Initializable, ContextUpgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 /**
@@ -1467,7 +1467,7 @@ abstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC721/extensions/IERC721Enumerable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
@@ -1498,7 +1498,7 @@ interface IERC721EnumerableUpgradeable is IERC721Upgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/ERC721Enumerable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 
@@ -1676,7 +1676,7 @@ abstract contract ERC721EnumerableUpgradeable is Initializable, ERC721Upgradeabl
 
 // OpenZeppelin Contracts (last updated v4.5.0) (interfaces/draft-IERC1822.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev ERC1822: Universal Upgradeable Proxy Standard (UUPS) documents a method for upgradeability through a simplified
@@ -1700,7 +1700,7 @@ interface IERC1822ProxiableUpgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (proxy/beacon/IBeacon.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev This is the interface that {BeaconProxy} expects of its beacon.
@@ -1720,7 +1720,7 @@ interface IBeaconUpgradeable {
 
 // OpenZeppelin Contracts v4.4.1 (utils/StorageSlot.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /**
  * @dev Library for reading and writing primitive types to specific storage slots.
@@ -2022,7 +2022,7 @@ abstract contract ERC1967UpgradeUpgradeable is Initializable {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (proxy/utils/UUPSUpgradeable.sol)
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 
@@ -2130,7 +2130,7 @@ abstract contract UUPSUpgradeable is Initializable, IERC1822ProxiableUpgradeable
 // File @ndujalabs/wormhole721/contracts/interfaces/IWormholeStructs.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 interface IWormholeStructs {
   struct Provider {
@@ -2170,7 +2170,7 @@ interface IWormholeStructs {
 // File @ndujalabs/wormhole721/contracts/interfaces/IWormhole.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 interface IWormhole is IWormholeStructs {
   event LogMessagePublished(address indexed sender, uint64 sequence, uint32 nonce, bytes payload, uint8 consistencyLevel);
@@ -2713,7 +2713,7 @@ library BytesLib {
 // File @ndujalabs/wormhole721/contracts/nftHelpers/NFTStructs.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 contract NFTStructs {
   struct Transfer {
@@ -2731,7 +2731,7 @@ contract NFTStructs {
 // File @ndujalabs/wormhole721/contracts/nftHelpers/NFTStorage.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 contract NFTStorage {
   struct State {
@@ -2749,7 +2749,7 @@ contract NFTStorage {
 // File @ndujalabs/wormhole721/contracts/nftHelpers/NFTState.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 contract NFTState {
   NFTStorage.State _wormholeState;
@@ -2759,7 +2759,7 @@ contract NFTState {
 // File @ndujalabs/wormhole721/contracts/nftHelpers/NFTGetters.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 contract NFTGetters is NFTState {
@@ -2784,7 +2784,7 @@ contract NFTGetters is NFTState {
 // File @ndujalabs/wormhole721/contracts/nftHelpers/NFTSetters.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 contract NFTSetters is NFTState {
   function _setWormhole(address wh) internal {
@@ -2808,7 +2808,7 @@ contract NFTSetters is NFTState {
 // File @ndujalabs/wormhole721/contracts/interfaces/IWormhole721.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 /// ERC165 interfaceId is 0x647bffff
 /* is IERC165 */
@@ -2833,7 +2833,7 @@ interface IWormhole721 {
 // File @ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol@v0.3.0
 
 
-pragma solidity 0.8.11;
+pragma solidity ^0.8.0;
 
 
 

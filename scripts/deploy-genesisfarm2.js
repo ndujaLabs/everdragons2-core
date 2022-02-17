@@ -39,43 +39,41 @@ async function main() {
   const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
-  const GenesisFarm = await ethers.getContractFactory("GenesisFarm")
+  const GenesisFarm2 = await ethers.getContractFactory("GenesisFarm2")
 
-  const price = network === 'matic' ? normalize(500) : '1000000000000000'
-  const delay = network === 'matic' ? 63000 : 10
-  const timestamp = (await getTimestamp()) + delay
-  const maxForSale = network === 'matic' ? 250 : 60
-  const maxClaimable = network === 'matic' ? 350 : 90
+  const price = network === 'matic' ? normalize(100) : '50000000000000000'
 
-  const genesisFarm = await GenesisFarm.deploy(
-      everdragons2Genesis.address,
-      maxForSale,
-      maxClaimable,
-      price,
-      // sale start after one hour
-      timestamp
-  )
-  console.log("Deploying GenesisFarm");
-  await genesisFarm.deployed()
-  console.log("GenesisFarm deployed to:", genesisFarm.address);
+  // const genesisFarm2 = await GenesisFarm2.deploy(
+  //     everdragons2Genesis.address,
+  //     650,
+  //     350,
+  //     price,
+  //     4
+  // )
+  // console.log("Deploying GenesisFarm2");
+  // await genesisFarm2.deployed()
+  // console.log("GenesisFarm2 deployed to:", genesisFarm2.address);
 
-  await everdragons2Genesis.setManager(genesisFarm.address)
+  // await everdragons2Genesis.setManager(genesisFarm2.address)
+  const tx = await everdragons2Genesis.setManager('0xb9081406c720abc2b8b88609ab83c0b70caca04f')
+  console.log(tx)
+  await tx.wait()
 
   console.log(`
-To verify GenesisFarm source code:
+To verify GenesisFarm2 source code:
     
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
-      ${genesisFarm.address}  \\
+      ${genesisFarm2.address}  \\
       ${everdragons2Genesis.address} \\
-      ${maxForSale} \\
-      ${maxClaimable} \\
+      650 \\
+      350 \\
       ${price} \\
-      ${timestamp}
+      4
       
 `)
 
-  await deployUtils.saveDeployed(chainId, ['GenesisFarm'], [genesisFarm.address])
+  await deployUtils.saveDeployed(chainId, ['GenesisFarm2'], [genesisFarm2.address])
 }
 
 main()

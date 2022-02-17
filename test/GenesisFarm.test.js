@@ -20,11 +20,11 @@ describe("GenesisFarm", async function () {
   let everdragons2Genesis
   let GenesisFarm
   let genesisFarm
-  let owner, wallet, buyer1, buyer2, treasury, member, beneficiary1, beneficiary2,
+  let owner, wallet, buyer1, buyer2, buyer3, treasury, member, beneficiary1, beneficiary2,
       whitelisted1, whitelisted2, whitelisted3, whitelisted4
 
   before(async function () {
-    [owner, wallet, buyer1, buyer2, treasury, member, beneficiary1, beneficiary2,
+    [owner, wallet, buyer1, buyer2, buyer3, treasury, member, beneficiary1, beneficiary2,
       whitelisted1, whitelisted2, whitelisted3, whitelisted4] = await ethers.getSigners()
     Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
     GenesisFarm = await ethers.getContractFactory("GenesisFarm")
@@ -37,7 +37,7 @@ describe("GenesisFarm", async function () {
     }
     everdragons2Genesis = await upgrades.deployProxy(Everdragons2Genesis, []);
     await everdragons2Genesis.deployed()
-    // expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
+    expect(await everdragons2Genesis.contractURI(), 'https://img.everdragons2.com/e2gt/0')
     genesisFarm = await GenesisFarm.deploy(
         everdragons2Genesis.address,
         25, // maxForSale
@@ -117,14 +117,15 @@ describe("GenesisFarm", async function () {
       await genesisFarm.connect(buyer2).buyTokens(9, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(9)
       })
-      await genesisFarm.connect(treasury).buyTokens(4, {
+      await genesisFarm.connect(buyer3).buyTokens(4, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(4)
       })
+
       await assertThrowsMessage(genesisFarm.connect(buyer1).buyTokens(3, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(3)
       }), 'Not enough tokens left')
 
-      await genesisFarm.connect(treasury).buyTokens(2, {
+      await genesisFarm.connect(buyer3).buyTokens(2, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(2)
       })
 
@@ -360,7 +361,7 @@ describe("GenesisFarm", async function () {
       assert.equal(balance2After.sub(balance2Before).toString(), normalize(220))
     })
 
-    it("should throw if sale not ended yet", async function () {
+    it("should throw if insufficient funds", async function () {
 
       await genesisFarm.withdrawProceeds(beneficiary1.address, 0)
       await assertThrowsMessage(
