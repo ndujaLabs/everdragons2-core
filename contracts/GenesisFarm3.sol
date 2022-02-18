@@ -51,11 +51,13 @@ contract GenesisFarm3 is Ownable, IManager {
     emit OperatorSet(operator);
   }
 
-  function price(uint256 lastId) public pure returns (uint256) {
+  function price(uint256 lastId) public view returns (uint256) {
+    // price on Matic is 100, on Mumbai is 0.1
+    uint multiplier = getChainId() == 137 ? 1e18 : 1e15;
     if (lastId < 601) {
-      return 100 * 1e18;
+      return 100 * multiplier;
     } else {
-      return ((lastId - 401) / 100) * 100 * 1e18;
+      return ((lastId - 401) / 100) * 100 * multiplier;
     }
   }
 
@@ -169,4 +171,13 @@ contract GenesisFarm3 is Ownable, IManager {
     require(maxForSale_ != maxForSale, "Not a change");
     maxForSale = maxForSale_;
   }
+
+  function getChainId() public view returns (uint256) {
+    uint256 id;
+    assembly {
+      id := chainid()
+    }
+    return id;
+  }
+
 }

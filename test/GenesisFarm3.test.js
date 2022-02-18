@@ -85,7 +85,15 @@ describe("GenesisFarm3", async function () {
 
       expect(await everdragons2Genesis.manager()).equal(genesisFarm3.address)
       expect(await genesisFarm3.maxForSale()).equal(100)
-      expect(await genesisFarm3.price(400)).equal(normalize(100))
+      expect(await genesisFarm3.price(400)).equal('100000000000000000')
+      expect(await genesisFarm3.price(600)).equal('100000000000000000')
+      expect(await genesisFarm3.price(601)).equal('200000000000000000')
+      expect(await genesisFarm3.price(700)).equal('200000000000000000')
+      expect(await genesisFarm3.price(734)).equal('300000000000000000')
+      expect(await genesisFarm3.price(812)).equal('400000000000000000')
+      expect(await genesisFarm3.price(900)).equal('400000000000000000')
+      expect(await genesisFarm3.price(901)).equal('500000000000000000')
+      expect(await genesisFarm3.price(1000)).equal('500000000000000000')
       expect(await genesisFarm3.operator()).equal(operator.address)
 
       await genesisFarm3.connect(buyer1).buyTokens(3, {
@@ -250,10 +258,25 @@ describe("GenesisFarm3", async function () {
           .withArgs(ethers.constants.AddressZero, whitelisted1.address, 3)
     })
 
-    it("should allow owner to claim 4 dragons for whitelisted2", async function () {
+    it("should allow owner to claim 1 dragons for whitelisted2", async function () {
       let leaf = leaves[1]
       let proof = tree.getHexProof(leaf)
       await expect(await genesisFarm3.delegatedClaimWhitelistedTokens(whitelisted2.address, [2], proof))
+          .emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, whitelisted2.address, 2)
+
+    })
+
+    it("should allow owner to claim batch dragons for whitelisted1 and 2", async function () {
+      let leaf = leaves[0]
+      let proof = tree.getHexProof(leaf)
+      leaf = leaves[1]
+      let proof2 = tree.getHexProof(leaf)
+      await expect(await genesisFarm3.batchDelegatedClaimWhitelistedTokens([whitelisted1.address, whitelisted2.address], [[6, 3], [2]], [proof, proof2]))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 6)
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(ethers.constants.AddressZero, whitelisted1.address, 3)
           .emit(everdragons2Genesis, 'Transfer')
           .withArgs(ethers.constants.AddressZero, whitelisted2.address, 2)
 
