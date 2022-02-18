@@ -25,6 +25,8 @@ async function main() {
       : chainId === 80001 ? 'mumbai'
           : 'localhost'
 
+  const price = ethers.utils.parseEther((chainId === 137 ? 100 : 0.1).toString())
+
   if (!deployed[chainId]) {
     console.error('Everdragons2Genesis not deployed on', network)
     process.exit(1)
@@ -45,6 +47,7 @@ async function main() {
       everdragons2Genesis.address,
       650,
       350,
+      price,
       process.env.VALIDATOR
   )
   console.log("Deploying GenesisFarm3");
@@ -62,6 +65,7 @@ To verify GenesisFarm3 source code:
       ${everdragons2Genesis.address} \\
       650 \\
       350 \\
+      ${price} \\
       ${process.env.VALIDATOR}    
 `)
 

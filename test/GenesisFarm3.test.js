@@ -60,7 +60,7 @@ describe("GenesisFarm3", async function () {
       await increaseBlockTimestampBy(11)
     })
 
-    it("should very that the cross chain purchases work", async function () {
+    it.only("should verify that the cross chain purchases work", async function () {
 
       await genesisFarm.connect(buyer1).buyTokens(7, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(7)
@@ -78,6 +78,7 @@ describe("GenesisFarm3", async function () {
           everdragons2Genesis.address,
           100, // maxForSale
           10, // maxClaimable
+          ethers.utils.parseEther("0.1"),
           operator.address
       )
       await genesisFarm3.deployed()
@@ -85,19 +86,11 @@ describe("GenesisFarm3", async function () {
 
       expect(await everdragons2Genesis.manager()).equal(genesisFarm3.address)
       expect(await genesisFarm3.maxForSale()).equal(100)
-      expect(await genesisFarm3.price(400)).equal('100000000000000000')
-      expect(await genesisFarm3.price(600)).equal('100000000000000000')
-      expect(await genesisFarm3.price(601)).equal('200000000000000000')
-      expect(await genesisFarm3.price(700)).equal('200000000000000000')
-      expect(await genesisFarm3.price(734)).equal('300000000000000000')
-      expect(await genesisFarm3.price(812)).equal('400000000000000000')
-      expect(await genesisFarm3.price(900)).equal('400000000000000000')
-      expect(await genesisFarm3.price(901)).equal('500000000000000000')
-      expect(await genesisFarm3.price(1000)).equal('500000000000000000')
+      expect(await genesisFarm3.price()).equal('100000000000000000')
       expect(await genesisFarm3.operator()).equal(operator.address)
 
       await genesisFarm3.connect(buyer1).buyTokens(3, {
-        value: ethers.BigNumber.from(await genesisFarm3.price(400)).mul(3)
+        value: ethers.BigNumber.from(await genesisFarm3.price()).mul(3)
       })
 
       expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(10)
@@ -127,11 +120,11 @@ describe("GenesisFarm3", async function () {
       const {buyer, quantity: amount} = await ethereumFarm.purchasedTokens(nonce)
       assert.equal(buyer, buyer4.address)
 
-      await genesisFarm3.connect(operator).deliverCrossChainPurchase(buyer, amount)
+      await genesisFarm3.connect(operator).deliverCrossChainPurchase(nonce, buyer, amount)
 
       expect(await everdragons2Genesis.balanceOf(buyer)).equal(amount)
       await genesisFarm3.connect(buyer1).buyTokens(3, {
-        value: ethers.BigNumber.from(await genesisFarm3.price(400)).mul(3)
+        value: ethers.BigNumber.from(await genesisFarm3.price()).mul(3)
       })
       expect(await everdragons2Genesis.balanceOf(buyer1.address)).equal(13)
 
@@ -153,8 +146,10 @@ describe("GenesisFarm3", async function () {
       assert.equal(buyerB, buyer2.address)
 
       expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(3)
-      await genesisFarm3.connect(operator).deliverCrossChainPurchase(buyerB, amountB)
+      await genesisFarm3.connect(operator).deliverCrossChainPurchase(nonce, buyerB, amountB)
       expect(await everdragons2Genesis.balanceOf(buyer2.address)).equal(4)
+
+      await assertThrowsMessage(genesisFarm3.connect(operator).deliverCrossChainPurchase(nonce, buyerB, amountB), "Nonce already used")
 
       let proceeds = await genesisFarm3.proceedsBalance()
       let balance1Before = await ethers.provider.getBalance(beneficiary1.address)
@@ -190,6 +185,7 @@ describe("GenesisFarm3", async function () {
           everdragons2Genesis.address,
           100, // maxForSale
           10, // maxClaimable
+          ethers.utils.parseEther("0.1"),
           operator.address
       )
       await genesisFarm3.deployed()
@@ -240,6 +236,7 @@ describe("GenesisFarm3", async function () {
           everdragons2Genesis.address,
           100, // maxForSale
           10, // maxClaimable
+          ethers.utils.parseEther("0.1"),
           operator.address
       )
       await genesisFarm3.deployed()
