@@ -36,7 +36,7 @@ async function main() {
   await ethereumFarm.deployed()
 
   console.log(`
-To verify GenesisFarm2 source code:
+To verify EthereumFarm source code:
     
   npx hardhat verify --show-stack-traces \\
       --network ${network} \\
