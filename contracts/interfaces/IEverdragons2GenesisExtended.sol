@@ -17,6 +17,8 @@ interface IEverdragons2GenesisExtended {
 
   function mintEnded() external view returns (bool);
 
+  function manager() external view returns (address);
+
   function totalSupply() external view returns (uint256);
 
   function ownerOf(uint256 tokenId) external view returns (address owner);

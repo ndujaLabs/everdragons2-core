@@ -8,11 +8,11 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IEverdragons2GenesisExtended.sol";
-import "./interfaces/IManager.sol";
+import "./interfaces/IManager3.sol";
 
 import "hardhat/console.sol";
 
-contract GenesisFarm3 is Ownable, IManager {
+contract GenesisFarm3 is Ownable, IManager3 {
   using SafeMath for uint256;
 
   event OperatorSet(address operator);
@@ -59,6 +59,10 @@ contract GenesisFarm3 is Ownable, IManager {
 
   function isManager() external pure override returns (bool) {
     return true;
+  }
+
+  function hasManagerRole() external view override returns(bool) {
+    return everdragons2Genesis.manager() == address(this);
   }
 
   function claimRemainingTokens(address treasury, uint256 limit) external onlyOwner {
@@ -139,7 +143,7 @@ contract GenesisFarm3 is Ownable, IManager {
   }
 
   function buyTokens(uint256 quantity) external payable {
-    require(msg.value >= price, "Insufficient payment");
+    require(msg.value >= price.mul(quantity), "Insufficient payment");
     require(nextTokenId + quantity - 1 <= maxTokenId(), "Not enough tokens left");
     uint256 nextId = nextTokenId;
     for (uint256 i = 0; i < quantity; i++) {

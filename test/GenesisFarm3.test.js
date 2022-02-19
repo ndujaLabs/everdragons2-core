@@ -84,6 +84,8 @@ describe("GenesisFarm3", async function () {
       await genesisFarm3.deployed()
       await everdragons2Genesis.setManager(genesisFarm3.address)
 
+      expect(await genesisFarm3.hasManagerRole()).to.be.true
+
       expect(await everdragons2Genesis.manager()).equal(genesisFarm3.address)
       expect(await genesisFarm3.maxForSale()).equal(100)
       expect(await genesisFarm3.price()).equal('100000000000000000')

@@ -11,7 +11,8 @@
   "137": {
     "Everdragons2Genesis": "0xe0ed11Da98E3cD5630c1b4f1a5981Dd6379bF8cb",
     "GenesisFarm": "0x4494B9daaFeF2e7c1Be3AF8f72A75A1C11745e24",
-    "GenesisFarm2": "0xb9081406c720abc2b8b88609ab83c0b70caca04f"
+    "GenesisFarm2": "0xb9081406c720abc2b8b88609ab83c0b70caca04f",
+    "GenesisFarm3": "0x71ec289E50BCf4f19d4b5515B8D9cA2900F829b8"
   },
   "1337": {
     "Everdragons2Genesis": "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
@@ -23,6 +24,6 @@
     "Everdragons2Genesis": "0xdE3735dFBb099d6869C553db195e0F359E0E8e73",
     "GenesisFarm": "0x40B29C6438035EaC314A154bF4268CF57f9570B3",
     "GenesisFarm2": "0x7Fc7b801575dA0C80Fdba3739814A9537fDb1cf9",
-    "GenesisFarm3": "0x9e0D3dea36FA3308A8F15a42a2Ac3930bcdBda6F"
+    "GenesisFarm3": "0x8eC70d9A48079C716d619C13C356090259E02610"
   }
 }
