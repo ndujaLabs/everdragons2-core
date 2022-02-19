@@ -60,7 +60,7 @@ describe("GenesisFarm3", async function () {
       await increaseBlockTimestampBy(11)
     })
 
-    it.only("should verify that the cross chain purchases work", async function () {
+    it("should verify that the cross chain purchases work", async function () {
 
       await genesisFarm.connect(buyer1).buyTokens(7, {
         value: ethers.BigNumber.from(await genesisFarm.price()).mul(7)

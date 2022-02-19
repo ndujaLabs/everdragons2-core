@@ -48,6 +48,7 @@ contract GenesisFarm3 is Ownable, IManager {
     nextTokenId = maxClaimable + temporaryTotalSupply + 1;
     price = price_;
     setOperator(operator_);
+    closeSale(maxClaimable_ + maxForSale_ - (getChainId() == 137 ? 100 : 50));
   }
 
   function setOperator(address operator_) public onlyOwner {
@@ -86,7 +87,7 @@ contract GenesisFarm3 is Ownable, IManager {
     claimingEnded = true;
   }
 
-  function closeSale(uint256 saleClosedAt_) external onlyOwner {
+  function closeSale(uint256 saleClosedAt_) public onlyOwner {
     require(saleClosedAt_ >= nextTokenId && saleClosedAt_ < maxClaimable + maxForSale, "Out of range");
     saleClosedAt = saleClosedAt_;
   }

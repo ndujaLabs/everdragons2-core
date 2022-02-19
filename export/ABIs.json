@@ -1,5 +1,5 @@
 {
-  "when": "2022-02-18T00:26:22.662Z",
+  "when": "2022-02-18T19:13:09.630Z",
   "contracts": {
     "EthereumFarm": [
       {
@@ -2918,6 +2918,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "price_",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
             "name": "operator_",
             "type": "address"
@@ -3046,6 +3051,19 @@
       {
         "inputs": [
           {
+            "internalType": "uint256",
+            "name": "saleClosedAt_",
+            "type": "uint256"
+          }
+        ],
+        "name": "closeSale",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "recipient",
             "type": "address"
@@ -3068,6 +3086,11 @@
       },
       {
         "inputs": [
+          {
+            "internalType": "uint16",
+            "name": "nonce",
+            "type": "uint16"
+          },
           {
             "internalType": "address",
             "name": "buyer",
@@ -3182,6 +3205,19 @@
       },
       {
         "inputs": [],
+        "name": "maxTokenId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
         "name": "nextTokenId",
         "outputs": [
           {
@@ -3220,13 +3256,7 @@
         "type": "function"
       },
       {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "lastId",
-            "type": "uint256"
-          }
-        ],
+        "inputs": [],
         "name": "price",
         "outputs": [
           {
@@ -3266,6 +3296,19 @@
             "internalType": "bytes32",
             "name": "",
             "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "saleClosedAt",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
@@ -3321,6 +3364,25 @@
         "name": "updateMaxForSale",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint16",
+            "name": "",
+            "type": "uint16"
+          }
+        ],
+        "name": "usedNonces",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       },
       {
