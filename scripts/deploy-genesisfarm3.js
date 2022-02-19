@@ -56,6 +56,8 @@ async function main() {
 
   await (await everdragons2Genesis.setManager(genesisFarm3.address)).wait()
 
+  console.log('New manager:', await everdragons2Genesis.manager())
+
   console.log(`
 To verify GenesisFarm3 source code:
     
