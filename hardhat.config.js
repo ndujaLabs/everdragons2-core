@@ -87,8 +87,8 @@ module.exports = {
   },
   etherscan: {
     // apiKey: env.etherscanKey
-    // apiKey: env.bscscanKey
     apiKey: env.polygonscanAPIKey
+    // apiKey: env.bscscanKey
   },
   gasReporter: {
     currency: 'USD',

@@ -24,7 +24,9 @@ contract GenesisFarm3 is Ownable, IManager {
   uint256 public maxForSale;
   uint256 public proceedsBalance;
   uint256 public price;
+  uint256 public saleClosedAt;
   address public operator;
+  mapping(uint16 => bool) public usedNonces;
 
   uint256 public maxClaimable;
   uint256 private _lastUnclaimed;
@@ -46,6 +48,7 @@ contract GenesisFarm3 is Ownable, IManager {
     nextTokenId = maxClaimable + temporaryTotalSupply + 1;
     price = price_;
     setOperator(operator_);
+    closeSale(maxClaimable_ + maxForSale_ - (getChainId() == 137 ? 100 : 50));
   }
 
   function setOperator(address operator_) public onlyOwner {
@@ -80,12 +83,13 @@ contract GenesisFarm3 is Ownable, IManager {
     root = root_;
   }
 
-  function updatePrice(uint256 price_) external onlyOwner {
-    price = price_;
-  }
-
   function endClaiming() external onlyOwner {
     claimingEnded = true;
+  }
+
+  function closeSale(uint256 saleClosedAt_) public onlyOwner {
+    require(saleClosedAt_ >= nextTokenId && saleClosedAt_ < maxClaimable + maxForSale, "Out of range");
+    saleClosedAt = saleClosedAt_;
   }
 
   function encodeLeaf(address recipient, uint256[] calldata tokenIds) public pure returns (bytes32) {
@@ -93,38 +97,70 @@ contract GenesisFarm3 is Ownable, IManager {
   }
 
   function claimWhitelistedTokens(uint256[] calldata tokenIds, bytes32[] calldata proof) external {
+    _claimWhitelistedTokens(_msgSender(), tokenIds, proof);
+  }
+
+  function delegatedClaimWhitelistedTokens(
+    address recipient,
+    uint256[] calldata tokenIds,
+    bytes32[] calldata proof
+  ) external onlyOwner {
+    _claimWhitelistedTokens(recipient, tokenIds, proof);
+  }
+
+  function batchDelegatedClaimWhitelistedTokens(
+    address[] memory recipients,
+    uint256[][] calldata tokenIds,
+    bytes32[][] calldata proof
+  ) external onlyOwner {
+    for (uint256 i = 0; i < recipients.length; i++) {
+      _claimWhitelistedTokens(recipients[i], tokenIds[i], proof[i]);
+    }
+  }
+
+  function _claimWhitelistedTokens(
+    address recipient,
+    uint256[] calldata tokenIds,
+    bytes32[] calldata proof
+  ) internal {
     require(root != 0, "Root not set yet");
     require(!claimingEnded, "Claiming ended");
-    bytes32 leaf = encodeLeaf(_msgSender(), tokenIds);
+    bytes32 leaf = encodeLeaf(recipient, tokenIds);
     require(MerkleProof.verify(proof, root, leaf), "Invalid proof");
     for (uint256 i = 0; i < tokenIds.length; i++) {
       require(tokenIds[i] <= maxClaimable, "Id out of range");
       _claimed[tokenIds[i]] = true;
-      everdragons2Genesis.mint(_msgSender(), tokenIds[i]);
+      everdragons2Genesis.mint(recipient, tokenIds[i]);
     }
   }
 
+  function maxTokenId() public view returns (uint256) {
+    return saleClosedAt != 0 ? saleClosedAt : maxForSale + maxClaimable;
+  }
+
   function buyTokens(uint256 quantity) external payable {
-    require(nextTokenId + quantity - 1 <= maxForSale + maxClaimable, "Not enough tokens left");
-    require(msg.value >= price.mul(quantity), "Insufficient payment");
+    require(msg.value >= price, "Insufficient payment");
+    require(nextTokenId + quantity - 1 <= maxTokenId(), "Not enough tokens left");
     uint256 nextId = nextTokenId;
     for (uint256 i = 0; i < quantity; i++) {
       everdragons2Genesis.mint(_msgSender(), nextId++);
     }
-    require(nextId <= maxForSale + maxClaimable + 1, "Id out of range");
+    require(nextId <= maxTokenId() + 1, "Id out of range");
     nextTokenId = nextId;
     proceedsBalance += msg.value;
   }
 
-  function deliverCrossChainPurchase(address buyer, uint quantity) external {
+  function deliverCrossChainPurchase(uint16 nonce, address buyer, uint256 quantity) external {
+    require(!usedNonces[nonce], "Nonce already used");
     require(operator != address(0) && _msgSender() == operator, "Sender not the operator");
-    require(nextTokenId + quantity - 1 <= maxForSale + maxClaimable, "Not enough tokens left");
+    require(nextTokenId + quantity - 1 <= maxTokenId(), "Not enough tokens left");
     uint256 nextId = nextTokenId;
     for (uint256 i = 0; i < quantity; i++) {
       everdragons2Genesis.mint(buyer, nextId++);
     }
-    require(nextId <= maxForSale + maxClaimable + 1, "Id out of range");
+    require(nextId <= maxTokenId() + 1, "Id out of range");
     nextTokenId = nextId;
+    usedNonces[nonce] = true;
   }
 
   function withdrawProceeds(address beneficiary, uint256 amount) public onlyOwner {
@@ -140,5 +176,13 @@ contract GenesisFarm3 is Ownable, IManager {
   function updateMaxForSale(uint256 maxForSale_) external onlyOwner {
     require(maxForSale_ != maxForSale, "Not a change");
     maxForSale = maxForSale_;
+  }
+
+  function getChainId() public view returns (uint256) {
+    uint256 id;
+    assembly {
+      id := chainid()
+    }
+    return id;
   }
 }
