@@ -1,5 +1,5 @@
 {
-  "when": "2022-02-19T17:38:24.711Z",
+  "when": "2022-02-20T00:18:36.989Z",
   "contracts": {
     "EthereumFarm": [
       {
@@ -3159,6 +3159,19 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "hasManagerRole",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
           }
         ],
         "stateMutability": "view",

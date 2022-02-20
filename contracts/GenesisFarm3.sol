@@ -139,7 +139,7 @@ contract GenesisFarm3 is Ownable, IManager3 {
   }
 
   function maxTokenId() public view returns (uint256) {
-    return saleClosedAt != 0 ? saleClosedAt : maxForSale + maxClaimable;
+    return maxForSale + maxClaimable - (getChainId() == 137 ? 100 : 50);
   }
 
   function buyTokens(uint256 quantity) external payable {

@@ -12,7 +12,6 @@ if (process.env.GAS_REPORT === 'yes') {
   require("hardhat-gas-reporter");
 }
 
-
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async () => {
@@ -77,12 +76,12 @@ module.exports = {
       url: 'https://rpc-mumbai.matic.today',
       chainId: 80001,
       gasPrice: 20000000000,
-      accounts: [env.privateKeyTestnet]
+      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKeyTestnet]
     },
     matic: {
       url: `https://polygon-mainnet.infura.io/v3/${env.infuraApiKey}`,
       chainId: 137,
-      accounts: [env.privateKey]
+      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKey]
     },
   },
   etherscan: {
