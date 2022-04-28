@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole-tunnel/contracts/WormholeTunnelUpgradeable.sol";
 
 import "./interfaces/IEverdragons2GenesisBridged.sol";
 
@@ -22,16 +22,24 @@ contract Everdragons2GenesisBridged is
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
-  Wormhole721Upgradeable
+  WormholeTunnelUpgradeable
 {
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
+  address public manager;
+  mapping(uint256 => bool) public staked;
+
+  modifier onlyManager() {
+    require(manager != address(0) && _msgSender() == manager, "Forbidden");
+    _;
+  }
 
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
   function initialize() public initializer {
-    __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
+    __WormholeTunnel_init();
+    __ERC721_init("Everdragons2 Genesis Token", "EVD2");
     __ERC721Enumerable_init();
     // tokenURI pre-reveal
     _baseTokenURI = "https://img.everdragons2.com/e2gt/";
@@ -50,7 +58,7 @@ contract Everdragons2GenesisBridged is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(WormholeTunnelUpgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
@@ -73,4 +81,51 @@ contract Everdragons2GenesisBridged is
   function contractURI() public view returns (string memory) {
     return _baseURI();
   }
+
+  // staking
+
+  function getApproved(uint256 tokenId) public view override returns (address) {
+    if (staked[tokenId]) {
+      return address(0);
+    }
+    return super.getApproved(tokenId);
+  }
+
+  function isApprovedForAll(address owner, address operator) public view override returns (bool) {
+    return false;
+  }
+
+  function stake(uint256 tokenID) external onlyManager {
+    // will revert if token does not exist
+    ownerOf(tokenID);
+    staked[tokenID] = true;
+  }
+
+  function unstake(uint256 tokenID) external onlyManager {
+    // will revert if token does not exist
+    ownerOf(tokenID);
+    delete staked[tokenID];
+  }
+
+  // wormhole
+
+  function wormholeTransfer(
+    uint256 tokenID,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) public payable override returns (uint64 sequence) {
+    require(!staked[tokenID], "Token is staked");
+    require(_isApprovedOrOwner(_msgSender(), tokenID), "Transfer caller is not owner nor approved");
+    _burn(tokenID);
+    return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
+  }
+
+  // Complete a transfer from Wormhole
+  function wormholeCompleteTransfer(bytes memory encodedVm) public override {
+    (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
+    _safeMint(to, tokenId);
+  }
+
+  uint256[50] private __gap;
 }

@@ -13,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole721/contracts/WormholeTunnelUpgradeable.sol";
 
 import "./IEverdragons2.sol";
 
@@ -25,7 +25,7 @@ contract Everdragons2 is
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
-  Wormhole721Upgradeable
+  WormholeTunnelUpgradeable
 {
   //using Address for address;
   address public manager;
@@ -51,7 +51,7 @@ contract Everdragons2 is
   constructor() initializer {}
 
   function initialize(uint256 lastTokenId_, bool secondaryChain) public initializer {
-    __Wormhole721_init("Everdragons2 Genesis", "E2G");
+    __WormholeTunnel_init("Everdragons2 Genesis", "E2G");
     __ERC721Enumerable_init();
     _lastTokenId = lastTokenId_;
     if (secondaryChain) {
@@ -80,7 +80,7 @@ contract Everdragons2 is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(WormholeTunnelUpgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);

@@ -2805,14 +2805,14 @@ contract NFTSetters is NFTState {
 }
 
 
-// File @ndujalabs/wormhole721/contracts/interfaces/IWormhole721.sol@v0.3.0
+// File @ndujalabs/wormhole721/contracts/interfaces/IWormholeTunnel.sol@v0.3.0
 
 
 pragma solidity ^0.8.0;
 
 /// ERC165 interfaceId is 0x647bffff
 /* is IERC165 */
-interface IWormhole721 {
+interface IWormholeTunnel {
   function wormholeInit(uint16 chainId, address wormhole) external;
 
   function wormholeRegisterContract(uint16 chainId, bytes32 nftContract) external;
@@ -2830,7 +2830,7 @@ interface IWormhole721 {
 }
 
 
-// File @ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol@v0.3.0
+// File @ndujalabs/wormhole721/contracts/WormholeTunnelUpgradeable.sol@v0.3.0
 
 
 pragma solidity ^0.8.0;
@@ -2844,9 +2844,9 @@ pragma solidity ^0.8.0;
 
 
 
-contract Wormhole721Upgradeable is
+contract WormholeTunnelUpgradeable is
   ERC721Upgradeable,
-  IWormhole721,
+  IWormholeTunnel,
   NFTGetters,
   NFTSetters,
   PausableUpgradeable,
@@ -2856,7 +2856,7 @@ contract Wormhole721Upgradeable is
   using BytesLib for bytes;
 
   // solhint-disable-next-line func-name-mixedcase
-  function __Wormhole721_init(string memory name, string memory symbol) internal virtual initializer {
+  function __WormholeTunnel_init(string memory name, string memory symbol) internal virtual initializer {
     __Ownable_init();
     __Pausable_init();
     __UUPSUpgradeable_init();
@@ -2866,7 +2866,7 @@ contract Wormhole721Upgradeable is
   function _authorizeUpgrade(address newImplementation) internal virtual override onlyOwner {}
 
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable) returns (bool) {
-    return interfaceId == type(IWormhole721).interfaceId || super.supportsInterface(interfaceId);
+    return interfaceId == type(IWormholeTunnel).interfaceId || super.supportsInterface(interfaceId);
   }
 
   function wormholeInit(uint16 chainId, address wormhole) public override onlyOwner {
@@ -2983,8 +2983,8 @@ contract Wormhole721Upgradeable is
 
   // convenience helper
 
-  //  function getIWormhole721InterfaceId() external pure returns(bytes4) {
-  //    return type(IWormhole721).interfaceId;
+  //  function getIWormholeTunnelInterfaceId() external pure returns(bytes4) {
+  //    return type(IWormholeTunnel).interfaceId;
   //  }
 }
 
@@ -3047,7 +3047,7 @@ contract Everdragons2Genesis is
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
-  Wormhole721Upgradeable
+  WormholeTunnelUpgradeable
 {
   bool private _mintEnded;
   bool private _baseTokenURIFrozen;
@@ -3069,7 +3069,7 @@ contract Everdragons2Genesis is
   constructor() initializer {}
 
   function initialize() public initializer {
-    __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
+    __WormholeTunnel_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
     // tokenURI pre-reveal
     _baseTokenURI = "https://img.everdragons2.com/e2gt/";
@@ -3088,7 +3088,7 @@ contract Everdragons2Genesis is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(WormholeTunnelUpgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
