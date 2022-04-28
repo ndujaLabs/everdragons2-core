@@ -14,8 +14,6 @@ import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
 import "./interfaces/IEverdragons2GenesisBridged.sol";
 
-//import "hardhat/console.sol";
-
 contract Everdragons2GenesisBridged is
   IEverdragons2GenesisBridged,
   Initializable,
