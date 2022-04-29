@@ -113,4 +113,13 @@ contract Everdragons2Genesis is
       _burn(tokenIds[i]);
     }
   }
+
+  // override name and symbol
+  function name() public pure override returns (string memory) {
+    return "Everdragons2 Genesis Coupon";
+  }
+
+  function symbol() public pure override returns (string memory) {
+    return "E2C";
+  }
 }
