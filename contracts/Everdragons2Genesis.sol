@@ -104,14 +104,13 @@ contract Everdragons2Genesis is
   }
 
   function contractURI() public view returns (string memory) {
-    return string(abi.encodePacked(_baseTokenURI, "0"));
+    return string(abi.encodePacked(_baseTokenURI, "e2gt"));
   }
 
   // to burn all the token airdropped on the V2
-  function burnBatch(uint[] tokenIds) external onlyOwner {
-    for (uint i = 0; i< tokenIds.lengt; i++) {
+  function burnBatch(uint256[] calldata tokenIds) external onlyOwner {
+    for (uint256 i = 0; i < tokenIds.length; i++) {
       _burn(tokenIds[i]);
     }
   }
-
 }
