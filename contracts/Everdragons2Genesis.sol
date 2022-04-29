@@ -71,8 +71,9 @@ contract Everdragons2Genesis is
   }
 
   function setManager(address manager_) external override onlyOwner canMint {
-    require(manager_ != address(0), "Manager cannot be 0x0");
-    require(IManager(manager_).isManager(), "Not a manager");
+    if (manager_ != address(0)) {
+      require(IManager(manager_).isManager(), "Not a manager");
+    } // else disable the manager
     manager = manager_;
   }
 
@@ -105,4 +106,12 @@ contract Everdragons2Genesis is
   function contractURI() public view returns (string memory) {
     return string(abi.encodePacked(_baseTokenURI, "0"));
   }
+
+  // to burn all the token airdropped on the V2
+  function burnBatch(uint[] tokenIds) external onlyOwner {
+    for (uint i = 0; i< tokenIds.lengt; i++) {
+      _burn(tokenIds[i]);
+    }
+  }
+
 }
