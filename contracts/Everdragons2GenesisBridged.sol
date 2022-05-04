@@ -2,47 +2,72 @@
 pragma solidity 0.8.11;
 
 // Authors: Francesco Sullo <francesco@sullo.co>
-//          Emanuele Cesena <emanuele@ndujalabs.com>
 // Everdragons2, https://everdragons2.com
 
 import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@ndujalabs/wormhole-tunnel/contracts/WormholeTunnelUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-import "./interfaces/IEverdragons2GenesisBridged.sol";
+import "./interfaces/IEverdragons2Genesis.sol";
+import "./interfaces/IEverdragons2Bridge.sol";
+import "./interfaces/IStakingPool.sol";
 
-//import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract Everdragons2GenesisBridged is
-  IEverdragons2GenesisBridged,
+  IEverdragons2Genesis,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
-  WormholeTunnelUpgradeable
+  OwnableUpgradeable,
+  UUPSUpgradeable
 {
+  using AddressUpgradeable for address;
+
+  bool private _airdropCompleted;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
-  address public manager;
-  mapping(uint256 => bool) public staked;
+  uint256 private _maxSupply;
 
-  modifier onlyManager() {
-    require(manager != address(0) && _msgSender() == manager, "Forbidden");
+  IEverdragons2Bridge public bridge;
+  mapping(address => bool) public pools;
+  mapping(uint256 => address) public staked;
+  mapping(bytes4 => bool) private _usedEVMs;
+
+  modifier onlyBridge() {
+    require(address(bridge) != address(0) && _msgSender() == address(bridge), "Forbidden");
+    _;
+  }
+
+  modifier onlyPool() {
+    require(pools[_msgSender()], "Forbidden");
+    _;
+  }
+
+  modifier whenNotStaked(uint256 tokenID) {
+    require(!isStaked(tokenID), "Token is staked");
+    _;
+  }
+
+  modifier whenAirdropCompleted() {
+    require(_airdropCompleted == false, "Airdrop not completed");
     _;
   }
 
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
-  function initialize() public initializer {
-    __WormholeTunnel_init();
+  function initialize(string memory baseTokenURI) public initializer {
+    __Ownable_init();
     __ERC721_init("Everdragons2 Genesis Token", "EVD2");
     __ERC721Enumerable_init();
-    // tokenURI pre-reveal
-    _baseTokenURI = "https://img.everdragons2.com/e2gt/";
+    _baseTokenURI = baseTokenURI;
+    _maxSupply = 600;
   }
 
   function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -58,11 +83,17 @@ contract Everdragons2GenesisBridged is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(WormholeTunnelUpgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
   }
+
+  function id() external view override returns (bytes32) {
+    return keccak256("Everdragons2Genesis");
+  }
+
+  // tokenURI
 
   function _baseURI() internal view virtual override returns (string memory) {
     return _baseTokenURI;
@@ -78,53 +109,110 @@ contract Everdragons2GenesisBridged is
     _baseTokenURIFrozen = true;
   }
 
-  function contractURI() public view returns (string memory) {
-    return _baseURI();
+  // bridge
+
+  function setBridge(IEverdragons2Bridge bridge_) external override onlyOwner {
+    require(bridge_.id() == keccak256("Everdragons2Bridge"), "Not a bridge");
+    bridge = bridge_;
   }
 
-  // staking
+  function crossChainTransfer(
+    uint256 tokenID,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) external override whenNotStaked(tokenID) whenAirdropCompleted {
+    require(_isApprovedOrOwner(_msgSender(), tokenID), "Transfer caller is not owner nor approved");
+    bridge.wormholeTransfer(tokenID, recipientChain, recipient, nonce);
+  }
+
+  function completeCrossChainTransfer(bytes memory encodedVm) external override {
+    bridge.wormholeCompleteTransfer(encodedVm);
+  }
+
+  function mint(
+    address to,
+    uint256 tokenID,
+    bytes4 evm
+  ) external override onlyBridge whenAirdropCompleted {
+    require(tokenID <= _maxSupply, "tokenID out of range");
+    require(!_usedEVMs[evm], "tokenID already minted for this evm");
+    _usedEVMs[evm] = true;
+    _safeMint(to, tokenID);
+  }
+
+  function burn(uint256 tokenID) external override onlyBridge whenAirdropCompleted whenNotStaked(tokenID) {
+    _burn(tokenID);
+  }
+
+  // stakes
+
+  function isStaked(uint256 tokenID) public view override returns (bool) {
+    return staked[tokenID] != address(0);
+  }
+
+  function setPool(address pool) external override onlyOwner {
+    require(IStakingPool(pool).id() == keccak256("Everdragons2Pool"), "Not a pool");
+    pools[pool] = true;
+  }
+
+  function removePool(address pool) external override onlyOwner {
+    require(pools[pool], "Not an active pool");
+    delete pools[pool];
+  }
+
+  function approve(address to, uint256 tokenId) public override {
+    super.approve(to, tokenId);
+  }
 
   function getApproved(uint256 tokenId) public view override returns (address) {
-    if (staked[tokenId]) {
+    if (isStaked(tokenId)) {
       return address(0);
     }
     return super.getApproved(tokenId);
   }
 
-  function isApprovedForAll(address owner, address operator) public view override returns (bool) {
+  function hasStakes(address owner) public view override returns (bool) {
+    uint256 balance = balanceOf(owner);
+    for (uint256 i = 0; i < balance; i++) {
+      uint256 id = tokenOfOwnerByIndex(owner, i);
+      if (isStaked(id)) {
+        return true;
+      }
+    }
     return false;
   }
 
-  function stake(uint256 tokenID) external onlyManager {
-    // will revert if token does not exist
-    ownerOf(tokenID);
-    staked[tokenID] = true;
+  function setApprovalForAll(address operator, bool approved) public override {
+    if (!hasStakes(_msgSender())) {
+      super.setApprovalForAll(operator, approved);
+    }
   }
 
-  function unstake(uint256 tokenID) external onlyManager {
+  function isApprovedForAll(address owner, address operator) public view override returns (bool) {
+    if (hasStakes(owner)) {
+      return false;
+    }
+    return super.isApprovedForAll(owner, operator);
+  }
+
+  function stake(uint256 tokenID) external override onlyPool whenAirdropCompleted {
     // will revert if token does not exist
     ownerOf(tokenID);
+    staked[tokenID] = _msgSender();
+  }
+
+  function unstake(uint256 tokenID) external override onlyPool {
+    // will revert if token does not exist
+    require(staked[tokenID] == _msgSender(), "Wrong pool");
     delete staked[tokenID];
   }
 
-  // wormhole
-
-  function wormholeTransfer(
-    uint256 tokenID,
-    uint16 recipientChain,
-    bytes32 recipient,
-    uint32 nonce
-  ) public payable override returns (uint64 sequence) {
-    require(!staked[tokenID], "Token is staked");
-    require(_isApprovedOrOwner(_msgSender(), tokenID), "Transfer caller is not owner nor approved");
-    _burn(tokenID);
-    return _wormholeTransferWithValue(tokenID, recipientChain, recipient, nonce, msg.value);
-  }
-
-  // Complete a transfer from Wormhole
-  function wormholeCompleteTransfer(bytes memory encodedVm) public override {
-    (address to, uint256 tokenId) = _wormholeCompleteTransfer(encodedVm);
-    _safeMint(to, tokenId);
+  // emergency function in case a compromised pool is removed
+  function unstakeIfRemovedPool(uint256 tokenID) external override onlyOwner {
+    require(isStaked(tokenID), "Not a staked tokenID");
+    require(!pools[staked[tokenID]], "Pool is active");
+    delete staked[tokenID];
   }
 
   uint256[50] private __gap;
