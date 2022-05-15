@@ -61,7 +61,7 @@ contract GenesisFarm3 is Ownable, IManager3 {
     return true;
   }
 
-  function hasManagerRole() external view override returns(bool) {
+  function hasManagerRole() external view override returns (bool) {
     return everdragons2Genesis.manager() == address(this);
   }
 
@@ -154,7 +154,11 @@ contract GenesisFarm3 is Ownable, IManager3 {
     proceedsBalance += msg.value;
   }
 
-  function deliverCrossChainPurchase(uint16 nonce, address buyer, uint256 quantity) external {
+  function deliverCrossChainPurchase(
+    uint16 nonce,
+    address buyer,
+    uint256 quantity
+  ) external {
     require(!usedNonces[nonce], "Nonce already used");
     require(operator != address(0) && _msgSender() == operator, "Sender not the operator");
     require(nextTokenId + quantity - 1 <= maxTokenId(), "Not enough tokens left");
