@@ -23,7 +23,7 @@ contract Everdragons2GenesisV2Mumbai is
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-  bool internal _mintEnded;
+  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
 
