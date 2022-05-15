@@ -92,7 +92,7 @@ describe("Everdragons2GenesisV2", async function () {
       pool = await StakingPool.deploy(everdragons2Genesis.address)
       await pool.deployed()
 
-      await everdragons2Genesis.endMint()
+      await everdragons2Genesis.endMinting()
 
       await everdragons2Genesis.setPool(pool.address)
       await pool.connect(buyer1).stakeEvd2(13)

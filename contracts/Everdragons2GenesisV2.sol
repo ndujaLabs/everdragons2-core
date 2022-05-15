@@ -23,7 +23,7 @@ contract Everdragons2GenesisV2 is
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-  bool internal _mintEnded;
+  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
 
@@ -67,7 +67,7 @@ contract Everdragons2GenesisV2 is
   }
 
   function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(!_mintEnded, "Airdrop completed");
+    require(!mintEnded(), "Airdrop completed");
     require(recipients.length == tokenIDs.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
       require(tokenIDs[i] < 601, "ID out of range");
@@ -83,7 +83,7 @@ contract Everdragons2GenesisV2 is
     }
   }
 
-  function mintEnded() external view returns (bool) {
+  function mintEnded() public view virtual returns (bool) {
     return _mintEnded;
   }
 
@@ -137,7 +137,7 @@ contract Everdragons2GenesisV2 is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    require(_mintEnded, "Mint not ended, yet");
+    require(mintEnded(), "Mint not ended, yet");
     // will revert if token does not exist
     ownerOf(tokenID);
     staked[tokenID] = _msgSender();

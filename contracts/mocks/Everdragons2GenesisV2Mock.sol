@@ -13,8 +13,14 @@ contract Everdragons2GenesisV2Mock is
   Everdragons2GenesisV2
 {
 
-  function endMint() external {
-    _mintEnded = true;
+  // in the contract _mintEnded is private, so we need a new variable here
+  bool private _mintEnded2;
+
+  function endMinting() external onlyOwner {
+    _mintEnded2 = true;
   }
 
+  function mintEnded() public view override returns (bool) {
+    return _mintEnded2;
+  }
 }
