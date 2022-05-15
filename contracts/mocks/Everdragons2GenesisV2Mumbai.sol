@@ -12,11 +12,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
-import "./interfaces/IStakingPool.sol";
+import "../interfaces/IStakingPool.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV2 is
+contract Everdragons2GenesisV2Mumbai is
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
@@ -70,15 +70,15 @@ contract Everdragons2GenesisV2 is
     require(!_mintEnded, "Airdrop completed");
     require(recipients.length == tokenIDs.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
-      require(tokenIDs[i] < 601, "ID out of range");
-      if (totalSupply() < 601) {
+      require(tokenIDs[i] < 1001, "ID out of range");
+      if (totalSupply() < 1001) {
         _safeMint(recipients[i], tokenIDs[i]);
       } else {
         _mintEnded = true;
         return;
       }
     }
-    if (totalSupply() == 600) {
+    if (totalSupply() == 1000) {
       _mintEnded = true;
     }
   }
