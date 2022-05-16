@@ -29,14 +29,16 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
-  const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
+  // const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
+  // const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const Everdragons2GenesisV2Mumbai = await ethers.getContractFactory("Everdragons2GenesisV2Mumbai")
 
-  await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
+  // await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2GenesisV2Mumbai);
+  //
+  // process.exit()
 
-  const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV2Mumbai);
+  const upgraded = await upgrades.upgradeProxy(deployed[chainId].Everdragons2Genesis, Everdragons2GenesisV2Mumbai);
   await upgraded.deployed();
 
   // everdragons2Genesis = await upgrades.upgradeProxy('0xE37760c7933176679951A5328a5Cd11fa800c60b', Everdragons2Genesis);

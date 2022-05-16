@@ -67,7 +67,7 @@ contract Everdragons2GenesisV2 is
   }
 
   function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(!mintEnded(), "Airdrop completed");
+    require(totalSupply() < 600, "Airdrop completed");
     require(recipients.length == tokenIDs.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
       require(tokenIDs[i] < 601, "ID out of range");
@@ -137,7 +137,6 @@ contract Everdragons2GenesisV2 is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    require(mintEnded(), "Mint not ended, yet");
     // will revert if token does not exist
     ownerOf(tokenID);
     staked[tokenID] = _msgSender();

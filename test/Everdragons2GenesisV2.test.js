@@ -31,7 +31,7 @@ describe("Everdragons2GenesisV2", async function () {
     [owner, wallet, buyer1, buyer2, buyer3, treasury, member, beneficiary1, beneficiary2,
       whitelisted1, whitelisted2, whitelisted3, openSea] = await ethers.getSigners()
     Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
-    Everdragons2GenesisV2 = await ethers.getContractFactory("Everdragons2GenesisV2Mock")
+    Everdragons2GenesisV2 = await ethers.getContractFactory("Everdragons2GenesisV2")
     GenesisFarm = await ethers.getContractFactory("GenesisFarm")
     StakingPool = await ethers.getContractFactory("StakingPoolMock")
     initEthers(ethers)
@@ -92,7 +92,7 @@ describe("Everdragons2GenesisV2", async function () {
       pool = await StakingPool.deploy(everdragons2Genesis.address)
       await pool.deployed()
 
-      await everdragons2Genesis.endMinting()
+      // await everdragons2Genesis.endMinting()
 
       await everdragons2Genesis.setPool(pool.address)
       await pool.connect(buyer1).stakeEvd2(13)

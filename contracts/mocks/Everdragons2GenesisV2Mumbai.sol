@@ -67,19 +67,15 @@ contract Everdragons2GenesisV2Mumbai is
   }
 
   function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(!_mintEnded, "Airdrop completed");
+    require(totalSupply() < 1001, "Airdrop completed");
     require(recipients.length == tokenIDs.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
       require(tokenIDs[i] < 1001, "ID out of range");
       if (totalSupply() < 1001) {
         _safeMint(recipients[i], tokenIDs[i]);
       } else {
-        _mintEnded = true;
         return;
       }
-    }
-    if (totalSupply() == 1000) {
-      _mintEnded = true;
     }
   }
 
@@ -137,7 +133,7 @@ contract Everdragons2GenesisV2Mumbai is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    require(_mintEnded, "Mint not ended, yet");
+    require(totalSupply() == 1000, "Mint not ended, yet");
     // will revert if token does not exist
     ownerOf(tokenID);
     staked[tokenID] = _msgSender();
