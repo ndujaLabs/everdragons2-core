@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
 import "./interfaces/IStakingPool.sol";
+import "./interfaces/IEverdragons2Bridge.sol";
 
 //import "hardhat/console.sol";
 
@@ -31,6 +32,7 @@ contract Everdragons2GenesisV2 is
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
+  IEverdragons2Bridge public bridge;
 
   modifier onlyPool() {
     require(pools[_msgSender()], "Forbidden");
@@ -66,13 +68,13 @@ contract Everdragons2GenesisV2 is
     return super.supportsInterface(interfaceId);
   }
 
-  function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
+  function airdrop(address[] memory recipients, uint256[] memory tokenIds) external onlyOwner {
     require(totalSupply() < 600, "Airdrop completed");
-    require(recipients.length == tokenIDs.length, "Inconsistent lengths");
+    require(recipients.length == tokenIds.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
-      require(tokenIDs[i] < 601, "ID out of range");
+      require(tokenIds[i] < 601, "ID out of range");
       if (totalSupply() < 601) {
-        _safeMint(recipients[i], tokenIDs[i]);
+        _safeMint(recipients[i], tokenIds[i]);
       } else {
         _mintEnded = true;
         return;
@@ -107,12 +109,12 @@ contract Everdragons2GenesisV2 is
 
   // stakes
 
-  function isStaked(uint256 tokenID) public view returns (bool) {
-    return staked[tokenID] != address(0);
+  function isStaked(uint256 tokenId) public view returns (bool) {
+    return staked[tokenId] != address(0);
   }
 
-  function getStaker(uint256 tokenID) external view returns (address) {
-    return staked[tokenID];
+  function getStaker(uint256 tokenId) external view returns (address) {
+    return staked[tokenId];
   }
 
   function setPool(address pool) external onlyOwner {
@@ -136,23 +138,23 @@ contract Everdragons2GenesisV2 is
     return false;
   }
 
-  function stake(uint256 tokenID) external onlyPool {
+  function stake(uint256 tokenId) external onlyPool {
     // will revert if token does not exist
-    ownerOf(tokenID);
-    staked[tokenID] = _msgSender();
+    ownerOf(tokenId);
+    staked[tokenId] = _msgSender();
   }
 
-  function unstake(uint256 tokenID) external onlyPool {
+  function unstake(uint256 tokenId) external onlyPool {
     // will revert if token does not exist
-    require(staked[tokenID] == _msgSender(), "Wrong pool");
-    delete staked[tokenID];
+    require(staked[tokenId] == _msgSender(), "Wrong pool");
+    delete staked[tokenId];
   }
 
   // emergency function in case a compromised pool is removed
-  function unstakeIfRemovedPool(uint256 tokenID) external onlyOwner {
-    require(isStaked(tokenID), "Not a staked tokenID");
-    require(!pools[staked[tokenID]], "Pool is active");
-    delete staked[tokenID];
+  function unstakeIfRemovedPool(uint256 tokenId) external onlyOwner {
+    require(isStaked(tokenId), "Not a staked tokenId");
+    require(!pools[staked[tokenId]], "Pool is active");
+    delete staked[tokenId];
   }
 
   // manage approval
@@ -180,4 +182,43 @@ contract Everdragons2GenesisV2 is
     }
     return super.isApprovedForAll(owner, operator);
   }
+
+  // bridge
+
+  function setBridge(IEverdragons2Bridge bridge_) external onlyOwner {
+    require(bridge_.id() == keccak256("Everdragons2Bridge"), "Not a bridge");
+    bridge = bridge_;
+  }
+
+  function crossChainTransfer(
+    uint256 tokenId,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) external {
+    require(!isStaked(tokenId), "Token is staked");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "Transfer caller is not owner nor approved");
+    bridge.wormholeTransfer(tokenId, recipientChain, recipient, nonce);
+  }
+
+  function completeCrossChainTransfer(bytes memory encodedVm) external {
+    bridge.wormholeCompleteTransfer(encodedVm);
+  }
+
+  // deprecated
+
+  function wormholeTransfer(
+    uint256 tokenId,
+    uint16 recipientChain,
+    bytes32 recipient,
+    uint32 nonce
+  ) public payable virtual override returns (uint64 sequence) {
+    revert("Deprecated");
+  }
+
+
+  function wormholeCompleteTransfer(bytes memory encodedVm) public virtual override {
+    revert("Deprecated");
+  }
+
 }

@@ -33,8 +33,8 @@ async function main() {
 
   await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
 
-  const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV2);
-  await upgraded.deployed();
+  // const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV2);
+  // await upgraded.deployed();
 
 }
 

@@ -15,7 +15,7 @@ const {
 } = require('./helpers')
 const whitelist = require('./fixtures/whitelist.json');
 
-describe("Everdragons2GenesisV2", async function () {
+describe.only("Everdragons2GenesisV2", async function () {
 
   let Everdragons2Genesis
   let Everdragons2GenesisV2
