@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../Everdragons2GenesisV2.sol";
 import "../interfaces/IStakingPool.sol";
 
-contract StakingPoolMock is IStakingPool  {
+contract StakingPoolMock is IStakingPool {
   Everdragons2GenesisV2 public e2;
 
   constructor(address e2_) {
@@ -16,12 +16,11 @@ contract StakingPoolMock is IStakingPool  {
     return keccak256("Everdragons2Pool");
   }
 
-  function stakeEvd2(uint tokenId) external {
+  function stakeEvd2(uint256 tokenId) external {
     e2.stake(tokenId);
   }
 
-  function unstakeEvd2(uint tokenId) external {
+  function unstakeEvd2(uint256 tokenId) external {
     e2.unstake(tokenId);
   }
-
 }

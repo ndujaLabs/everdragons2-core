@@ -9,10 +9,7 @@ import "../Everdragons2GenesisV2.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV2Mock is
-  Everdragons2GenesisV2
-{
-
+contract Everdragons2GenesisV2Mock is Everdragons2GenesisV2 {
   // in the contract _mintEnded is private, so we need a new variable here
   bool private _mintEnded2;
 

@@ -154,7 +154,7 @@ contract Everdragons2GenesisV2Mumbai is
 
   // manage approval
 
-  function approve(address to, uint256 tokenId) public override  {
+  function approve(address to, uint256 tokenId) public override {
     require(!isStaked(tokenId), "Dragon is staked");
     super.approve(to, tokenId);
   }
@@ -166,12 +166,12 @@ contract Everdragons2GenesisV2Mumbai is
     return super.getApproved(tokenId);
   }
 
-  function setApprovalForAll(address operator, bool approved) override public {
+  function setApprovalForAll(address operator, bool approved) public override {
     require(!approved || !hasStakes(_msgSender()), "At least one dragon is staked");
     super.setApprovalForAll(operator, approved);
   }
 
-  function isApprovedForAll(address owner, address operator) public override view returns (bool) {
+  function isApprovedForAll(address owner, address operator) public view override returns (bool) {
     if (hasStakes(owner)) {
       return false;
     }
