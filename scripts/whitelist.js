@@ -1843,16 +1843,16 @@ module.exports = [
       535
     ]
   },
-    // WRITER WHO CREATES ALL THE ATTRIBUTES NAMES
+    // WRITER WHO CREATED ALL THE ATTRIBUTES NAMES
   {
     address: "0x8279981BFE98e05c0cddA73b0A9050222a632cB4",
     tokenIds: [
       536
     ]
   },
-    // DESIGNER WHO CREATES THE IMAGES FOR THE WEBSITE
+    // DESIGNER WHO CREATED THE IMAGES FOR THE WEBSITE
   {
-    address: "",
+    address: "0xF817d4D2cF642913Bacb9303C0e6e92e4b8a9afa",
     tokenIds: [
       537
     ]
