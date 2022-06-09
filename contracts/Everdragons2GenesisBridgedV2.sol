@@ -113,8 +113,8 @@ contract Everdragons2GenesisBridgedV2 is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    // will revert if token does not exist
-    ownerOf(tokenID);
+    // pool must be approved to mark the token as staked
+    require(getApproved(tokenID) == _msgSender() || isApprovedForAll(ownerOf(tokenID), _msgSender()), "Pool not approved");
     staked[tokenID] = _msgSender();
   }
 
