@@ -95,6 +95,10 @@ describe("Everdragons2GenesisV2", async function () {
       // await everdragons2Genesis.endMinting()
 
       await everdragons2Genesis.setPool(pool.address)
+
+      await assertThrowsMessage(pool.connect(buyer1).stakeEvd2(13), "Pool not approved")
+
+      await everdragons2Genesis.connect(buyer1).approve(pool.address, 13)
       await pool.connect(buyer1).stakeEvd2(13)
       expect(await upgraded.isStaked(13)).equal(true)
       expect(await upgraded.getStaker(13)).equal(pool.address)
