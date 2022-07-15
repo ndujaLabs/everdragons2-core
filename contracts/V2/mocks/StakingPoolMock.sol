@@ -3,7 +3,6 @@ pragma solidity 0.8.11;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../Everdragons2GenesisV2.sol";
-import "../interfaces/IStakingPool.sol";
 
 contract StakingPoolMock is IStakingPool {
   Everdragons2GenesisV2 public e2;

@@ -10,36 +10,22 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 
-import "./interfaces/IEverdragons2Genesis.sol";
-import "./interfaces/IManager.sol";
+import "./interfaces/IEverdragons2GenesisBridged.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2Genesis is
-  IEverdragons2Genesis,
+contract Everdragons2GenesisBridged is
+  IEverdragons2GenesisBridged,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
-
-  address public manager;
-
-  modifier onlyManager() {
-    require(manager != address(0) && _msgSender() == manager, "Forbidden");
-    _;
-  }
-
-  modifier canMint() {
-    require(!_mintEnded, "Minting ended");
-    _;
-  }
 
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
@@ -70,24 +56,6 @@ contract Everdragons2Genesis is
     return super.supportsInterface(interfaceId);
   }
 
-  function setManager(address manager_) external override onlyOwner canMint {
-    require(manager_ != address(0), "Manager cannot be 0x0");
-    require(IManager(manager_).isManager(), "Not a manager");
-    manager = manager_;
-  }
-
-  function mint(address recipient, uint256 tokenId) public override onlyManager canMint {
-    _safeMint(recipient, tokenId);
-  }
-
-  function endMinting() external override onlyOwner {
-    _mintEnded = true;
-  }
-
-  function mintEnded() external view override returns (bool) {
-    return _mintEnded;
-  }
-
   function _baseURI() internal view virtual override returns (string memory) {
     return _baseTokenURI;
   }
@@ -103,6 +71,6 @@ contract Everdragons2Genesis is
   }
 
   function contractURI() public view returns (string memory) {
-    return string(abi.encodePacked(_baseTokenURI, "0"));
+    return _baseURI();
   }
 }

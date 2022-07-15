@@ -2,7 +2,9 @@ lockfileVersion: 5.4
 
 specifiers:
   '@ndujalabs/erc721playable': ^0.3.0
-  '@ndujalabs/wormhole721': 0.3.0
+  '@ndujalabs/wormhole-tunnel': ^0.4.0
+  '@ndujalabs/wormhole721': ^0.5.3
+  '@ndujalabs/wormhole721-0-3-0': npm:@ndujalabs/wormhole721@0.3.0
   '@nomiclabs/hardhat-ethers': ^2.0.3
   '@nomiclabs/hardhat-etherscan': ^2.1.8
   '@nomiclabs/hardhat-waffle': ^2.0.1
@@ -29,7 +31,9 @@ specifiers:
 
 devDependencies:
   '@ndujalabs/erc721playable': 0.3.0
-  '@ndujalabs/wormhole721': 0.3.0
+  '@ndujalabs/wormhole-tunnel': 0.4.0
+  '@ndujalabs/wormhole721': 0.5.3
+  '@ndujalabs/wormhole721-0-3-0': /@ndujalabs/wormhole721/0.3.0
   '@nomiclabs/hardhat-ethers': 2.0.4_ethers@5.5.4+hardhat@2.8.3
   '@nomiclabs/hardhat-etherscan': 2.1.8_hardhat@2.8.3
   '@nomiclabs/hardhat-waffle': 2.0.2_6oy2mnnnyf6xpql55mxsdlbst4
@@ -569,8 +573,23 @@ packages:
     resolution: {integrity: sha512-b1//uNv/lhBqlu6hZXMnNTmMVqdf85I+c2e+/mpQEAgu7crGvoh6JbJQtlcrbO9zZ55OvlQAXaMexzGbpBiCDQ==}
     dev: true
 
+  /@ndujalabs/wormhole-tunnel/0.4.0:
+    resolution: {integrity: sha512-OpmaD2vRzkpcyUgKuE9Uc2oFs9gt0AWGyHMjrmNRb6sNt/DyZzwH/rXyVxYBEaLbjqb/3V8F05vpbWzyTgkmFA==}
+    dependencies:
+      '@openzeppelin/contracts': 4.5.0
+      '@openzeppelin/contracts-upgradeable': 4.5.0
+    dev: true
+
   /@ndujalabs/wormhole721/0.3.0:
     resolution: {integrity: sha512-buUuKfdyVBtCIWZq797o09MoqIOV9c9lCWZFlE0ub2UAu+DAiiaHtlW1DfL7/V3wENcYJmustG260rGoMqh7tA==}
+    dev: true
+
+  /@ndujalabs/wormhole721/0.5.3:
+    resolution: {integrity: sha512-JvNr10alOFqxOWC9UICXpQvKaY+zkYNnTtJy1BvJWBGSLy7Nv25NgPhRhVq1dpdSmXpkctjlvG/YVAZqePlHnA==}
+    dependencies:
+      '@ndujalabs/wormhole-tunnel': 0.4.0
+      '@openzeppelin/contracts': 4.5.0
+      '@openzeppelin/contracts-upgradeable': 4.5.0
     dev: true
 
   /@nomiclabs/hardhat-ethers/2.0.4_ethers@5.5.4+hardhat@2.8.3:
@@ -6589,7 +6608,7 @@ packages:
     dev: true
 
   /mv/2.1.1:
-    resolution: {integrity: sha1-rmzg1vbV4KT32JN5jQPB6pVZtqI=}
+    resolution: {integrity: sha512-at/ZndSy3xEGJ8i0ygALh8ru9qy7gWW1cmkaqBN29JmMlIvM//MEO9y1sk/avxuwnPcfhkejkLsuPxH81BrkSg==}
     engines: {node: '>=0.8.0'}
     requiresBuild: true
     dependencies:

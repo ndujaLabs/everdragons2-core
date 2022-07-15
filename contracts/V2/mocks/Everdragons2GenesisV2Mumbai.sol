@@ -10,13 +10,13 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 
-import "./interfaces/IStakingPool.sol";
+import "../interfaces/IStakingPool.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV2 is
+contract Everdragons2GenesisV2Mumbai is
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
@@ -67,23 +67,19 @@ contract Everdragons2GenesisV2 is
   }
 
   function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(totalSupply() < 600, "Airdrop completed");
+    require(totalSupply() < 1001, "Airdrop completed");
     require(recipients.length == tokenIDs.length, "Inconsistent lengths");
     for (uint256 i = 0; i < recipients.length; i++) {
-      require(tokenIDs[i] < 601, "ID out of range");
-      if (totalSupply() < 601) {
+      require(tokenIDs[i] < 1001, "ID out of range");
+      if (totalSupply() < 1001) {
         _safeMint(recipients[i], tokenIDs[i]);
       } else {
-        _mintEnded = true;
         return;
       }
     }
-    if (totalSupply() == 600) {
-      _mintEnded = true;
-    }
   }
 
-  function mintEnded() public view virtual returns (bool) {
+  function mintEnded() external view returns (bool) {
     return _mintEnded;
   }
 
@@ -137,8 +133,9 @@ contract Everdragons2GenesisV2 is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    // pool must be approved to mark the token as staked
-    require(getApproved(tokenID) == _msgSender() || isApprovedForAll(ownerOf(tokenID), _msgSender()), "Pool not approved");
+    require(totalSupply() == 1000, "Mint not ended, yet");
+    // will revert if token does not exist
+    ownerOf(tokenID);
     staked[tokenID] = _msgSender();
   }
 
