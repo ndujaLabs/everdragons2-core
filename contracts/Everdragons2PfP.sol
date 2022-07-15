@@ -40,7 +40,7 @@ contract Everdragons2PfP is Initializable, ERC721Upgradeable, ERC721EnumerableUp
     __Wormhole721_init("Everdragons2 PfP", "E2PfP");
     __ERC721Enumerable_init();
     // tokenURI pre-reveal
-    _baseTokenURI = "https://img.everdragons2.com/e2gt/";
+    _baseTokenURI = "https://img.everdragons2.com/e2pfp/";
   }
 
   function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}

@@ -34,7 +34,7 @@ contract Everdragons2PfPBridged is Initializable, ERC721Upgradeable, ERC721Enume
     __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
     // tokenURI pre-reveal
-    _baseTokenURI = "https://img.everdragons2.com/e2gt/";
+    _baseTokenURI = "https://img.everdragons2.com/e2pfp/";
   }
 
   function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
