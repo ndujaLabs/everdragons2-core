@@ -11,7 +11,7 @@ contract StakingPoolMock is IStakingPool {
     e2 = Everdragons2GenesisV2(e2_);
   }
 
-  function id() external view returns (bytes32) {
+  function id() external pure returns (bytes32) {
     return keccak256("Everdragons2Pool");
   }
 
