@@ -4,15 +4,9 @@ pragma solidity 0.8.11;
 interface IEverdragons2GenesisV3 {
   event LockerSet(address locker);
   event LockerRemoved(address locker);
-  event LockRemoved(uint256 tokenId);
+  event ForcefullyUnlocked(uint256 tokenId);
   event Locked(uint256 tokendId);
   event Unlocked(uint256 tokendId);
-
-  function updateTokenURI(string memory uri) external;
-
-  function freezeTokenURI() external;
-
-  function contractURI() external view returns (string memory);
 
   function isLocked(uint256 tokenID) external view returns (bool);
 

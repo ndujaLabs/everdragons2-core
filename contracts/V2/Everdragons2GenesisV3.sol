@@ -167,7 +167,7 @@ contract Everdragons2GenesisV3 is IEverdragons2GenesisV3,
     require(isLocked(tokenId), "not a locked tokenId");
     require(!pools[staked[tokenId]], "locker is still active");
     delete staked[tokenId];
-    emit LockRemoved(tokenId);
+    emit ForcefullyUnlocked(tokenId);
   }
 
   // manage approval
