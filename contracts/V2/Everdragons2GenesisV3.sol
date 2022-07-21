@@ -14,11 +14,11 @@ import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 import "./interfaces/IStakingPool.sol";
-import "./interfaces/IEverdragons2GenesisV3.sol";
+import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV3 is IEverdragons2GenesisV3,
+contract Everdragons2GenesisV3 is ILockable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,

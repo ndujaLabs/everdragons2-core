@@ -15,11 +15,11 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
-import "./interfaces/IEverdragons2GenesisV3.sol";
+import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisBridgedV3 is IEverdragons2GenesisV3,
+contract Everdragons2GenesisBridgedV3 is ILockable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
