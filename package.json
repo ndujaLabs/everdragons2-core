@@ -10,8 +10,8 @@
     "size": "npx hardhat size-contracts",
     "lint": "prettier --write 'contracts/**/*.sol' && solhint 'contracts/**/*.sol'"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Francesco Sullo <francesco@sullo.co>",
+  "license": "MIT",
   "devDependencies": {
     "@ndujalabs/erc721playable": "^0.3.0",
     "@ndujalabs/wormhole-tunnel": "^0.4.0",
@@ -24,6 +24,7 @@
     "@openzeppelin/contracts-upgradeable": "4.5.0",
     "@openzeppelin/hardhat-upgrades": "^1.17.0",
     "@poanet/solidity-flattener": "^3.0.6",
+    "attributable": "^0.0.3",
     "chai": "^4.3.4",
     "dotenv": "^11.0.0",
     "ethereum-waffle": "^3.4.0",

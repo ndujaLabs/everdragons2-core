@@ -12,6 +12,7 @@ specifiers:
   '@openzeppelin/contracts-upgradeable': 4.5.0
   '@openzeppelin/hardhat-upgrades': ^1.17.0
   '@poanet/solidity-flattener': ^3.0.6
+  attributable: ^0.0.3
   chai: ^4.3.4
   dotenv: ^11.0.0
   ethereum-waffle: ^3.4.0
@@ -41,6 +42,7 @@ devDependencies:
   '@openzeppelin/contracts-upgradeable': 4.5.0
   '@openzeppelin/hardhat-upgrades': 1.17.0_obecqhgvcrl56ghqkup63xikwu
   '@poanet/solidity-flattener': 3.0.6
+  attributable: 0.0.3
   chai: 4.3.6
   dotenv: 11.0.0
   ethereum-waffle: 3.4.0
@@ -1365,6 +1367,10 @@ packages:
     resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
     engines: {node: '>= 4.5.0'}
     hasBin: true
+    dev: true
+
+  /attributable/0.0.3:
+    resolution: {integrity: sha512-w8Aaayr2ZcTjXFB0d6aVXekQeDdQmf36bh9WE5dYzcrjuAl/TTeqD6I57BusyoKvolXhSsCYH3druJaDiwOt/A==}
     dev: true
 
   /available-typed-arrays/1.0.5:
