@@ -31,7 +31,7 @@ async function main() {
 
   const Everdragons2GenesisV2 = await ethers.getContractFactory("Everdragons2GenesisV2")
 
-  await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
+  // await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
 
   const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV2);
   await upgraded.deployed();

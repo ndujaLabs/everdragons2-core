@@ -13,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 
 import "./IEverdragons2.sol";
 

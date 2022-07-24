@@ -88,6 +88,9 @@ describe("Everdragons2GenesisV2", async function () {
           .to.emit(everdragons2Genesis, 'Transfer')
           .withArgs(ethers.constants.AddressZero, buyer3.address, 16)
 
+      expect(await everdragons2Genesis.connect(buyer3).transferFrom(buyer3.address, buyer2.address, 16))
+          .to.emit(everdragons2Genesis, 'Transfer')
+          .withArgs(buyer3.address, buyer2.address, 16)
 
       pool = await StakingPool.deploy(everdragons2Genesis.address)
       await pool.deployed()
