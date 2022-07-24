@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "attributable/contracts/IAttributable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
@@ -19,7 +20,7 @@ import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisBridgedV3 is ILockable,
+contract Everdragons2GenesisBridgedV3 is ILockable, IAttributable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
@@ -33,6 +34,8 @@ contract Everdragons2GenesisBridgedV3 is ILockable,
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
+
+  mapping(uint256 => mapping(address => mapping(uint8 => uint256))) internal _tokenAttributes;
 
   modifier onlyPool() {
     require(pools[_msgSender()], "Forbidden");
@@ -172,5 +175,32 @@ contract Everdragons2GenesisBridgedV3 is ILockable,
       return false;
     }
     return super.isApprovedForAll(owner, operator);
+  }
+
+  // attributable
+
+  function attributesOf(
+    uint256 _id,
+    address _player,
+    uint8 _index
+  ) external view override returns (uint256) {
+    return _tokenAttributes[_id][_player][_index];
+  }
+
+  function authorizePlayer(uint256 _id, address _player) external override {
+    require(ownerOf(_id) == _msgSender(), "Not the owner");
+    require(_tokenAttributes[_id][_player][0] == 0, "Player already authorized");
+    _tokenAttributes[_id][_player][0] = 1;
+  }
+
+  function updateAttributes(
+    uint256 _id,
+    uint8 _index,
+    uint256 _attributes
+  ) external override {
+    require(_tokenAttributes[_id][_msgSender()][0] != 0, "Player not authorized");
+    // notice that if the playes set the attributes to zero, it de-authorize itself
+    // and not more changes will be allowed until the NFT owner authorize it again
+    _tokenAttributes[_id][_msgSender()][_index] = _attributes;
   }
 }
