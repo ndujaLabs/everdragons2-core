@@ -1,3 +1,11 @@
+const {requirePath} = require("require-or-mock");
+// if missed, it sets a mock up
+requirePath(".env");
+
+require("dotenv").config();
+require("cryptoenv").parse();
+
+
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 require('@openzeppelin/hardhat-upgrades');
@@ -50,38 +58,38 @@ module.exports = {
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKeyTestnet]
+      accounts: [process.env.FOR_TESTNET]
     },
     kovan: {
       url: `https://kovan.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKeyTestnet]
+      accounts: [process.env.FOR_TESTNET]
     },
     ethereum: {
       url: `https://mainnet.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKey]
+      accounts: [process.env.NDUJA]
     },
     bsc_testnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,
-      accounts: [env.privateKeyTestnet]
+      accounts: [process.env.FOR_TESTNET]
     },
     bsc: {
       url: "https://bsc-dataseed.binance.org",
       chainId: 56,
       gasPrice: 20000000000,
-      accounts: [env.privateKey]
+      accounts: [process.env.NDUJA]
     },
     mumbai: {
       url: "https://matic-mumbai.chainstacklabs.com",
       chainId: 80001,
       gasPrice: 20000000000,
-      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKeyTestnet]
+      accounts: [process.env.FOR_TESTNET]
     },
     matic: {
       url: `https://polygon-mainnet.infura.io/v3/${env.infuraApiKey}`,
       chainId: 137,
-      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKey]
+      accounts: [process.env.NDUJA]
     },
   },
   etherscan: {
