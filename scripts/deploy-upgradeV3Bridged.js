@@ -12,11 +12,7 @@ async function main() {
   const chainId = await deployUtils.currentChainId()
   let [deployer] = await ethers.getSigners();
 
-  const network = chainId === 1 ? 'ethereum' : 'localhost'
-
-  if (chainId !== 1 && chainId !== 1337) {
-    process.exit();
-  }
+  const network = chainId === 1 ? 'ethereum' : chainId === 56 ? 'bsc' : 'localhost'
 
   console.log(
       "Deploying contracts with the account:",
@@ -32,8 +28,7 @@ async function main() {
   const Everdragons2GenesisBridgedV3 = await ethers.getContractFactory("Everdragons2GenesisBridgedV3")
   //
   // console.log("Importing")
-  // console.log(await upgrades.forceImport(deployed[chainId].Everdragons2GenesisBridged, Everdragons2GenesisBridged));
-
+  // await upgrades.forceImport(deployed[chainId].Everdragons2GenesisBridged, Everdragons2GenesisBridged);
   // process.exit()
 
   const upgraded = await upgrades.upgradeProxy(everdragons2GenesisBridged.address, Everdragons2GenesisBridgedV3);

@@ -12,11 +12,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 import "@ndujalabs/attributable/contracts/IAttributable.sol";
+import "@ndujalabs/lockable/contracts/ILockable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
-import "hardhat/console.sol";
-import "./V2-V3/interfaces/ILockable.sol";
+//import "hardhat/console.sol";
 
 contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgradeable, ERC721EnumerableUpgradeable, Wormhole721Upgradeable {
   using AddressUpgradeable for address;
@@ -69,7 +69,7 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
     override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
-    return super.supportsInterface(interfaceId);
+    return interfaceId == type(ILockable).interfaceId || interfaceId == type(IAttributable).interfaceId || super.supportsInterface(interfaceId);
   }
 
   function claim() external {

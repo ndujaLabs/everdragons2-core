@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@ndujalabs/attributable': ^0.0.1
   '@ndujalabs/erc721playable': ^0.3.0
+  '@ndujalabs/lockable': ^0.0.1
   '@ndujalabs/wormhole-tunnel': ^0.4.0
   '@ndujalabs/wormhole721': ^0.5.3
   '@ndujalabs/wormhole721-0-3-0': npm:@ndujalabs/wormhole721@0.3.0
@@ -34,6 +35,7 @@ specifiers:
 devDependencies:
   '@ndujalabs/attributable': 0.0.1
   '@ndujalabs/erc721playable': 0.3.0
+  '@ndujalabs/lockable': 0.0.1
   '@ndujalabs/wormhole-tunnel': 0.4.0
   '@ndujalabs/wormhole721': 0.5.3
   '@ndujalabs/wormhole721-0-3-0': /@ndujalabs/wormhole721/0.3.0
@@ -579,6 +581,10 @@ packages:
 
   /@ndujalabs/erc721playable/0.3.0:
     resolution: {integrity: sha512-b1//uNv/lhBqlu6hZXMnNTmMVqdf85I+c2e+/mpQEAgu7crGvoh6JbJQtlcrbO9zZ55OvlQAXaMexzGbpBiCDQ==}
+    dev: true
+
+  /@ndujalabs/lockable/0.0.1:
+    resolution: {integrity: sha512-QUN64h5gU3N8i3GPoROT30gJmEZQ5TSD8eEsUkC+Bw1hV7+/2VMYHJVPmxETXi9cZe7Vwthcp+thy3tH4hu7Zw==}
     dev: true
 
   /@ndujalabs/wormhole-tunnel/0.4.0:
