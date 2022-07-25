@@ -15,7 +15,7 @@ const {
 } = require('./helpers')
 const whitelist = require('./fixtures/whitelist.json');
 
-describe("Everdragons2GenesisV23", async function () {
+describe("Everdragons2GenesisV3", async function () {
 
   let Everdragons2Genesis
   let Everdragons2GenesisV2
@@ -75,6 +75,10 @@ describe("Everdragons2GenesisV23", async function () {
 
       expect(await genesisFarm.nextTokenId()).equal(14)
 
+      await genesisFarm.connect(buyer2).buyTokens(1, {
+        value: await genesisFarm.price()
+      })
+
       let upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV2);
       await upgraded.deployed();
 
@@ -87,22 +91,15 @@ describe("Everdragons2GenesisV23", async function () {
 
       everdragons2Genesis = Everdragons2GenesisV3.attach(upgraded.address)
 
-      expect(await everdragons2Genesis.airdrop([buyer2.address, buyer3.address, buyer3.address], [14, 15, 16]))
+      expect(await everdragons2Genesis.connect(buyer1).transferFrom(buyer1.address, buyer2.address, 12))
           .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer2.address, 14)
-          .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer3.address, 15)
-          .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, buyer3.address, 16)
+          .withArgs(buyer1.address, buyer2.address, 12)
 
-      expect(await everdragons2Genesis.connect(buyer3).transferFrom(buyer3.address, buyer2.address, 16))
-          .to.emit(everdragons2Genesis, 'Transfer')
-          .withArgs(buyer3.address, buyer2.address, 16)
 
       pool = await StakingPool.deploy(everdragons2Genesis.address)
       await pool.deployed()
 
-      // await everdragons2Genesis.endMinting()
+      console.log(9)
 
       await assertThrowsMessage(pool.connect(buyer1).stakeEvd2(13), "Forbidden")
 

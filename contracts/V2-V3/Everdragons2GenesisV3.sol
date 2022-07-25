@@ -74,23 +74,6 @@ contract Everdragons2GenesisV3 is ILockable, IAttributable,
     return super.supportsInterface(interfaceId);
   }
 
-  function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(totalSupply() < 600, "Airdrop completed");
-    require(recipients.length == tokenIDs.length, "Inconsistent lengths");
-    for (uint256 i = 0; i < recipients.length; i++) {
-      require(tokenIDs[i] < 601, "ID out of range");
-      if (totalSupply() < 601) {
-        _safeMint(recipients[i], tokenIDs[i]);
-      } else {
-        _mintEnded = true;
-        return;
-      }
-    }
-    if (totalSupply() == 600) {
-      _mintEnded = true;
-    }
-  }
-
   function mintEnded() public view virtual returns (bool) {
     return _mintEnded;
   }
