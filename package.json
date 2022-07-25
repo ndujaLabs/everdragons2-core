@@ -13,6 +13,7 @@
   "author": "Francesco Sullo <francesco@sullo.co>",
   "license": "MIT",
   "devDependencies": {
+    "@ndujalabs/attributable": "^0.0.1",
     "@ndujalabs/erc721playable": "^0.3.0",
     "@ndujalabs/wormhole-tunnel": "^0.4.0",
     "@ndujalabs/wormhole721": "^0.5.3",
@@ -24,7 +25,6 @@
     "@openzeppelin/contracts-upgradeable": "4.5.0",
     "@openzeppelin/hardhat-upgrades": "^1.17.0",
     "@poanet/solidity-flattener": "^3.0.6",
-    "attributable": "^0.0.3",
     "chai": "^4.3.4",
     "cryptoenv": "^0.1.3",
     "dotenv": "^11.0.0",
