@@ -29,14 +29,14 @@ async function main() {
   const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
-  const Everdragons2GenesisV2 = await ethers.getContractFactory("Everdragons2GenesisBridgedV3")
+  const Everdragons2GenesisV3 = await ethers.getContractFactory("Everdragons2GenesisV3")
 
-  await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
+  // await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
 
-  process.exit()
-
-  const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisBridgedV3);
+  const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV3);
   await upgraded.deployed();
+
+  console.log("upgraded")
 
 }
 

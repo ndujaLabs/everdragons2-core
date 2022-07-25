@@ -11,12 +11,14 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "attributable/contracts/IAttributable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
 import "hardhat/console.sol";
+import "./V2-V3/interfaces/ILockable.sol";
 
-contract Everdragons2PfP is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, Wormhole721Upgradeable {
+contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgradeable, ERC721EnumerableUpgradeable, Wormhole721Upgradeable {
   using AddressUpgradeable for address;
 
   bool private _mintEnded;
@@ -27,6 +29,8 @@ contract Everdragons2PfP is Initializable, ERC721Upgradeable, ERC721EnumerableUp
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
+
+  mapping(uint256 => mapping(address => mapping(uint8 => uint256))) internal _tokenAttributes;
 
   modifier onlyPool() {
     require(pools[_msgSender()], "Forbidden");
@@ -55,7 +59,7 @@ contract Everdragons2PfP is Initializable, ERC721Upgradeable, ERC721EnumerableUp
     address to,
     uint256 tokenId
   ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
-    require(!isStaked(tokenId), "Dragon is staked");
+    require(!isLocked(tokenId), "Dragon is staked");
     super._beforeTokenTransfer(from, to, tokenId);
   }
 
@@ -102,80 +106,116 @@ contract Everdragons2PfP is Initializable, ERC721Upgradeable, ERC721EnumerableUp
     return string(abi.encodePacked(_baseTokenURI, "0"));
   }
 
-  // stakes
+  // locks
 
-  function isStaked(uint256 tokenID) public view returns (bool) {
-    return staked[tokenID] != address(0);
+  function isLocked(uint256 tokenId) public view override returns (bool) {
+    return staked[tokenId] != address(0);
   }
 
-  function getStaker(uint256 tokenID) external view returns (address) {
-    return staked[tokenID];
+  function lockerOf(uint256 tokenId) external view override returns (address) {
+    return staked[tokenId];
   }
 
-  function setPool(address pool) external onlyOwner {
-    require(IStakingPool(pool).id() == keccak256("Everdragons2Pool"), "Not a pool");
-    pools[pool] = true;
+  function isLocker(address locker) public view override returns (bool) {
+    return pools[locker];
   }
 
-  function removePool(address pool) external onlyOwner {
-    require(pools[pool], "Not an active pool");
-    delete pools[pool];
+  function setLocker(address locker) external override onlyOwner {
+    require(locker.isContract(), "locker not a contract");
+    pools[locker] = true;
+    emit LockerSet(locker);
   }
 
-  function hasStakes(address owner) public view returns (bool) {
+  function removeLocker(address locker) external override onlyOwner {
+    require(pools[locker], "not an active locker");
+    delete pools[locker];
+    emit LockerRemoved(locker);
+  }
+
+  function hasLocks(address owner) public view override returns (bool) {
     uint256 balance = balanceOf(owner);
     for (uint256 i = 0; i < balance; i++) {
       uint256 id = tokenOfOwnerByIndex(owner, i);
-      if (isStaked(id)) {
+      if (isLocked(id)) {
         return true;
       }
     }
     return false;
   }
 
-  function stake(uint256 tokenID) external onlyPool {
-    // pool must be approved to mark the token as staked
-    require(getApproved(tokenID) == _msgSender() || isApprovedForAll(ownerOf(tokenID), _msgSender()), "Pool not approved");
-    staked[tokenID] = _msgSender();
+  function lock(uint256 tokenId) external override onlyPool {
+    // locker must be approved to mark the token as locked
+    require(isLocker(_msgSender()), "Not an authorized locker");
+    require(getApproved(tokenId) == _msgSender() || isApprovedForAll(ownerOf(tokenId), _msgSender()), "Locker not approved");
+    staked[tokenId] = _msgSender();
+    emit Locked(tokenId);
   }
 
-  function unstake(uint256 tokenID) external onlyPool {
+  function unlock(uint256 tokenId) external override onlyPool {
     // will revert if token does not exist
-    require(staked[tokenID] == _msgSender(), "Wrong pool");
-    delete staked[tokenID];
+    require(staked[tokenId] == _msgSender(), "wrong locker");
+    delete staked[tokenId];
+    emit Unlocked(tokenId);
   }
 
-  // emergency function in case a compromised pool is removed
-  function unstakeIfRemovedPool(uint256 tokenID) external onlyOwner {
-    require(isStaked(tokenID), "Not a staked tokenID");
-    require(!pools[staked[tokenID]], "Pool is active");
-    delete staked[tokenID];
+  // emergency function in case a compromised locker is removed
+  function unlockIfRemovedLocker(uint256 tokenId) external override onlyOwner {
+    require(isLocked(tokenId), "not a locked tokenId");
+    require(!pools[staked[tokenId]], "locker is still active");
+    delete staked[tokenId];
+    emit ForcefullyUnlocked(tokenId);
   }
 
   // manage approval
 
   function approve(address to, uint256 tokenId) public override {
-    console.log(tokenId);
-    require(!isStaked(tokenId), "Dragon is staked");
+    require(!isLocked(tokenId), "locked asset");
     super.approve(to, tokenId);
   }
 
   function getApproved(uint256 tokenId) public view override returns (address) {
-    if (isStaked(tokenId)) {
+    if (isLocked(tokenId)) {
       return address(0);
     }
     return super.getApproved(tokenId);
   }
 
   function setApprovalForAll(address operator, bool approved) public override {
-    require(!approved || !hasStakes(_msgSender()), "At least one dragon is staked");
+    require(!approved || !hasLocks(_msgSender()), "at least one asset is locked");
     super.setApprovalForAll(operator, approved);
   }
 
   function isApprovedForAll(address owner, address operator) public view override returns (bool) {
-    if (hasStakes(owner)) {
+    if (hasLocks(owner)) {
       return false;
     }
     return super.isApprovedForAll(owner, operator);
+  }
+
+  // attributable
+
+  function attributesOf(
+    uint256 _id,
+    address _player,
+    uint8 _index
+  ) external view override returns (uint256) {
+    return _tokenAttributes[_id][_player][_index];
+  }
+
+  function authorizePlayer(uint256 _id, address _player) external override {
+    require(ownerOf(_id) == _msgSender(), "Not the owner");
+    require(_tokenAttributes[_id][_player][0] == 0, "Player already authorized");
+    _tokenAttributes[_id][_player][0] = 1;
+  }
+
+  function updateAttributes(
+    uint256 _id,
+    uint8 _index,
+    uint256 _attributes
+  ) external override {
+    require(_tokenAttributes[_id][_msgSender()][0] != 0, "Player not authorized");
+    // notice that if the playes set the attributes to zero, it de-authorize itself
+    // and not more changes will be allowed until the NFT owner authorize it again
+    _tokenAttributes[_id][_msgSender()][_index] = _attributes;
   }
 }
