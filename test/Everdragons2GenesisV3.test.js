@@ -99,8 +99,6 @@ describe("Everdragons2GenesisV3", async function () {
       pool = await StakingPool.deploy(everdragons2Genesis.address)
       await pool.deployed()
 
-      console.log(9)
-
       await assertThrowsMessage(pool.connect(buyer1).stakeEvd2(13), "Forbidden")
 
       await everdragons2Genesis.setLocker(pool.address)

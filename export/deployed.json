@@ -1,6 +1,7 @@
 {
   "1": {
-    "EthereumFarm": "0x386312412F9b4C75f9AaBdB7F4EaDF9dEDbF6b56"
+    "EthereumFarm": "0x386312412F9b4C75f9AaBdB7F4EaDF9dEDbF6b56",
+    "Everdragons2GenesisBridged": "0x2118cec729b12a61c3caa1d559461876eda5ca62"
   },
   "3": {
     "Everdragons2Genesis": "0x300B9514920d3aa5DCAE532d6DFd39031e7118ec"
@@ -15,7 +16,7 @@
     "GenesisFarm3": "0x552252957A0F13D77B94704290Ee7406a9723B1A"
   },
   "1337": {
-    "Everdragons2Genesis": "0x081F08945fd17C5470f7bCee23FB57aB1099428E",
+    "Everdragons2Genesis": "0x9945f9611ff3D6D863aa2ca785e2C9EEE7750DB1",
     "GenesisFarm": "0x3aAde2dCD2Df6a8cAc689EE797591b2913658659",
     "GenesisFarm2": "0x1f10F3Ba7ACB61b2F50B9d6DdCf91a6f787C0E82",
     "GenesisFarm3": "0xFD6F7A6a5c21A3f503EBaE7a473639974379c351",

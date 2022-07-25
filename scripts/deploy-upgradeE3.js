@@ -36,6 +36,8 @@ async function main() {
   const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV3);
   await upgraded.deployed();
 
+  console.log("upgraded")
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
