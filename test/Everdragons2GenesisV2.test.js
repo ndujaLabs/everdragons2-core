@@ -106,6 +106,9 @@ describe("Everdragons2GenesisV2", async function () {
       expect(await upgraded.isStaked(13)).equal(true)
       expect(await upgraded.getStaker(13)).equal(pool.address)
 
+      await expect(everdragons2Genesis.connect(buyer1).approve(genesisFarm.address, 13)).revertedWith()
+
+
       expect(everdragons2Genesis.connect(buyer1).approve(openSea.address, 13)).revertedWith("Dragon is staked")
 
       expect(everdragons2Genesis.connect(buyer1).setApprovalForAll(openSea.address, true)).revertedWith("At least one dragon is staked")

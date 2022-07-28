@@ -5,28 +5,32 @@ pragma solidity 0.8.11;
 //          Emanuele Cesena <emanuele@ndujalabs.com>
 // Everdragons2, https://everdragons2.com
 
+import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 import "@ndujalabs/attributable/contracts/IAttributable.sol";
-import "@ndujalabs/lockable/contracts/ILockable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
+import "./interfaces/ILockable.sol";
+
 //import "hardhat/console.sol";
 
-contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgradeable, ERC721EnumerableUpgradeable, Wormhole721Upgradeable {
+contract Everdragons2BridgedV1 is ILockable, IAttributable,
+  Initializable,
+  ERC721Upgradeable,
+  ERC721PlayableUpgradeable,
+  ERC721EnumerableUpgradeable,
+  Wormhole721Upgradeable
+{
   using AddressUpgradeable for address;
 
-  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
-
-  ERC721EnumerableUpgradeable public genesisToken;
-  ERC721EnumerableUpgradeable public nonGenesisToken;
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
@@ -42,26 +46,19 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   constructor() initializer {}
 
   function initialize() public initializer {
-    __Wormhole721_init("Everdragons2 PfP", "E2PfP");
+    __Wormhole721_init("Everdragons2 Genesis Token", "E2GT");
     __ERC721Enumerable_init();
     // tokenURI pre-reveal
-    _baseTokenURI = "https://img.everdragons2.com/e2pfp/";
+    _baseTokenURI = "https://img.everdragons2.com/e2gt/";
   }
 
   function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
-  function setTokens(address genesis, address nonGenesis) external onlyOwner {
-    require(genesis.isContract(), "Not a contract");
-    require(nonGenesis.isContract(), "Not a contract");
-    genesisToken = ERC721EnumerableUpgradeable(genesis);
-    nonGenesisToken = ERC721EnumerableUpgradeable(nonGenesis);
-  }
 
   function _beforeTokenTransfer(
     address from,
     address to,
     uint256 tokenId
-  ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
+  ) internal override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable) {
     require(!isLocked(tokenId), "Dragon is staked");
     super._beforeTokenTransfer(from, to, tokenId);
   }
@@ -69,33 +66,10 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable)
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
-    return interfaceId == type(ILockable).interfaceId || interfaceId == type(IAttributable).interfaceId || super.supportsInterface(interfaceId);
-  }
-
-  function claim() external {
-    require(address(genesisToken) != address(0), "Genesis token not set");
-    for (uint k=0;k<2;k++) {
-      ERC721EnumerableUpgradeable token = k == 0 ? genesisToken : nonGenesisToken;
-      if (address(token) == address(0)) {
-        // nonGenesisToken not set yet
-        return;
-      }
-      uint256 balance = token.balanceOf(_msgSender());
-      uint256 k = 0;
-      for (uint256 i = 0; i < balance; i++) {
-        uint256 tokenId = genesisToken.tokenOfOwnerByIndex(_msgSender(), i) + (k == 1 ? 600 : 0);
-        if (!_exists(tokenId)) {
-          _safeMint(_msgSender(), tokenId);
-          k++;
-          if (k == 10) {
-            break;
-          }
-        }
-      }
-    }
+    return super.supportsInterface(interfaceId);
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
@@ -113,8 +87,9 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   }
 
   function contractURI() public view returns (string memory) {
-    return string(abi.encodePacked(_baseTokenURI, "0"));
+    return _baseURI();
   }
+
 
   // locks
 
