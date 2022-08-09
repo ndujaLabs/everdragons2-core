@@ -31,7 +31,7 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
 
-  mapping(uint256 => mapping(address => mapping(uint8 => uint256))) internal _tokenAttributes;
+  mapping(uint256 => mapping(address => mapping(uint => uint256))) internal _tokenAttributes;
 
   modifier onlyPool() {
     require(pools[_msgSender()], "Forbidden");
@@ -207,20 +207,21 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   function attributesOf(
     uint256 _id,
     address _player,
-    uint8 _index
+    uint _index
   ) external view override returns (uint256) {
     return _tokenAttributes[_id][_player][_index];
   }
 
-  function authorizePlayer(uint256 _id, address _player) external override {
+  function initializeAttributesFor(uint256 _id, address _player) external override {
     require(ownerOf(_id) == _msgSender(), "Not the owner");
     require(_tokenAttributes[_id][_player][0] == 0, "Player already authorized");
     _tokenAttributes[_id][_player][0] = 1;
+    emit AttributesInitializedFor(_id, _player);
   }
 
   function updateAttributes(
     uint256 _id,
-    uint8 _index,
+    uint _index,
     uint256 _attributes
   ) external override {
     require(_tokenAttributes[_id][_msgSender()][0] != 0, "Player not authorized");

@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721-0-3-0/contracts/Wormhole721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@ndujalabs/attributable/contracts/IAttributable.sol";
+import "attributable-1/contracts/IAttributable.sol";
 
 import "./interfaces/IStakingPool.sol";
 import "./interfaces/ILockable.sol";
@@ -196,6 +196,7 @@ contract Everdragons2GenesisV3 is ILockable, IAttributable,
     require(ownerOf(_id) == _msgSender(), "Not the owner");
     require(_tokenAttributes[_id][_player][0] == 0, "Player already authorized");
     _tokenAttributes[_id][_player][0] = 1;
+    emit AttributesInitializedFor(_id, _player);
   }
 
   function updateAttributes(

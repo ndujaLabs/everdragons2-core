@@ -13,13 +13,13 @@ const {
   getTimestamp,
   increaseBlockTimestampBy
 } = require('./helpers')
-const whitelist = require('./fixtures/whitelist.json');
 
 describe("Everdragons2GenesisV3", async function () {
 
   let Everdragons2Genesis
   let Everdragons2GenesisV2
   let Everdragons2GenesisV3
+  let Everdragons2GenesisV4
   let everdragons2Genesis
   let StakingPool
   let pool
@@ -34,6 +34,7 @@ describe("Everdragons2GenesisV3", async function () {
     Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
     Everdragons2GenesisV2 = await ethers.getContractFactory("Everdragons2GenesisV2")
     Everdragons2GenesisV3 = await ethers.getContractFactory("Everdragons2GenesisV3")
+    Everdragons2GenesisV4 = await ethers.getContractFactory("Everdragons2GenesisV4")
     GenesisFarm = await ethers.getContractFactory("GenesisFarm")
     StakingPool = await ethers.getContractFactory("StakingPoolMockV3")
     initEthers(ethers)
@@ -121,6 +122,15 @@ describe("Everdragons2GenesisV3", async function () {
       await pool.connect(buyer2).unstakeEvd2(14)
       await everdragons2Genesis.connect(buyer2).approve(openSea.address, 14)
       expect(await everdragons2Genesis.getApproved(14)).equal(openSea.address)
+
+      // upgrading to V4
+
+      upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV4);
+      await upgraded.deployed();
+      //
+      expect(everdragons2Genesis.address).equal(upgraded.address)
+      expect(await everdragons2Genesis.ownerOf(12)).equal(buyer2.address)
+
 
     })
 
