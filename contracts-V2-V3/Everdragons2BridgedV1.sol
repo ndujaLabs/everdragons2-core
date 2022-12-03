@@ -15,11 +15,14 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@ndujalabs/attributable/contracts/IAttributable.sol";
 
 import "./interfaces/IStakingPool.sol";
+
 import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2V1 is ILockable, IAttributable,
+contract Everdragons2BridgedV1 is
+  ILockable,
+  IAttributable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
@@ -28,11 +31,8 @@ contract Everdragons2V1 is ILockable, IAttributable,
 {
   using AddressUpgradeable for address;
 
-  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
-
-  address public manager;
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
@@ -74,10 +74,6 @@ contract Everdragons2V1 is ILockable, IAttributable,
     return super.supportsInterface(interfaceId);
   }
 
-  function mintEnded() public view virtual returns (bool) {
-    return _mintEnded;
-  }
-
   function _baseURI() internal view virtual override returns (string memory) {
     return _baseTokenURI;
   }
@@ -93,7 +89,7 @@ contract Everdragons2V1 is ILockable, IAttributable,
   }
 
   function contractURI() public view returns (string memory) {
-    return string(abi.encodePacked(_baseTokenURI, "0"));
+    return _baseURI();
   }
 
   // locks

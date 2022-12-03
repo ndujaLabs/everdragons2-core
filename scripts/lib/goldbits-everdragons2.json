@@ -1,0 +1,471 @@
+[
+    {
+        "id": 12,
+        "wallet": "0xcb0158d97d1f8d40d033b8330db808baf6952101",
+        "goldbits": 33400,
+        "totalWins": 11,
+        "totalTweets": 4
+    },
+    {
+        "id": 13,
+        "wallet": "0x34c3c350b25546b013433b24763ce7f4cb8b246e",
+        "goldbits": 28100,
+        "totalWins": 17,
+        "totalTweets": 1
+    },
+    {
+        "id": 14,
+        "wallet": "0xf69fb08572f8bea265b41bfba875abcf2fa16a44",
+        "goldbits": 517100,
+        "totalWins": 63,
+        "totalTweets": 1
+    },
+    {
+        "id": 15,
+        "wallet": "0xcef638dc54dc103e36a1767b0cb29001069942f9",
+        "goldbits": 1700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 16,
+        "wallet": "0xe027582df6156f78176da29a1c7c63b5eabb26c6",
+        "goldbits": 3600,
+        "totalWins": 3,
+        "totalTweets": 0
+    },
+    {
+        "id": 17,
+        "wallet": "0x5213b28f6b3d7705424aba776c23d8cde457ba0d",
+        "goldbits": 1700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 18,
+        "wallet": "0xda817dd48ee0efd57ac5a83cf94e43a9f1613925",
+        "goldbits": 35900,
+        "totalWins": 7,
+        "totalTweets": 0
+    },
+    {
+        "id": 19,
+        "wallet": "0x4cdbcaed05065486890ac801eb62fb2d1eef9301",
+        "goldbits": 1200,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 20,
+        "wallet": "0xf10adeabba8f744b9608916e2378d78eecfc4781",
+        "goldbits": 360200,
+        "totalWins": 106,
+        "totalTweets": 1
+    },
+    {
+        "id": 21,
+        "wallet": "0xac552bf0f5f2c5be9bb9db98c172ab12c734a862",
+        "goldbits": 501400,
+        "totalWins": 77,
+        "totalTweets": 2
+    },
+    {
+        "id": 22,
+        "wallet": "0x18f83af7490c4fb5cd9db2f996d305a1f9994688",
+        "goldbits": 64600,
+        "totalWins": 38,
+        "totalTweets": 0
+    },
+    {
+        "id": 23,
+        "wallet": "0x5129ffc42f1f2ca276ab72229fe70ba67a9a2e55",
+        "goldbits": 24900,
+        "totalWins": 12,
+        "totalTweets": 0
+    },
+    {
+        "id": 24,
+        "wallet": "0xd437592071079b041fa6708d2ff58b99c97015ef",
+        "goldbits": 37800,
+        "totalWins": 14,
+        "totalTweets": 0
+    },
+    {
+        "id": 25,
+        "wallet": "0x666fd64e05da7582dbafb49a81fc6174b5ed7a2f",
+        "goldbits": 1700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 26,
+        "wallet": "0x2e536fb44303658694fc794c7155ee360af51762",
+        "goldbits": 31700,
+        "totalWins": 26,
+        "totalTweets": 1
+    },
+    {
+        "id": 27,
+        "wallet": "0xf7479a7814fcb71179e3eb3b3e3951822cfef0d5",
+        "goldbits": 64300,
+        "totalWins": 29,
+        "totalTweets": 1
+    },
+    {
+        "id": 28,
+        "wallet": "0x8380e9f508dcb06456737f6849e83daddf2f96d2",
+        "goldbits": 70800,
+        "totalWins": 59,
+        "totalTweets": 0
+    },
+    {
+        "id": 29,
+        "wallet": "0xd00880653b98986cba21d275f8467d4a1ba4e500",
+        "goldbits": 45900,
+        "totalWins": 27,
+        "totalTweets": 0
+    },
+    {
+        "id": 30,
+        "wallet": "0xaf7da76924d1c3e445abd6b4eebb4fee474f21b6",
+        "goldbits": 64400,
+        "totalWins": 7,
+        "totalTweets": 0
+    },
+    {
+        "id": 31,
+        "wallet": "0xa437f3075c4563fc7c9a62a78b073380b9b624d1",
+        "goldbits": 67200,
+        "totalWins": 21,
+        "totalTweets": 0
+    },
+    {
+        "id": 32,
+        "wallet": "0x88c36aac04487c1cb8e998cb76f6dd9cf10854b9",
+        "goldbits": 20100,
+        "totalWins": 3,
+        "totalTweets": 0
+    },
+    {
+        "id": 33,
+        "wallet": "0xc6f678cac5444fb4b346dece54e882db99251282",
+        "goldbits": 18500,
+        "totalWins": 5,
+        "totalTweets": 0
+    },
+    {
+        "id": 34,
+        "wallet": "0x38671f9a37bd37ea52ad63182d3ff6a64e2692d6",
+        "goldbits": 2700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 35,
+        "wallet": "0x828fc8813e87515830a7fb87079b910a25c1c571",
+        "goldbits": 232000,
+        "totalWins": 35,
+        "totalTweets": 1
+    },
+    {
+        "id": 36,
+        "wallet": "0x747600d74234c729c731587563b6c9ca2f4fc747",
+        "goldbits": 169900,
+        "totalWins": 77,
+        "totalTweets": 1
+    },
+    {
+        "id": 37,
+        "wallet": "0xee75c15d510aa873850ac752de1b149249ea45e9",
+        "goldbits": 22400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 38,
+        "wallet": "0xd7fc32e69a361ce58dcb70b8b33633c0037dd96a",
+        "goldbits": 48600,
+        "totalWins": 18,
+        "totalTweets": 0
+    },
+    {
+        "id": 39,
+        "wallet": "0x03aca8ad0bb87eb40b6bfdedae858005c2682c0f",
+        "goldbits": 60300,
+        "totalWins": 19,
+        "totalTweets": 0
+    },
+    {
+        "id": 40,
+        "wallet": "0x37e90297c0f5bb64123dbf6566c1289edef5cdd2",
+        "goldbits": 18700,
+        "totalWins": 11,
+        "totalTweets": 0
+    },
+    {
+        "id": 41,
+        "wallet": "0xbad415900333a9fabcb06631cd78e594a074d1d7",
+        "goldbits": 7200,
+        "totalWins": 6,
+        "totalTweets": 0
+    },
+    {
+        "id": 42,
+        "wallet": "0x0dc5d86869dd7f0c36233f7634d627e7abca872f",
+        "goldbits": 11900,
+        "totalWins": 7,
+        "totalTweets": 0
+    },
+    {
+        "id": 43,
+        "wallet": "0x50885bcebd5d5ad11279b6aeea1d1274d0d7dc64",
+        "goldbits": 3400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 44,
+        "wallet": "0x285b80824aa190f9c73ac32b6a2cc006d9ce9dc7",
+        "goldbits": 42300,
+        "totalWins": 9,
+        "totalTweets": 0
+    },
+    {
+        "id": 45,
+        "wallet": "0xd16d9cdfd807b97359a02d40b6908485c599005e",
+        "goldbits": 16200,
+        "totalWins": 6,
+        "totalTweets": 0
+    },
+    {
+        "id": 46,
+        "wallet": "0xf83829cd8a5d6d3f762a6d6a2f25bca6d3840017",
+        "goldbits": 38400,
+        "totalWins": 12,
+        "totalTweets": 0
+    },
+    {
+        "id": 47,
+        "wallet": "0xbd5d70f757158ec94a2d9571f5aba69468975046",
+        "goldbits": 2492100,
+        "totalWins": 93,
+        "totalTweets": 2
+    },
+    {
+        "id": 48,
+        "wallet": "0x8a5079df082f1422bb1d44a46b09bbb2a09d6c5e",
+        "goldbits": 15600,
+        "totalWins": 3,
+        "totalTweets": 0
+    },
+    {
+        "id": 49,
+        "wallet": "0x5ea1211bfc0a4c331bc2a1da6a6d54632d5b7988",
+        "goldbits": 3600,
+        "totalWins": 3,
+        "totalTweets": 0
+    },
+    {
+        "id": 50,
+        "wallet": "0x1e09107b261afe12cb64ec29be7ad474c3a57552",
+        "goldbits": 2200,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 51,
+        "wallet": "0x70f41fe744657df9cc5bd317c58d3e7928e22e1b",
+        "goldbits": 3600,
+        "totalWins": 3,
+        "totalTweets": 0
+    },
+    {
+        "id": 52,
+        "wallet": "0x2cb255345940494ecb400704f3ff7b387bf912e9",
+        "goldbits": 12000,
+        "totalWins": 10,
+        "totalTweets": 0
+    },
+    {
+        "id": 53,
+        "wallet": "0x68e0fc72b41b93bdef5b6e9ebde0f84e0f2c045a",
+        "goldbits": 41600,
+        "totalWins": 13,
+        "totalTweets": 1
+    },
+    {
+        "id": 54,
+        "wallet": "0xc7c127028cd330c09c31f18f0cf29d6dd9e8cf0c",
+        "goldbits": 3400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 55,
+        "wallet": "0x284651cd24fcb74da517b21a5e2e5fecc2f664e9",
+        "goldbits": 5400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 56,
+        "wallet": "0x354f034cb0f71c73b9f21a62188a64d85da45a48",
+        "goldbits": 143100,
+        "totalWins": 53,
+        "totalTweets": 0
+    },
+    {
+        "id": 57,
+        "wallet": "0xbfa4c6616eb7682adf99eb5f662d30c751086051",
+        "goldbits": 21600,
+        "totalWins": 8,
+        "totalTweets": 0
+    },
+    {
+        "id": 58,
+        "wallet": "0x5372fed7b55e7c584e7b15f42ace879f25690637",
+        "goldbits": 31200,
+        "totalWins": 26,
+        "totalTweets": 0
+    },
+    {
+        "id": 59,
+        "wallet": "0x92c8d772d2b567329847ce859ba7283ee347bcf3",
+        "goldbits": 2400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 60,
+        "wallet": "0xf8cc60472bbae138fd0ea4a75c5b45c4a339e1f3",
+        "goldbits": 5400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 61,
+        "wallet": "0x5edc2d0d22c5e9d7f6e91102c3e1b43b023132ee",
+        "goldbits": 51000,
+        "totalWins": 30,
+        "totalTweets": 0
+    },
+    {
+        "id": 62,
+        "wallet": "0xbfb1a5e0753f683033357d6e32b869f53b11d55a",
+        "goldbits": 4400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 63,
+        "wallet": "0xce1b4edf69c3e2e7d441859978e21dafc500c036",
+        "goldbits": 48600,
+        "totalWins": 13,
+        "totalTweets": 1
+    },
+    {
+        "id": 64,
+        "wallet": "0x3f3eba74b7a10d52150c76ecf4f34671db3cde43",
+        "goldbits": 23400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 65,
+        "wallet": "0x4eaa53130475db8e89d290ad784a680b96cfd038",
+        "goldbits": 1200,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 66,
+        "wallet": "0x5c3fb2203db9b3f959c5f360960072e959fd0f72",
+        "goldbits": 4400,
+        "totalWins": 2,
+        "totalTweets": 0
+    },
+    {
+        "id": 67,
+        "wallet": "0x76f5771667d147a65307e36762c569d68f094ef3",
+        "goldbits": 1700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 68,
+        "wallet": "0x0495cf6fa13af03a0628b0d272eb8edbdbf9d6f8",
+        "goldbits": 24000,
+        "totalWins": 20,
+        "totalTweets": 0
+    },
+    {
+        "id": 69,
+        "wallet": "0xa36d6f7a9b97866eaa87ea802ed28b4e4aa53500",
+        "goldbits": 2700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 70,
+        "wallet": "0xb299d1c0904691b3ebcb337293bd5ed657036ec1",
+        "goldbits": 1700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 71,
+        "wallet": "0xb8a004cdc2ded3a6fda11bb31be9e415818383a6",
+        "goldbits": 70900,
+        "totalWins": 17,
+        "totalTweets": 0
+    },
+    {
+        "id": 72,
+        "wallet": "0x26349cc1373c1e8a834815e930ad05632c375b27",
+        "goldbits": 35700,
+        "totalWins": 21,
+        "totalTweets": 0
+    },
+    {
+        "id": 74,
+        "wallet": "0x2cf1c668ad1c0cde7644b2d88a1afcc716632097",
+        "goldbits": 8400,
+        "totalWins": 7,
+        "totalTweets": 0
+    },
+    {
+        "id": 75,
+        "wallet": "0x6637c7bfdc61359fc8e9c48c68fecd590cd4d4ff",
+        "goldbits": 27100,
+        "totalWins": 13,
+        "totalTweets": 0
+    },
+    {
+        "id": 76,
+        "wallet": "0xf52e3f7625b56a59f6caa0aead91a1646c983be8",
+        "goldbits": 2700,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 77,
+        "wallet": "0xb6b221851807c21ef8278736885960a99ab768a9",
+        "goldbits": 30300,
+        "totalWins": 14,
+        "totalTweets": 0
+    },
+    {
+        "id": 78,
+        "wallet": "0x5183bb89e37ebbb4fd53a8d760dd3a0aa4d8873a",
+        "goldbits": 1200,
+        "totalWins": 1,
+        "totalTweets": 0
+    },
+    {
+        "id": 79,
+        "wallet": "0x07f0c9c847816fddf3a06021c871a9c76477857b",
+        "goldbits": 1200,
+        "totalWins": 1,
+        "totalTweets": 0
+    }
+]

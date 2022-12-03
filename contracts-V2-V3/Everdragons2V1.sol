@@ -19,7 +19,9 @@ import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV3 is ILockable, IAttributable,
+contract Everdragons2V1 is
+  ILockable,
+  IAttributable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,

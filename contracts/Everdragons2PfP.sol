@@ -18,7 +18,14 @@ import "./interfaces/IStakingPool.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgradeable, ERC721EnumerableUpgradeable, Wormhole721Upgradeable {
+contract Everdragons2PfP is
+  Initializable,
+  ILockable,
+  IAttributable,
+  ERC721Upgradeable,
+  ERC721EnumerableUpgradeable,
+  Wormhole721Upgradeable
+{
   using AddressUpgradeable for address;
 
   bool private _mintEnded;
@@ -31,7 +38,7 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
 
-  mapping(uint256 => mapping(address => mapping(uint8 => uint256))) internal _tokenAttributes;
+  mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _tokenAttributes;
 
   modifier onlyPool() {
     require(pools[_msgSender()], "Forbidden");
@@ -72,25 +79,28 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
     override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
-    return interfaceId == type(ILockable).interfaceId || interfaceId == type(IAttributable).interfaceId || super.supportsInterface(interfaceId);
+    return
+      interfaceId == type(ILockable).interfaceId ||
+      interfaceId == type(IAttributable).interfaceId ||
+      super.supportsInterface(interfaceId);
   }
 
   function claim() external {
     require(address(genesisToken) != address(0), "Genesis token not set");
-    for (uint k=0;k<2;k++) {
+    for (uint256 k = 0; k < 2; k++) {
       ERC721EnumerableUpgradeable token = k == 0 ? genesisToken : nonGenesisToken;
       if (address(token) == address(0)) {
         // nonGenesisToken not set yet
         return;
       }
       uint256 balance = token.balanceOf(_msgSender());
-      uint256 k = 0;
+      uint256 j = 0;
       for (uint256 i = 0; i < balance; i++) {
         uint256 tokenId = genesisToken.tokenOfOwnerByIndex(_msgSender(), i) + (k == 1 ? 600 : 0);
         if (!_exists(tokenId)) {
           _safeMint(_msgSender(), tokenId);
-          k++;
-          if (k == 10) {
+          j++;
+          if (j == 10) {
             break;
           }
         }
@@ -207,12 +217,12 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
   function attributesOf(
     uint256 _id,
     address _player,
-    uint8 _index
+    uint256 _index
   ) external view override returns (uint256) {
     return _tokenAttributes[_id][_player][_index];
   }
 
-  function authorizePlayer(uint256 _id, address _player) external override {
+  function initializeAttributesFor(uint256 _id, address _player) external override {
     require(ownerOf(_id) == _msgSender(), "Not the owner");
     require(_tokenAttributes[_id][_player][0] == 0, "Player already authorized");
     _tokenAttributes[_id][_player][0] = 1;
@@ -220,7 +230,7 @@ contract Everdragons2PfP is Initializable, ILockable, IAttributable, ERC721Upgra
 
   function updateAttributes(
     uint256 _id,
-    uint8 _index,
+    uint256 _index,
     uint256 _attributes
   ) external override {
     require(_tokenAttributes[_id][_msgSender()][0] != 0, "Player not authorized");

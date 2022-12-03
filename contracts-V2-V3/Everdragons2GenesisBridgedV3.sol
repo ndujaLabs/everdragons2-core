@@ -20,7 +20,9 @@ import "./interfaces/ILockable.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2BridgedV1 is ILockable, IAttributable,
+contract Everdragons2GenesisBridgedV3 is
+  ILockable,
+  IAttributable,
   Initializable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
@@ -89,7 +91,6 @@ contract Everdragons2BridgedV1 is ILockable, IAttributable,
   function contractURI() public view returns (string memory) {
     return _baseURI();
   }
-
 
   // locks
 
