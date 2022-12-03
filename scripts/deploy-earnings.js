@@ -52,7 +52,7 @@ async function main() {
       expect(saved.goldbits).equal(data[j].goldbits)
     }
   }
-
+  console.log(await earnings.total(), "should be 67 :-)")
   await earnings.freeze()
 
 }

@@ -56,5 +56,8 @@ describe.only("GoldbitsEarnings", async function () {
       await earnings.freeze()
       expect(earnings.save(["0xf4cb8b246e34c3c350b25546b013433b24763ce7"], [extra])).revertedWith("Frozen")
 
+      expect(await earnings.total()).equal(67)
+      expect(await earnings.earners(1)).equal("0x34C3C350b25546b013433B24763cE7F4cB8B246E")
+
     })
 })

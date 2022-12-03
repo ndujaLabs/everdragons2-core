@@ -29,10 +29,15 @@ contract GoldbitsEarnings is Ownable {
     require(!frozen, "Frozen");
     for (uint256 i = 0; i < earner.length; i++) {
       earnings[earner[i]] = Earning({id: data[i].id, goldbits: data[i].goldbits, totalWins: data[i].totalWins, totalTweets: data[i].totalTweets});
+      earners.push(earner[i]);
     }
   }
 
   function freeze() external onlyOwner {
     frozen = true;
+  }
+
+  function total() external view returns(uint) {
+    return earners.length;
   }
 }
