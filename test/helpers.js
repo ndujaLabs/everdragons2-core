@@ -45,17 +45,7 @@ const Helpers = {
 
   normalize(val, n = 18) {
     return ('' + val + '0'.repeat(n))
-  },
-
-  cleanStruct(struct) {
-    let ret = {};
-    for (let key in struct) {
-      if (isNaN(parseInt(key))) {
-        ret[key] = struct[key];
-      }
-    }
-    return ret;
-  },
+  }
 
 }
 
