@@ -26,7 +26,9 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2Genesis")
+  const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2GenesisV2")
+
+  console.log(999)
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const Everdragons2GenesisV3 = await ethers.getContractFactory("Everdragons2GenesisV3")
