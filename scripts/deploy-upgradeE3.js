@@ -12,9 +12,9 @@ async function main() {
   const chainId = await deployUtils.currentChainId()
   let [deployer] = await ethers.getSigners();
 
-  const network = chainId === 137 ? 'matic' : 'localhost'
+  const network = chainId === 137 ? 'matic' : chainId === 44787 ? "alfajores" : 'localhost'
 
-  if (chainId !== 137 && chainId !== 1337) {
+  if (chainId !== 137 && chainId !== 1337 &&  chainId !== 44787) {
     process.exit();
   }
 
@@ -30,8 +30,6 @@ async function main() {
   const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
 
   const Everdragons2GenesisV3 = await ethers.getContractFactory("Everdragons2GenesisV3")
-
-  await upgrades.forceImport(deployed[chainId].Everdragons2Genesis, Everdragons2Genesis);
 
   const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV3);
   await upgraded.deployed();
