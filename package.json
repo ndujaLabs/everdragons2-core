@@ -23,6 +23,7 @@
     "@openzeppelin/hardhat-upgrades": "^1.17.0",
     "@poanet/solidity-flattener": "^3.0.6",
     "chai": "^4.3.4",
+    "cryptoenv": "^0.2.0",
     "dotenv": "^11.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.2",

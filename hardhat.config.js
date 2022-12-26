@@ -4,13 +4,14 @@ require('@openzeppelin/hardhat-upgrades');
 // require("hardhat-gas-reporter");
 const requireOrMock = require('require-or-mock')
 
-let env = requireOrMock('env.js', {
-
-});
+require("dotenv").config();
+require("cryptoenv").parse(() => process.env.NODE_ENV !== "test");
 
 if (process.env.GAS_REPORT === 'yes') {
   require("hardhat-gas-reporter");
 }
+
+const {env} = process;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -49,43 +50,43 @@ module.exports = {
       url: "http://localhost:7545"
     },
     ropsten: {
-      url: `https://ropsten.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKeyTestnet]
+      url: `https://ropsten.infura.io/v3/${env.INFURA_KEY}`,
+      accounts: [env.FOR_TESTNET]
     },
     kovan: {
-      url: `https://kovan.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKeyTestnet]
+      url: `https://kovan.infura.io/v3/${env.INFURA_KEY}`,
+      accounts: [env.FOR_TESTNET]
     },
     ethereum: {
-      url: `https://mainnet.infura.io/v3/${env.infuraApiKey}`,
-      accounts: [env.privateKey]
+      url: `https://mainnet.infura.io/v3/${env.INFURA_KEY}`,
+      accounts: [env.NDUJA]
     },
     bsc_testnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,
-      accounts: [env.privateKeyTestnet]
+      accounts: [env.FOR_TESTNET]
     },
     bsc: {
       url: "https://bsc-dataseed.binance.org",
       chainId: 56,
       gasPrice: 20000000000,
-      accounts: [env.privateKey]
+      accounts: [env.NDUJA]
     },
     mumbai: {
       url: "https://matic-mumbai.chainstacklabs.com",
       chainId: 80001,
       gasPrice: 20000000000,
-      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKeyTestnet]
+      accounts: [env.USEMATICKEY ? env.maticKey : env.FOR_TESTNET]
     },
     matic: {
-      url: `https://polygon-mainnet.infura.io/v3/${env.infuraApiKey}`,
+      url: `https://polygon-mainnet.infura.io/v3/${env.INFURA_KEY}`,
       chainId: 137,
-      accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKey]
+      accounts: [env.USEMATICKEY ? env.maticKey : env.NDUJA]
     },
     alfajores: {
       url: "https://alfajores-forno.celo-testnet.org",
-      accounts: [process.env.FOR_TESTNET],
+      accounts: [env.FOR_TESTNET],
       chainId: 44787,
     },
   },

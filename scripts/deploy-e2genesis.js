@@ -13,7 +13,7 @@ async function main() {
 
   const network = chainId === 137 ? 'matic'
       : chainId == 80001 ? 'mumbai'
-          : chainId == 42 ? 'kovan'
+          : chainId == 44787 ? 'alfajores'
               : chainId == 3 ? 'ropsten'
           // for now:
           : 'localhost'
