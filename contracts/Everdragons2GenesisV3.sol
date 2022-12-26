@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
+import "../wormhole721/Wormhole721Upgradeable.sol";
 import "@ndujalabs/attributable/contracts/IAttributable.sol";
 import "@ndujalabs/lockable/contracts/ILockable.sol";
 
