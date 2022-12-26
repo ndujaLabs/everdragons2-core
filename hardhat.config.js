@@ -83,6 +83,11 @@ module.exports = {
       chainId: 137,
       accounts: [process.env.USEMATICKEY ? env.maticKey : env.privateKey]
     },
+    alfajores: {
+      url: "https://alfajores-forno.celo-testnet.org",
+      accounts: [process.env.FOR_TESTNET],
+      chainId: 44787,
+    },
   },
   etherscan: {
     // apiKey: env.etherscanKey
