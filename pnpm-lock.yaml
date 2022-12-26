@@ -1,7 +1,9 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@ndujalabs/attributable': ^0.0.4
   '@ndujalabs/erc721playable': ^0.3.0
+  '@ndujalabs/lockable': ^0.0.4
   '@ndujalabs/wormhole721': 0.3.0
   '@nomiclabs/hardhat-ethers': ^2.0.3
   '@nomiclabs/hardhat-etherscan': ^2.1.8
@@ -28,7 +30,9 @@ specifiers:
   solhint: ^3.3.6
 
 devDependencies:
+  '@ndujalabs/attributable': 0.0.4
   '@ndujalabs/erc721playable': 0.3.0
+  '@ndujalabs/lockable': 0.0.4
   '@ndujalabs/wormhole721': 0.3.0
   '@nomiclabs/hardhat-ethers': 2.0.4_ethers@5.5.4+hardhat@2.8.3
   '@nomiclabs/hardhat-etherscan': 2.1.8_hardhat@2.8.3
@@ -111,7 +115,7 @@ packages:
     dependencies:
       '@resolver-engine/imports': 0.3.3
       '@resolver-engine/imports-fs': 0.3.3
-      '@typechain/ethers-v5': 2.0.0_typechain@3.0.0
+      '@typechain/ethers-v5': 2.0.0_reth2rithpeda6nuq3n7irbdfu
       '@types/mkdirp': 0.5.2
       '@types/node-fetch': 2.5.12
       ethers: 5.5.4
@@ -565,8 +569,16 @@ packages:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}
     dev: true
 
+  /@ndujalabs/attributable/0.0.4:
+    resolution: {integrity: sha512-XsRV36KGIc9e9XVSGoaxHsKRoS7RIyS4WD31Srv0hA9G5ocMgZO3kTUodcUOfoL/oGHaJuv2ks24ByC/Rpmfmg==}
+    dev: true
+
   /@ndujalabs/erc721playable/0.3.0:
     resolution: {integrity: sha512-b1//uNv/lhBqlu6hZXMnNTmMVqdf85I+c2e+/mpQEAgu7crGvoh6JbJQtlcrbO9zZ55OvlQAXaMexzGbpBiCDQ==}
+    dev: true
+
+  /@ndujalabs/lockable/0.0.4:
+    resolution: {integrity: sha512-pRHgKJk3Qy6PsN5SSFV8lYfmJPES7fcVW50Gaooezd8/JFP6aSfuMyQSmWSK4Qe0NcKHB7xeOqxA9Iv4gZFZOw==}
     dev: true
 
   /@ndujalabs/wormhole721/0.3.0:
@@ -843,16 +855,14 @@ packages:
     dev: true
     optional: true
 
-  /@typechain/ethers-v5/2.0.0_typechain@3.0.0:
+  /@typechain/ethers-v5/2.0.0_reth2rithpeda6nuq3n7irbdfu:
     resolution: {integrity: sha512-0xdCkyGOzdqh4h5JSf+zoWx85IusEjDcPIwNEHP8mrWSnCae4rvrqB+/gtpdNfX7zjlFlZiMeePn2r63EI3Lrw==}
     peerDependencies:
+      ethers: ^5.0.0
       typechain: ^3.0.0
     dependencies:
       ethers: 5.5.4
       typechain: 3.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
     dev: true
 
   /@types/abstract-leveldown/7.2.0:
@@ -6589,7 +6599,7 @@ packages:
     dev: true
 
   /mv/2.1.1:
-    resolution: {integrity: sha1-rmzg1vbV4KT32JN5jQPB6pVZtqI=}
+    resolution: {integrity: sha512-at/ZndSy3xEGJ8i0ygALh8ru9qy7gWW1cmkaqBN29JmMlIvM//MEO9y1sk/avxuwnPcfhkejkLsuPxH81BrkSg==}
     engines: {node: '>=0.8.0'}
     requiresBuild: true
     dependencies:

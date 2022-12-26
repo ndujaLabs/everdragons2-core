@@ -5,29 +5,24 @@ pragma solidity 0.8.11;
 //          Emanuele Cesena <emanuele@ndujalabs.com>
 // Everdragons2, https://everdragons2.com
 
-import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/wormhole721/contracts/Wormhole721Upgradeable.sol";
 
-import "../interfaces/IStakingPool.sol";
+import "./interfaces/IStakingPool.sol";
 
 //import "hardhat/console.sol";
 
-contract Everdragons2GenesisV2Mumbai is
+contract Everdragons2GenesisBridgedV3 is
   Initializable,
   ERC721Upgradeable,
-  ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-  bool private _mintEnded;
   bool private _baseTokenURIFrozen;
   string private _baseTokenURI;
-
-  address public manager;
 
   mapping(address => bool) public pools;
   mapping(uint256 => address) public staked;
@@ -53,34 +48,17 @@ contract Everdragons2GenesisV2Mumbai is
     address from,
     address to,
     uint256 tokenId
-  ) internal override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable) {
+  ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
     super._beforeTokenTransfer(from, to, tokenId);
   }
 
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
-  }
-
-  function airdrop(address[] memory recipients, uint256[] memory tokenIDs) external onlyOwner {
-    require(totalSupply() < 1001, "Airdrop completed");
-    require(recipients.length == tokenIDs.length, "Inconsistent lengths");
-    for (uint256 i = 0; i < recipients.length; i++) {
-      require(tokenIDs[i] < 1001, "ID out of range");
-      if (totalSupply() < 1001) {
-        _safeMint(recipients[i], tokenIDs[i]);
-      } else {
-        return;
-      }
-    }
-  }
-
-  function mintEnded() external view returns (bool) {
-    return _mintEnded;
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
@@ -98,7 +76,7 @@ contract Everdragons2GenesisV2Mumbai is
   }
 
   function contractURI() public view returns (string memory) {
-    return string(abi.encodePacked(_baseTokenURI, "0"));
+    return _baseURI();
   }
 
   // stakes
@@ -133,9 +111,8 @@ contract Everdragons2GenesisV2Mumbai is
   }
 
   function stake(uint256 tokenID) external onlyPool {
-    require(totalSupply() == 1000, "Mint not ended, yet");
-    // will revert if token does not exist
-    ownerOf(tokenID);
+    // pool must be approved to mark the token as staked
+    require(getApproved(tokenID) == _msgSender() || isApprovedForAll(ownerOf(tokenID), _msgSender()), "Pool not approved");
     staked[tokenID] = _msgSender();
   }
 
