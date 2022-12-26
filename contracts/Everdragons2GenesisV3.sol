@@ -5,10 +5,10 @@ pragma solidity 0.8.11;
 //          Emanuele Cesena <emanuele@ndujalabs.com>
 // Everdragons2, https://everdragons2.com
 
+import "@ndujalabs/erc721playable/contracts/IERC721Playable.sol";
+import "@ndujalabs/erc721playable/contracts/ERC721PlayableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "../wormhole721/Wormhole721Upgradeable.sol";
@@ -20,24 +20,19 @@ import "./interfaces/IStakingPool.sol";
 //import "hardhat/console.sol";
 
 contract Everdragons2GenesisV3 is
-  Initializable,
-  ERC721Upgradeable,
   ILockable,
   IAttributable,
+  ERC721Upgradeable,
+  ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
 {
-
   using AddressUpgradeable for address;
 
   error NotALocker();
-  error NotTheGame();
-  error AssetDoesNotExist();
-  error AlreadyInitiated();
   error NotTheAssetOwner();
   error PlayerAlreadyAuthorized();
   error PlayerNotAuthorized();
-  error FrozenTokenURI();
   error NotAContract();
   error NotADeactivatedLocker();
   error WrongLocker();
@@ -45,6 +40,7 @@ contract Everdragons2GenesisV3 is
   error LockedAsset();
   error AtLeastOneLockedAsset();
   error LockerNotApproved();
+  error BaseTokenUriHasBeenFrozen();
 
   bool private _mintEnded;
   bool private _baseTokenURIFrozen;
@@ -82,7 +78,7 @@ contract Everdragons2GenesisV3 is
     address from,
     address to,
     uint256 tokenId
-  ) internal override(ERC721Upgradeable,  ERC721EnumerableUpgradeable) {
+  ) internal override(ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable) {
     if (isLocked(tokenId)) {
       revert LockedAsset();
     }
@@ -92,14 +88,14 @@ contract Everdragons2GenesisV3 is
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(Wormhole721Upgradeable, ERC721Upgradeable,  ERC721EnumerableUpgradeable)
+    override(Wormhole721Upgradeable, ERC721Upgradeable, ERC721PlayableUpgradeable, ERC721EnumerableUpgradeable)
     returns (bool)
   {
-    return interfaceId == type(IAttributable).interfaceId || interfaceId == type(ILockable).interfaceId || super.supportsInterface(interfaceId);
-  }
-
-  function mintEnded() public view virtual returns (bool) {
-    return _mintEnded;
+    if (type(IERC721Playable).interfaceId == interfaceId) return false;
+    return
+      interfaceId == type(IAttributable).interfaceId ||
+      interfaceId == type(ILockable).interfaceId ||
+      super.supportsInterface(interfaceId);
   }
 
   function _baseURI() internal view virtual override returns (string memory) {
@@ -107,7 +103,7 @@ contract Everdragons2GenesisV3 is
   }
 
   function updateTokenURI(string memory uri) external onlyOwner {
-    require(!_baseTokenURIFrozen, "baseTokenUri has been frozen");
+    if (_baseTokenURIFrozen) revert BaseTokenUriHasBeenFrozen();
     // after revealing, this allows to set up a final uri
     _baseTokenURI = uri;
   }
@@ -237,33 +233,28 @@ contract Everdragons2GenesisV3 is
   // NFT cannot be transferred. Overriding the approval functions, following
   // OpenZeppelin best practices, avoid the user to spend useless gas.
 
-  function approve(address to, uint256 tokenId) public override( ERC721Upgradeable) {
+  function approve(address to, uint256 tokenId) public override(ERC721Upgradeable) {
     if (isLocked(tokenId)) {
       revert LockedAsset();
     }
     super.approve(to, tokenId);
   }
 
-  function getApproved(uint256 tokenId) public view override( ERC721Upgradeable) returns (address) {
+  function getApproved(uint256 tokenId) public view override(ERC721Upgradeable) returns (address) {
     if (isLocked(tokenId)) {
       return address(0);
     }
     return super.getApproved(tokenId);
   }
 
-  function setApprovalForAll(address operator, bool approved) public override( ERC721Upgradeable) {
+  function setApprovalForAll(address operator, bool approved) public override(ERC721Upgradeable) {
     if (approved && hasLocks(_msgSender())) {
       revert AtLeastOneLockedAsset();
     }
     super.setApprovalForAll(operator, approved);
   }
 
-  function isApprovedForAll(address owner, address operator)
-  public
-  view
-  override( ERC721Upgradeable)
-  returns (bool)
-  {
+  function isApprovedForAll(address owner, address operator) public view override(ERC721Upgradeable) returns (bool) {
     if (hasLocks(owner)) {
       return false;
     }
