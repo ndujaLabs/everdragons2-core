@@ -13,9 +13,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ndujalabs/attributable": "^0.0.4",
+    "@ndujalabs/erc721attributable": "^0.1.0",
+    "@ndujalabs/erc721lockable": "^0.1.2",
     "@ndujalabs/erc721playable": "^0.3.0",
-    "@ndujalabs/lockable": "^0.0.4",
     "@ndujalabs/wormhole-tunnel": "^0.4.1",
     "@ndujalabs/wormhole721": "0.5.4",
     "@nomiclabs/hardhat-ethers": "^2.0.3",

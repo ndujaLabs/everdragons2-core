@@ -1,9 +1,9 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@ndujalabs/attributable': ^0.0.4
+  '@ndujalabs/erc721attributable': ^0.1.0
+  '@ndujalabs/erc721lockable': ^0.1.2
   '@ndujalabs/erc721playable': ^0.3.0
-  '@ndujalabs/lockable': ^0.0.4
   '@ndujalabs/wormhole-tunnel': ^0.4.1
   '@ndujalabs/wormhole721': 0.5.4
   '@nomiclabs/hardhat-ethers': ^2.0.3
@@ -32,9 +32,9 @@ specifiers:
   solhint: ^3.3.6
 
 devDependencies:
-  '@ndujalabs/attributable': 0.0.4
+  '@ndujalabs/erc721attributable': 0.1.0
+  '@ndujalabs/erc721lockable': 0.1.2
   '@ndujalabs/erc721playable': 0.3.0
-  '@ndujalabs/lockable': 0.0.4
   '@ndujalabs/wormhole-tunnel': 0.4.1
   '@ndujalabs/wormhole721': 0.5.4
   '@nomiclabs/hardhat-ethers': 2.0.4_ethers@5.5.4+hardhat@2.8.3
@@ -573,16 +573,16 @@ packages:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}
     dev: true
 
-  /@ndujalabs/attributable/0.0.4:
-    resolution: {integrity: sha512-XsRV36KGIc9e9XVSGoaxHsKRoS7RIyS4WD31Srv0hA9G5ocMgZO3kTUodcUOfoL/oGHaJuv2ks24ByC/Rpmfmg==}
+  /@ndujalabs/erc721attributable/0.1.0:
+    resolution: {integrity: sha512-81FZ/rj4OrSQWu+uPLMYMsyxTlIgOem/9A3dIpk2ZqyUdKmeK6ZJN88SxNoEjEE/Fk1Z8wBKQy6L/b6ld6+X3A==}
+    dev: true
+
+  /@ndujalabs/erc721lockable/0.1.2:
+    resolution: {integrity: sha512-a1Z0e5Clz9BEchmWZM0QQVsHBeI2smnSloSUnqqZj3XuUkwiYnPeP5YsKbiC3kf3IPGwt7cz/tiQ0F1YKPyLPw==}
     dev: true
 
   /@ndujalabs/erc721playable/0.3.0:
     resolution: {integrity: sha512-b1//uNv/lhBqlu6hZXMnNTmMVqdf85I+c2e+/mpQEAgu7crGvoh6JbJQtlcrbO9zZ55OvlQAXaMexzGbpBiCDQ==}
-    dev: true
-
-  /@ndujalabs/lockable/0.0.4:
-    resolution: {integrity: sha512-pRHgKJk3Qy6PsN5SSFV8lYfmJPES7fcVW50Gaooezd8/JFP6aSfuMyQSmWSK4Qe0NcKHB7xeOqxA9Iv4gZFZOw==}
     dev: true
 
   /@ndujalabs/wormhole-tunnel/0.4.1:
