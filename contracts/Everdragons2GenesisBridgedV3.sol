@@ -16,10 +16,12 @@ import "@ndujalabs/erc721attributable/contracts/IERC721Attributable.sol";
 import "@ndujalabs/erc721lockable/contracts/IERC721Lockable.sol";
 
 import "./interfaces/IStakingPool.sol";
+import "./Version.sol";
 
 //import "hardhat/console.sol";
 
 contract Everdragons2GenesisBridgedV3 is
+  Version,
   IERC721Lockable,
   IERC721Attributable,
   ERC721Upgradeable,
