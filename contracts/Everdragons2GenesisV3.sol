@@ -22,10 +22,12 @@ import "./Version.sol";
 
 contract Everdragons2GenesisV3 is
   Version,
+// It cannot extend IERC721Lockable because we used a variables with different names to save the states of the lockings
+// So, it must estend the interface and re-implement the functions
   IERC721Lockable,
   IERC721Attributable,
   ERC721Upgradeable,
-// extending erc721playable is necessary only to keep the upgradeability of the contract
+// Extending erc721playable is necessary to keep the upgradeability of the contract
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
   Wormhole721Upgradeable
