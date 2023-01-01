@@ -1,16 +1,12 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@ndujalabs/attributable': ^0.0.4
-  '@ndujalabs/erc721playable': ^0.3.0
-  '@ndujalabs/lockable': ^0.0.4
-  '@ndujalabs/wormhole-tunnel': ^0.4.1
-  '@ndujalabs/wormhole721': 0.5.4
+  '@ndujalabs/erc721subordinate': ^0.0.3
   '@nomiclabs/hardhat-ethers': ^2.0.3
   '@nomiclabs/hardhat-etherscan': ^2.1.8
   '@nomiclabs/hardhat-waffle': ^2.0.1
-  '@openzeppelin/contracts': 4.5.0
-  '@openzeppelin/contracts-upgradeable': 4.5.0
+  '@openzeppelin/contracts': ^4.8.0
+  '@openzeppelin/contracts-upgradeable': 4.8.0
   '@openzeppelin/hardhat-upgrades': ^1.17.0
   '@poanet/solidity-flattener': ^3.0.6
   chai: ^4.3.4
@@ -32,16 +28,12 @@ specifiers:
   solhint: ^3.3.6
 
 devDependencies:
-  '@ndujalabs/attributable': 0.0.4
-  '@ndujalabs/erc721playable': 0.3.0
-  '@ndujalabs/lockable': 0.0.4
-  '@ndujalabs/wormhole-tunnel': 0.4.1
-  '@ndujalabs/wormhole721': 0.5.4
+  '@ndujalabs/erc721subordinate': 0.0.3
   '@nomiclabs/hardhat-ethers': 2.0.4_ethers@5.5.4+hardhat@2.8.3
   '@nomiclabs/hardhat-etherscan': 2.1.8_hardhat@2.8.3
   '@nomiclabs/hardhat-waffle': 2.0.2_6oy2mnnnyf6xpql55mxsdlbst4
-  '@openzeppelin/contracts': 4.5.0
-  '@openzeppelin/contracts-upgradeable': 4.5.0
+  '@openzeppelin/contracts': 4.8.0
+  '@openzeppelin/contracts-upgradeable': 4.8.0
   '@openzeppelin/hardhat-upgrades': 1.17.0_obecqhgvcrl56ghqkup63xikwu
   '@poanet/solidity-flattener': 3.0.6
   chai: 4.3.6
@@ -573,31 +565,8 @@ packages:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}
     dev: true
 
-  /@ndujalabs/attributable/0.0.4:
-    resolution: {integrity: sha512-XsRV36KGIc9e9XVSGoaxHsKRoS7RIyS4WD31Srv0hA9G5ocMgZO3kTUodcUOfoL/oGHaJuv2ks24ByC/Rpmfmg==}
-    dev: true
-
-  /@ndujalabs/erc721playable/0.3.0:
-    resolution: {integrity: sha512-b1//uNv/lhBqlu6hZXMnNTmMVqdf85I+c2e+/mpQEAgu7crGvoh6JbJQtlcrbO9zZ55OvlQAXaMexzGbpBiCDQ==}
-    dev: true
-
-  /@ndujalabs/lockable/0.0.4:
-    resolution: {integrity: sha512-pRHgKJk3Qy6PsN5SSFV8lYfmJPES7fcVW50Gaooezd8/JFP6aSfuMyQSmWSK4Qe0NcKHB7xeOqxA9Iv4gZFZOw==}
-    dev: true
-
-  /@ndujalabs/wormhole-tunnel/0.4.1:
-    resolution: {integrity: sha512-j4G+9ksT6zvr4LiLPt4H7aZtwrb1SUwJrrA9UpInWL5giGZr/7c6OKPl96Smkbypfiy/jPKqOBUPnryDiKf7OQ==}
-    dependencies:
-      '@openzeppelin/contracts': 4.5.0
-      '@openzeppelin/contracts-upgradeable': 4.5.0
-    dev: true
-
-  /@ndujalabs/wormhole721/0.5.4:
-    resolution: {integrity: sha512-xLG8cMi2JiiQELwJYgRB0ER8qQoIL2dLpSzOK+dQnarxzpcbwugurLy3L6mad/sjE9nYOKhoIJaedR6w7S+l7Q==}
-    dependencies:
-      '@ndujalabs/wormhole-tunnel': 0.4.1
-      '@openzeppelin/contracts': 4.5.0
-      '@openzeppelin/contracts-upgradeable': 4.5.0
+  /@ndujalabs/erc721subordinate/0.0.3:
+    resolution: {integrity: sha512-cq8fJG8Uyi4/AXt6H/SJVm58abZGDlLNCmSR3sxyWefIyv9jRNGuinpITgZ73hKLLXIJyVusgJZEnWqo13E23w==}
     dev: true
 
   /@nomiclabs/hardhat-ethers/2.0.4_ethers@5.5.4+hardhat@2.8.3:
@@ -644,12 +613,12 @@ packages:
       hardhat: 2.8.3
     dev: true
 
-  /@openzeppelin/contracts-upgradeable/4.5.0:
-    resolution: {integrity: sha512-5540xxycH2aDFI3e+5Mqd0GDeozkSKSEaNWoM65l90OYxZxOs9YQMqa+b4fR+363BXXSXoC1DTXut2TuqViwPA==}
+  /@openzeppelin/contracts-upgradeable/4.8.0:
+    resolution: {integrity: sha512-5GeFgqMiDlqGT8EdORadp1ntGF0qzWZLmEY7Wbp/yVhN7/B3NNzCxujuI77ktlyG81N3CUZP8cZe3ZAQ/cW10w==}
     dev: true
 
-  /@openzeppelin/contracts/4.5.0:
-    resolution: {integrity: sha512-fdkzKPYMjrRiPK6K4y64e6GzULR7R7RwxSigHS8DDp7aWDeoReqsQI+cxHV1UuhAqX69L1lAaWDxenfP+xiqzA==}
+  /@openzeppelin/contracts/4.8.0:
+    resolution: {integrity: sha512-AGuwhRRL+NaKx73WKRNzeCxOCOCxpaqF+kp8TJ89QzAipSwZy/NoflkWaL9bywXFRhIzXt8j38sfF7KBKCPWLw==}
     dev: true
 
   /@openzeppelin/hardhat-upgrades/1.17.0_obecqhgvcrl56ghqkup63xikwu:
