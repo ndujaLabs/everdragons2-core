@@ -25,7 +25,7 @@ contract Everdragons2PFP is Version, ERC721EnumerableSubordinateUpgradeable, Own
     _baseTokenURI = "https://img.everdragons2.com/e2pfp/";
   }
 
-  function _authorizeUpgrade(address) internal virtual override {
+  function _authorizeUpgrade(address) internal virtual override onlyOwner {
     if (frozen) revert ContractHasBeenFrozen();
   }
 
