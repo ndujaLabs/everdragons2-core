@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ^0.8.9;
 
 // Author: Francesco Sullo, francesco@sullo.co
 // January 1st, 2023
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@ndujalabs/erc721subordinate/contracts/ERC721EnumerableSubordinateUpgradeable.sol";
 import "./Version.sol";
 
-contract Everdragons2PFP is Version, ERC721EnumerableSubordinateUpgradeable, OwnableUpgradeable {
-
+contract Everdragons2PFP is Version, ERC721EnumerableSubordinateUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
   event FrozeContract();
   error ContractHasBeenFrozen();
 
@@ -25,7 +25,7 @@ contract Everdragons2PFP is Version, ERC721EnumerableSubordinateUpgradeable, Own
     _baseTokenURI = "https://img.everdragons2.com/e2pfp/";
   }
 
-  function _authorizeUpgrade(address newImplementation) internal virtual override {
+  function _authorizeUpgrade(address) internal virtual override {
     if (frozen) revert ContractHasBeenFrozen();
   }
 
