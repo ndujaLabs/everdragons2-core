@@ -13,9 +13,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ndujalabs/attributable": "^0.0.4",
+    "@ndujalabs/erc721lockable": "^0.2.0",
     "@ndujalabs/erc721playable": "^0.3.0",
-    "@ndujalabs/lockable": "^0.0.4",
     "@ndujalabs/wormhole-tunnel": "^0.4.1",
     "@ndujalabs/wormhole721": "0.5.4",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
@@ -42,5 +41,8 @@
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "require-or-mock": "^0.2.1",
     "solhint": "^3.3.6"
+  },
+  "dependencies": {
+    "@ndujalabs/erc721attributable": "^0.1.0"
   }
 }

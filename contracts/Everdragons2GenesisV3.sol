@@ -12,16 +12,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "../wormhole721/Wormhole721Upgradeable.sol";
-import "@ndujalabs/attributable/contracts/IAttributable.sol";
-import "@ndujalabs/lockable/contracts/ILockable.sol";
+import "@ndujalabs/erc721attributable/contracts/IERC721Attributable.sol";
+import "@ndujalabs/erc721lockable/contracts/IERC721Lockable.sol";
 
 import "./interfaces/IStakingPool.sol";
 
 //import "hardhat/console.sol";
 
 contract Everdragons2GenesisV3 is
-  ILockable,
-  IAttributable,
+  IERC721Lockable,
+  IERC721Attributable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
@@ -93,8 +93,8 @@ contract Everdragons2GenesisV3 is
   {
     if (type(IERC721Playable).interfaceId == interfaceId) return false;
     return
-      interfaceId == type(IAttributable).interfaceId ||
-      interfaceId == type(ILockable).interfaceId ||
+      interfaceId == type(IERC721Attributable).interfaceId ||
+      interfaceId == type(IERC721Lockable).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 
@@ -150,7 +150,7 @@ contract Everdragons2GenesisV3 is
     _tokenAttributes[_id][_msgSender()][_index] = _attributes;
   }
 
-  // ILockable
+  // IERC721Lockable
   //
   // When a contract is locked, only the locker is approved
   // The advantage of locking an NFT instead of staking is that
