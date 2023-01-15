@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ndujalabs/erc721lockable": "^0.2.0",
+    "@ndujalabs/erc721lockable": "^0.3.0",
     "@ndujalabs/erc721playable": "^0.3.0",
     "@ndujalabs/wormhole-tunnel": "^0.4.1",
     "@ndujalabs/wormhole721": "0.5.4",
