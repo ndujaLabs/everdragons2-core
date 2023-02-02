@@ -214,12 +214,15 @@ contract Everdragons2GenesisV3 is
   }
 
   // emergency function in case a compromised locker is removed
-  function unlockIfRemovedLocker(uint256 tokenId) external override onlyOwner {
+  function unlockIfRemovedLocker(uint256 tokenId) external override {
     if (!locked(tokenId)) {
       revert NotLockedAsset();
     }
     if (_lockers[staked[tokenId]]) {
       revert NotADeactivatedLocker();
+    }
+    if (ownerOf(tokenId) != _msgSender()) {
+      revert NotTheAssetOwner();
     }
     delete staked[tokenId];
     emit ForcefullyUnlocked(tokenId);
