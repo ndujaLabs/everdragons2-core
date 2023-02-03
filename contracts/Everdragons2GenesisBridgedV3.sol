@@ -16,6 +16,7 @@ import "@ndujalabs/erc721attributable/contracts/IERC721Attributable.sol";
 import "@ndujalabs/erc721lockable/contracts/IERC721Lockable.sol";
 
 import "./interfaces/IStakingPool.sol";
+import "../wormhole721/interfaces/IWormholeTunnel.sol";
 
 //import "hardhat/console.sol";
 
@@ -90,7 +91,7 @@ contract Everdragons2GenesisBridgedV3 is
   {
     if (type(IERC721Playable).interfaceId == interfaceId) return false;
     return
-      interfaceId == type(IWormhole721).interfaceId ||
+      interfaceId == type(IWormholeTunnel).interfaceId ||
       interfaceId == type(IERC721Attributable).interfaceId ||
       interfaceId == type(IERC721Lockable).interfaceId ||
       super.supportsInterface(interfaceId);
