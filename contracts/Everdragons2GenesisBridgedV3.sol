@@ -90,6 +90,7 @@ contract Everdragons2GenesisBridgedV3 is
   {
     if (type(IERC721Playable).interfaceId == interfaceId) return false;
     return
+      interfaceId == type(IWormhole721).interfaceId ||
       interfaceId == type(IERC721Attributable).interfaceId ||
       interfaceId == type(IERC721Lockable).interfaceId ||
       super.supportsInterface(interfaceId);
