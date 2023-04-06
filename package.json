@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test",
-    "test:gas": "GAS_REPORT=yes npx hardhat test",
-    "compile": "npx hardhat compile",
-    "size": "npx hardhat size-contracts",
+    "test": "NODE_ENV=test npx hardhat test",
+    "test:gas": "NODE_ENV=test GAS_REPORT=yes npx hardhat test",
+    "compile": "NODE_ENV=test npx hardhat compile",
+    "size": "NODE_ENV=test npx hardhat size-contracts",
     "lint": "prettier --write 'contracts/**/*.sol' && solhint 'contracts/**/*.sol'"
   },
   "author": "",
