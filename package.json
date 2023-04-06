@@ -4,16 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test",
-    "test:gas": "GAS_REPORT=yes npx hardhat test",
-    "compile": "npx hardhat compile",
-    "size": "npx hardhat size-contracts",
+    "test": "NODE_ENV=test npx hardhat test",
+    "test:gas": "NODE_ENV=test GAS_REPORT=yes npx hardhat test",
+    "compile": "NODE_ENV=test npx hardhat compile",
+    "size": "NODE_ENV=test npx hardhat size-contracts",
     "lint": "prettier --write 'contracts/**/*.sol' && solhint 'contracts/**/*.sol'"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ndujalabs/erc721subordinate": "^0.0.3",
+    "@ndujalabs/erc721subordinate": "^0.5.2",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
