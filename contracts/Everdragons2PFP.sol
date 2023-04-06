@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ^0.8.9;
 
 // Author: Francesco Sullo, francesco@sullo.co
 // January 1st, 2023

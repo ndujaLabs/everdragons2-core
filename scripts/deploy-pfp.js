@@ -12,9 +12,12 @@ async function main() {
   const chainId = await deployUtils.currentChainId()
   let [deployer] = await ethers.getSigners();
 
-  const network = chainId === 137 ? 'matic' : chainId === 44787 ? "alfajores" : 'localhost'
-
-  if (chainId !== 137 && chainId !== 1337 &&  chainId !== 44787) {
+  const network = chainId === 137 ? 'matic'
+      : chainId === 80001 ? 'mumbai'
+          : chainId === 44787 ? "alfajores"
+              : chainId === 1337 ? 'localhost'
+                  : undefined;
+  if (!network) {
     process.exit();
   }
 
@@ -26,13 +29,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Everdragons2Genesis = await ethers.getContractFactory("Everdragons2GenesisV3")
-  const everdragons2Genesis = Everdragons2Genesis.attach(deployed[chainId].Everdragons2Genesis)
-
-  const Everdragons2GenesisV3 = await ethers.getContractFactory("Everdragons2GenesisV3")
-
-  const upgraded = await upgrades.upgradeProxy(everdragons2Genesis.address, Everdragons2GenesisV3);
-  await upgraded.deployed();
+  await deployUtils.deployProxy("Everdragons2PFP", deployed[chainId].Everdragons2Genesis);
 
 }
 
