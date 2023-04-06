@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@ndujalabs/erc721attributable': ^0.1.0
   '@ndujalabs/erc721subordinate': ^0.5.2
   '@nomiclabs/hardhat-ethers': ^2.0.3
   '@nomiclabs/hardhat-etherscan': ^2.1.8
@@ -26,6 +27,9 @@ specifiers:
   prettier-plugin-solidity: ^1.0.0-beta.19
   require-or-mock: ^0.2.1
   solhint: ^3.3.6
+
+dependencies:
+  '@ndujalabs/erc721attributable': 0.1.0
 
 devDependencies:
   '@ndujalabs/erc721subordinate': 0.5.2
@@ -564,6 +568,10 @@ packages:
   /@multiformats/base-x/4.0.1:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}
     dev: true
+
+  /@ndujalabs/erc721attributable/0.1.0:
+    resolution: {integrity: sha512-81FZ/rj4OrSQWu+uPLMYMsyxTlIgOem/9A3dIpk2ZqyUdKmeK6ZJN88SxNoEjEE/Fk1Z8wBKQy6L/b6ld6+X3A==}
+    dev: false
 
   /@ndujalabs/erc721subordinate/0.5.2:
     resolution: {integrity: sha512-jn4kmipwgMRVUnr7rjBcpi1uUu1HRI2VbppTDo1Jgw/i3Clvyi6VMloBYexNmHf+mkBoQj5vygFz8ssMHmBGiA==}
