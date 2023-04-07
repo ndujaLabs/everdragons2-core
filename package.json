@@ -15,6 +15,7 @@
   "devDependencies": {
     "@ndujalabs/erc721lockable": "^0.3.0",
     "@ndujalabs/erc721playable": "^0.3.0",
+    "@ndujalabs/erc721subordinate": "^0.6.2",
     "@ndujalabs/wormhole-tunnel": "^0.4.1",
     "@ndujalabs/wormhole721": "0.5.4",
     "@nomiclabs/hardhat-ethers": "^2.0.3",

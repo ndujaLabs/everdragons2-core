@@ -14,6 +14,8 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "../wormhole721/Wormhole721Upgradeable.sol";
 import "@ndujalabs/erc721attributable/contracts/IERC721Attributable.sol";
 import "@ndujalabs/erc721lockable/contracts/IERC721Lockable.sol";
+import "@ndujalabs/erc721subordinate/contracts/upgradeables/interfaces/IERC721DominantUpgradeable.sol";
+import "@ndujalabs/erc721subordinate/contracts/upgradeables/interfaces/IERC721SubordinateUpgradeable.sol";
 
 import "./interfaces/IStakingPool.sol";
 import "../wormhole721/interfaces/IWormholeTunnel.sol";
@@ -23,6 +25,7 @@ import "../wormhole721/interfaces/IWormholeTunnel.sol";
 contract Everdragons2GenesisV3 is
   IERC721Lockable,
   IERC721Attributable,
+  IERC721DominantUpgradeable,
   ERC721Upgradeable,
   ERC721PlayableUpgradeable,
   ERC721EnumerableUpgradeable,
@@ -42,6 +45,8 @@ contract Everdragons2GenesisV3 is
   error AtLeastOneLockedAsset();
   error LockerNotApproved();
   error BaseTokenUriHasBeenFrozen();
+  error NotOwnedByDominant(address subordinate, address dominant);
+  error NotASubordinate(address subordinate);
 
   bool private _mintEnded;
   bool private _baseTokenURIFrozen;
@@ -55,6 +60,9 @@ contract Everdragons2GenesisV3 is
   // added in V3
   mapping(address => bool) private _lockers;
   mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _tokenAttributes;
+
+  uint256 private _nextSubordinateId;
+  mapping(uint256 => address) private _subordinates;
 
   modifier onlyLocker() {
     if (!_lockers[_msgSender()]) {
@@ -83,6 +91,12 @@ contract Everdragons2GenesisV3 is
     if (locked(tokenId)) {
       revert LockedAsset();
     }
+    for (uint256 i = 0; i < _nextSubordinateId; i++) {
+      address subordinate = _subordinates[i];
+      if (subordinate != address(0)) {
+        IERC721SubordinateUpgradeable(subordinate).emitTransfer(from, to, tokenId);
+      }
+    }
     super._beforeTokenTransfer(from, to, tokenId);
   }
 
@@ -97,6 +111,7 @@ contract Everdragons2GenesisV3 is
       interfaceId == type(IWormholeTunnel).interfaceId ||
       interfaceId == type(IERC721Attributable).interfaceId ||
       interfaceId == type(IERC721Lockable).interfaceId ||
+      interfaceId == type(IERC721DominantUpgradeable).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 
@@ -147,9 +162,14 @@ contract Everdragons2GenesisV3 is
     if (_tokenAttributes[_id][_msgSender()][0] == 0) {
       revert PlayerNotAuthorized();
     }
-    // notice that if the playes set the attributes to zero, it de-authorize itself
+    // notice that if the player set the attributes to zero, it de-authorize itself
     // and not more changes will be allowed until the NFT owner authorize it again
     _tokenAttributes[_id][_msgSender()][_index] = _attributes;
+  }
+
+  function pause(bool status) external onlyOwner {
+    if (status) _pause();
+    else _unpause();
   }
 
   // IERC721Lockable
@@ -271,8 +291,23 @@ contract Everdragons2GenesisV3 is
     uint16 recipientChain,
     bytes32 recipient,
     uint32 nonce
-  ) public payable override returns (uint64 sequence) {
+  ) public payable override whenNotPaused returns (uint64 sequence) {
     if (locked(tokenID)) revert LockedAsset();
     return super.wormholeTransfer(tokenID, recipientChain, recipient, nonce);
   }
+
+  function addSubordinate(address subordinate) public virtual {
+    if (ERC721Upgradeable(subordinate).supportsInterface(type(IERC721SubordinateUpgradeable).interfaceId) == false)
+      revert NotASubordinate(subordinate);
+
+    if (IERC721SubordinateUpgradeable(subordinate).dominantToken() != address(this))
+      revert NotOwnedByDominant(subordinate, address(this));
+
+    _subordinates[_nextSubordinateId++] = subordinate;
+  }
+
+  function subordinateTokens(uint256 index) external virtual  view returns (address) {
+    return _subordinates[index];
+  }
+
 }
