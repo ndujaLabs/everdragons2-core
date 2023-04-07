@@ -6,7 +6,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@ndujalabs/erc721subordinate/contracts/ERC721SubordinateUpgradeable.sol";
+import "@ndujalabs/erc721subordinate/contracts/upgradeables/ERC721SubordinateUpgradeable.sol";
 
 contract Everdragons2PFP is OwnableUpgradeable, ERC721SubordinateUpgradeable, UUPSUpgradeable {
 
@@ -51,5 +51,15 @@ contract Everdragons2PFP is OwnableUpgradeable, ERC721SubordinateUpgradeable, UU
     // BE CAREFUL.
     // This makes the contract not upgradeable anymore, and cannot be reverted.
     frozen = true;
+  }
+
+  // anyone can call this function to emit the initial transfer events
+  function emitInitialTransfers(uint fromId, uint toId) external {
+    for (uint i = fromId; i <= toId; i++) {
+      try this.emitInitialTransfer(i) {
+      } catch {
+        // we ignore the error
+      }
+    }
   }
 }

@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@ethersproject/contracts': ^5.7.0
   '@ndujalabs/erc721attributable': ^0.1.0
-  '@ndujalabs/erc721subordinate': ^0.5.2
+  '@ndujalabs/erc721subordinate': ^0.6.2
   '@nomiclabs/hardhat-ethers': ^2.0.3
   '@nomiclabs/hardhat-etherscan': ^2.1.8
   '@nomiclabs/hardhat-waffle': ^2.0.1
@@ -35,7 +35,7 @@ dependencies:
 
 devDependencies:
   '@ethersproject/contracts': 5.7.0
-  '@ndujalabs/erc721subordinate': 0.5.2
+  '@ndujalabs/erc721subordinate': 0.6.2
   '@nomiclabs/hardhat-ethers': 2.0.4_ethers@5.5.4+hardhat@2.8.3
   '@nomiclabs/hardhat-etherscan': 2.1.8_hardhat@2.8.3
   '@nomiclabs/hardhat-waffle': 2.0.2_6oy2mnnnyf6xpql55mxsdlbst4
@@ -751,8 +751,8 @@ packages:
     resolution: {integrity: sha512-81FZ/rj4OrSQWu+uPLMYMsyxTlIgOem/9A3dIpk2ZqyUdKmeK6ZJN88SxNoEjEE/Fk1Z8wBKQy6L/b6ld6+X3A==}
     dev: false
 
-  /@ndujalabs/erc721subordinate/0.5.2:
-    resolution: {integrity: sha512-jn4kmipwgMRVUnr7rjBcpi1uUu1HRI2VbppTDo1Jgw/i3Clvyi6VMloBYexNmHf+mkBoQj5vygFz8ssMHmBGiA==}
+  /@ndujalabs/erc721subordinate/0.6.2:
+    resolution: {integrity: sha512-g9dylKYyS4lHrJ6EXOY6mvr+IKH0T5KBXJCWYaxtlneZME5BMSEVp3uy+/pD63zsYzBgegnueT4BPJJSCTb+KA==}
     dev: true
 
   /@nomiclabs/hardhat-ethers/2.0.4_ethers@5.5.4+hardhat@2.8.3:

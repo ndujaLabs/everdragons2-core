@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@ndujalabs/erc721subordinate": "^0.5.2",
+    "@ndujalabs/erc721subordinate": "^0.6.2",
     "@ethersproject/contracts": "^5.7.0",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
